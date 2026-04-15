@@ -1,0 +1,482 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraction Adventure!</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --secondary: #FF9800;
+            --background: #E8F5E9;
+            --text: #333;
+            --board-bg: #81C784;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--secondary);
+            text-shadow: 2px 2px 0px #fff;
+            margin-bottom: 5px;
+        }
+
+        /* Tablero de juego adaptado para 20 pasos */
+        .board-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 15px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .board {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .step {
+            width: 45px;
+            height: 45px;
+            background-color: var(--board-bg);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+            border: 3px solid #388E3C;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .step.active {
+            background-color: #2196F3;
+            border-color: #1565C0;
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+        }
+
+        .step.finish { background-color: #FFD700; border-color: #F57F17; }
+        
+        .player-icon {
+            font-size: 25px;
+            position: absolute;
+            top: -15px;
+            left: 5px;
+        }
+
+        /* Área de preguntas */
+        .question-area {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .level-indicator {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .fraction-display {
+            font-size: 40px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .fraction-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .whole-number {
+            font-size: 45px;
+            font-weight: bold;
+        }
+
+        .fraction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 30px;
+        }
+
+        .numerator { border-bottom: 3px solid var(--text); padding: 0 5px; }
+        .denominator { padding: 0 5px; }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button.option-btn {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px;
+            min-height: 80px;
+            font-size: 22px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 0 4px 0 #1976D2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        button.option-btn:hover { background-color: #1E88E5; transform: translateY(2px); box-shadow: 0 2px 0 #1976D2; }
+        button.option-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        /* Feedback */
+        #feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 18px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .correct { background-color: #C8E6C9; color: #2E7D32; }
+        .incorrect { background-color: #FFCDD2; color: #C62828; }
+
+        .btn-next {
+            margin-top: 15px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+        }
+        
+        #victory { display: none; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Fraction Adventure! 🚀</h1>
+    <p>Solve the math problems to move forward. Reach the goal (20 points)!</p>
+
+    <div class="board-container">
+        <div class="board" id="board">
+            <!-- Tablero generado por JS -->
+        </div>
+    </div>
+
+    <div class="question-area" id="game-area">
+        <div class="level-indicator" id="level-indicator">Level 1: Same Denominator</div>
+        <div class="fraction-display" id="question-container">
+            <!-- Fracción generada por JS -->
+        </div>
+        
+        <div class="options" id="options">
+            <!-- Opciones generadas por JS -->
+        </div>
+
+        <div id="feedback"></div>
+        <button class="btn-next" id="btn-next" onclick="nextTurn()">Next Question ➡️</button>
+    </div>
+
+    <div id="victory" class="question-area">
+        <h2>Congratulations! 🎉</h2>
+        <p>You have mastered adding and subtracting fractions!</p>
+        <div style="font-size: 80px;">🏆</div>
+        <button class="btn-next" style="display:inline-block;" onclick="location.reload()">Play Again</button>
+    </div>
+
+    <script>
+        const totalSteps = 20;
+        let currentStep = 0;
+        let currentAnswer = null;
+        let isAnswered = false;
+
+        // Construir tablero
+        const boardEl = document.getElementById('board');
+        for (let i = 0; i <= totalSteps; i++) {
+            const step = document.createElement('div');
+            step.className = `step ${i === totalSteps ? 'finish' : ''}`;
+            step.id = `step-${i}`;
+            step.innerText = i === 0 ? 'Start' : (i === totalSteps ? 'Goal' : i);
+            boardEl.appendChild(step);
+        }
+
+        // Utilidades matemáticas
+        function mcd(a, b) { return b === 0 ? a : mcd(b, a % b); }
+        function mcm(a, b) { return (a * b) / mcd(a, b); }
+
+        // Simplificar y convertir a mixto si es necesario para mostrar
+        function simplify(n, d) {
+            if (n === 0) return { w: 0, n: 0, d: 1 };
+            const divisor = mcd(Math.abs(n), Math.abs(d));
+            let sn = n / divisor;
+            let sd = d / divisor;
+            let w = 0;
+            
+            if (sn >= sd) {
+                w = Math.floor(sn / sd);
+                sn = sn % sd;
+            }
+            return { w, n: sn, d: sd };
+        }
+
+        // Convertir mixto a impropia
+        function toImproper(w, n, d) {
+            return (w * d) + n;
+        }
+
+        // Generar HTML de fracción
+        function formatFractionHTML(w, n, d) {
+            let html = '<div class="fraction-wrapper">';
+            if (w > 0) {
+                html += `<span class="whole-number">${w}</span>`;
+            }
+            if (n > 0 || (w === 0 && n === 0)) {
+                if (d === 1 || n === 0) {
+                    html += `<span style="font-size:40px">${n}</span>`;
+                } else {
+                    html += `
+                        <div class="fraction">
+                            <span class="numerator">${n}</span>
+                            <span class="denominator">${d}</span>
+                        </div>
+                    `;
+                }
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function updateBoard() {
+            document.querySelectorAll('.step').forEach(el => {
+                el.classList.remove('active');
+                const icon = el.querySelector('.player-icon');
+                if (icon) icon.remove();
+            });
+            const currentEl = document.getElementById(`step-${currentStep}`);
+            currentEl.classList.add('active');
+            currentEl.innerHTML += '<div class="player-icon">🚀</div>';
+        }
+
+        // Generar preguntas
+        function generateQuestion() {
+            isAnswered = false;
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('options').innerHTML = '';
+
+            let w1=0, n1, d1, w2=0, n2, d2, operator;
+            const isAddition = Math.random() > 0.4; // Ligeramente más sumas
+            operator = isAddition ? '+' : '-';
+
+            // DIFICULTAD SEGÚN POSICIÓN (20 Puntos)
+            if (currentStep < 5) {
+                document.getElementById('level-indicator').innerText = "Level 1: Same Denominator";
+                d1 = Math.floor(Math.random() * 8) + 3; 
+                d2 = d1;
+                n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
+                n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
+                if (!isAddition && n1 < n2) [n1, n2] = [n2, n1];
+            } else if (currentStep < 12) {
+                document.getElementById('level-indicator').innerText = "Level 2: Different Denominators";
+                const denoms = [2, 3, 4, 5, 6, 8, 10];
+                d1 = denoms[Math.floor(Math.random() * denoms.length)];
+                d2 = denoms[Math.floor(Math.random() * denoms.length)];
+                while (d1 === d2) d2 = denoms[Math.floor(Math.random() * denoms.length)];
+                n1 = Math.floor(Math.random() * d1) + 1;
+                n2 = Math.floor(Math.random() * d2) + 1;
+                
+                // Asegurar resta positiva
+                if (!isAddition && (n1/d1) < (n2/d2)) {
+                    [n1, n2] = [n2, n1]; [d1, d2] = [d2, d1];
+                }
+            } else {
+                document.getElementById('level-indicator').innerText = "Level 3: Mixed Numbers";
+                d1 = Math.floor(Math.random() * 4) + 2;
+                d2 = Math.floor(Math.random() * 4) + 2;
+                n1 = Math.floor(Math.random() * d1) + 1;
+                n2 = Math.floor(Math.random() * d2) + 1;
+                w1 = Math.floor(Math.random() * 3) + 1; // Entero de 1 a 3
+                w2 = Math.floor(Math.random() * 2) + 1;
+                
+                let val1 = w1 + (n1/d1);
+                let val2 = w2 + (n2/d2);
+                if (!isAddition && val1 < val2) {
+                    [w1, w2] = [w2, w1]; [n1, n2] = [n2, n1]; [d1, d2] = [d2, d1];
+                }
+            }
+
+            // Fracciones impropias para calcular la respuesta real
+            const impN1 = toImproper(w1, n1, d1);
+            const impN2 = toImproper(w2, n2, d2);
+            
+            const comunDenom = mcm(d1, d2);
+            const eqN1 = impN1 * (comunDenom / d1);
+            const eqN2 = impN2 * (comunDenom / d2);
+
+            let resN = isAddition ? (eqN1 + eqN2) : (eqN1 - eqN2);
+            let resD = comunDenom;
+            
+            const realAnswer = simplify(resN, resD);
+            currentAnswer = { ...realAnswer, type: 'correct' };
+
+            // Mostrar pregunta
+            const questionHTML = `
+                ${formatFractionHTML(w1, n1, d1)}
+                <span>${operator}</span>
+                ${formatFractionHTML(w2, n2, d2)}
+                <span>=</span>
+                <span style="font-size: 40px;">?</span>
+            `;
+            document.getElementById('question-container').innerHTML = questionHTML;
+
+            // Generar distractores con errores tipificados
+            let options = [currentAnswer];
+            
+            // Error 1: Sumar/restar hacia el lado (numerador con numerador, denominador con denominador)
+            let err1N = isAddition ? (impN1 + impN2) : Math.abs(impN1 - impN2);
+            let err1D = isAddition ? (d1 + d2) : Math.abs(d1 - d2);
+            if (err1D === 0) err1D = d1;
+            options.push({ ...simplify(err1N, err1D), type: 'error_across' });
+
+            // Error 2: Mal cálculo del numerador manteniendo el común múltiplo
+            options.push({ ...simplify(resN + (Math.floor(Math.random()*3)+1), resD), type: 'error_calc' });
+
+            // Error 3: Olvidar los enteros en mixtos, o simplemente otro error menor
+            if (w1 > 0 || w2 > 0) {
+                // Solo operó las fracciones y olvidó los enteros
+                let partEqN1 = n1 * (comunDenom / d1);
+                let partEqN2 = n2 * (comunDenom / d2);
+                let err3N = Math.abs(isAddition ? partEqN1 + partEqN2 : partEqN1 - partEqN2);
+                options.push({ ...simplify(err3N, comunDenom), type: 'error_mixed' });
+            } else {
+                options.push({ ...simplify(Math.abs(resN - 1) || 1, resD + 1), type: 'error_calc' });
+            }
+
+            // Filtrar duplicados visuales y asegurar 4 opciones
+            options = options.filter((v, i, a) => a.findIndex(t => (t.w === v.w && t.n === v.n && t.d === v.d)) === i);
+            while(options.length < 4) {
+                options.push({ ...simplify(Math.floor(Math.random()*15)+1, Math.floor(Math.random()*6)+2), type: 'error_random' });
+                options = options.filter((v, i, a) => a.findIndex(t => (t.w === v.w && t.n === v.n && t.d === v.d)) === i);
+            }
+
+            // Mezclar
+            options.sort(() => Math.random() - 0.5);
+
+            // Crear botones
+            const optionsContainer = document.getElementById('options');
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = formatFractionHTML(opt.w, opt.n, opt.d);
+                btn.onclick = () => checkAnswer(opt);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedOpt) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const feedback = document.getElementById('feedback');
+            const btnNext = document.getElementById('btn-next');
+
+            if (selectedOpt.type === 'correct') {
+                feedback.innerHTML = "Correct! 🌟 Awesome job!";
+                feedback.className = "correct";
+                currentStep++;
+                updateBoard();
+            } else {
+                let hint = "Oops! Incorrect.<br>";
+                
+                // Feedback diferenciado según el tipo de distractor elegido
+                if (selectedOpt.type === 'error_across') {
+                    hint += "<strong>Tip:</strong> You cannot just add or subtract denominators. Find a common denominator first!";
+                } else if (selectedOpt.type === 'error_mixed') {
+                    hint += "<strong>Tip:</strong> Don't forget about the whole numbers! Try converting the mixed numbers into improper fractions first.";
+                } else if (selectedOpt.type === 'error_calc') {
+                    hint += "<strong>Tip:</strong> You are close! Double-check your addition or subtraction on the numerators.";
+                } else {
+                    hint += "<strong>Tip:</strong> Remember to find the Least Common Multiple (LCM) for the denominators before operating.";
+                }
+                
+                feedback.innerHTML = hint;
+                feedback.className = "incorrect";
+            }
+
+            feedback.style.display = "block";
+            
+            if (currentStep >= totalSteps) {
+                setTimeout(() => {
+                    document.getElementById('game-area').style.display = 'none';
+                    document.getElementById('victory').style.display = 'block';
+                }, 1200);
+            } else {
+                btnNext.style.display = "inline-block";
+            }
+        }
+
+        function nextTurn() {
+            generateQuestion();
+        }
+
+        window.onload = () => {
+            updateBoard();
+            generateQuestion();
+        }
+    </script>
+</body>
+</html>
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
