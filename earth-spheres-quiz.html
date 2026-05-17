@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earth's Spheres Quiz - 6th Grade</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #46178f 0%, #864cbf 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  .screen {
+    width: 100%;
+    max-width: 900px;
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- START SCREEN ---------- */
+  .start-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 50px 40px;
+    text-align: center;
+    color: #333;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .logo {
+    font-size: 64px;
+    margin-bottom: 10px;
+  }
+
+  .start-card h1 {
+    color: #46178f;
+    font-size: 36px;
+    margin-bottom: 8px;
+    font-weight: 800;
+  }
+
+  .start-card .subtitle {
+    color: #666;
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+
+  .name-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 16px 20px;
+    font-size: 18px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .name-input:focus {
+    outline: none;
+    border-color: #46178f;
+  }
+
+  .btn-primary {
+    background: #46178f;
+    color: #fff;
+    border: none;
+    padding: 16px 50px;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+    box-shadow: 0 4px 0 #2e0d63;
+  }
+  .btn-primary:hover { background: #5a1eaa; }
+  .btn-primary:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #2e0d63;
+  }
+  .btn-primary:disabled {
+    background: #999;
+    cursor: not-allowed;
+    box-shadow: 0 4px 0 #666;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  .info-item {
+    background: #f5f0fb;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .info-item .num {
+    font-size: 28px;
+    font-weight: 800;
+    color: #46178f;
+  }
+  .info-item .label {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  /* ---------- QUESTION SCREEN ---------- */
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .q-counter {
+    background: rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 16px;
+  }
+
+  .score-display {
+    background: rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 16px;
+  }
+
+  .timer-bar-container {
+    width: 100%;
+    height: 12px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #26d07c, #ffd147, #e21b3c);
+    width: 100%;
+    transition: width 1s linear;
+    border-radius: 6px;
+  }
+
+  .timer-circle {
+    position: absolute;
+    top: 50%;
+    left: 30px;
+    transform: translateY(-50%);
+    width: 70px;
+    height: 70px;
+    background: #fff;
+    color: #46178f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .question-card {
+    background: #fff;
+    color: #333;
+    border-radius: 15px;
+    padding: 40px;
+    margin-bottom: 20px;
+    position: relative;
+    min-height: 140px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  .question-text {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    padding: 0 90px;
+  }
+
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .answer-btn {
+    border: none;
+    padding: 25px 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.1s, opacity 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 100px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+  }
+  .answer-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+  .answer-btn:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+  }
+  .answer-btn:disabled { cursor: default; }
+  .answer-btn.dimmed { opacity: 0.4; }
+
+  .answer-btn .shape {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .answer-btn.color-0 { background: #e21b3c; }
+  .answer-btn.color-1 { background: #1368ce; }
+  .answer-btn.color-2 { background: #ffd147; color: #333; }
+  .answer-btn.color-3 { background: #26890c; }
+
+  .answer-btn.correct {
+    background: #26d07c !important;
+    color: #fff !important;
+    transform: scale(1.03);
+  }
+  .answer-btn.wrong {
+    background: #c44 !important;
+    color: #fff !important;
+  }
+
+  /* ---------- FEEDBACK SCREEN ---------- */
+  .feedback-card {
+    background: #fff;
+    color: #333;
+    border-radius: 20px;
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .feedback-icon {
+    font-size: 80px;
+    margin-bottom: 15px;
+  }
+
+  .feedback-title {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .feedback-title.correct { color: #26d07c; }
+  .feedback-title.wrong { color: #e21b3c; }
+  .feedback-title.timeout { color: #999; }
+
+  .feedback-points {
+    font-size: 22px;
+    color: #46178f;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .feedback-correct-answer {
+    background: #f5f0fb;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    font-size: 17px;
+    color: #555;
+  }
+  .feedback-correct-answer strong { color: #46178f; }
+
+  /* ---------- FINAL SCREEN ---------- */
+  .final-card {
+    background: #fff;
+    color: #333;
+    border-radius: 20px;
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .trophy { font-size: 90px; margin-bottom: 10px; }
+
+  .final-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #46178f;
+    margin-bottom: 5px;
+  }
+  .final-player {
+    font-size: 22px;
+    color: #666;
+    margin-bottom: 25px;
+  }
+
+  .final-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  .stat-box {
+    background: #f5f0fb;
+    padding: 20px 10px;
+    border-radius: 12px;
+  }
+  .stat-box .stat-num {
+    font-size: 32px;
+    font-weight: 800;
+    color: #46178f;
+  }
+  .stat-box .stat-label {
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+  }
+
+  .grade-message {
+    font-size: 20px;
+    font-weight: 600;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+  }
+  .grade-excellent { background: #d4f4e2; color: #1a7d3e; }
+  .grade-good { background: #fff3cd; color: #856404; }
+  .grade-keep { background: #f8d7da; color: #721c24; }
+
+  .review-list {
+    text-align: left;
+    margin-bottom: 25px;
+    max-height: 250px;
+    overflow-y: auto;
+    background: #fafafa;
+    padding: 15px;
+    border-radius: 10px;
+  }
+  .review-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+  }
+  .review-item:last-child { border-bottom: none; }
+  .review-item .q-text { color: #333; margin-bottom: 4px; }
+  .review-item .result-line { font-size: 13px; }
+  .review-item.correct .result-line { color: #1a7d3e; }
+  .review-item.wrong .result-line { color: #721c24; }
+
+  .btn-secondary {
+    background: #fff;
+    color: #46178f;
+    border: 2px solid #46178f;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 5px;
+  }
+  .btn-secondary:hover { background: #f5f0fb; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 600px) {
+    .answers-grid { grid-template-columns: 1fr; }
+    .question-text {
+      font-size: 18px;
+      padding: 0 10px;
+      margin-top: 80px;
+    }
+    .timer-circle {
+      width: 60px;
+      height: 60px;
+      font-size: 26px;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .question-card { padding: 25px 20px; }
+    .answer-btn { font-size: 16px; padding: 20px 15px; min-height: 80px; }
+    .start-card h1 { font-size: 28px; }
+    .info-grid { grid-template-columns: 1fr; }
+    .final-stats { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="start-screen" class="screen active">
+  <div class="start-card">
+    <div class="logo">🌍</div>
+    <h1>Earth's Spheres Quiz</h1>
+    <p class="subtitle">6th Grade — Test what you know!</p>
+    <input type="text" id="player-name" class="name-input" placeholder="Enter your name" maxlength="20">
+    <br>
+    <button id="start-btn" class="btn-primary" disabled>Start Game</button>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="num">15</div>
+        <div class="label">Questions</div>
+      </div>
+      <div class="info-item">
+        <div class="num">30s</div>
+        <div class="label">Per question</div>
+      </div>
+      <div class="info-item">
+        <div class="num">1000</div>
+        <div class="label">Max points each</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION SCREEN -->
+<div id="question-screen" class="screen">
+  <div class="question-header">
+    <div class="q-counter">Question <span id="q-num">1</span> / <span id="q-total">15</span></div>
+    <div class="score-display">Score: <span id="current-score">0</span></div>
+  </div>
+
+  <div class="timer-bar-container">
+    <div id="timer-bar" class="timer-bar"></div>
+  </div>
+
+  <div class="question-card">
+    <div class="timer-circle" id="timer-circle">30</div>
+    <div class="question-text" id="question-text"></div>
+  </div>
+
+  <div class="answers-grid" id="answers-grid"></div>
+</div>
+
+<!-- FEEDBACK SCREEN -->
+<div id="feedback-screen" class="screen">
+  <div class="feedback-card">
+    <div id="feedback-icon" class="feedback-icon"></div>
+    <div id="feedback-title" class="feedback-title"></div>
+    <div id="feedback-points" class="feedback-points"></div>
+    <div id="feedback-correct-answer" class="feedback-correct-answer"></div>
+    <button id="next-btn" class="btn-primary">Next →</button>
+  </div>
+</div>
+
+<!-- FINAL SCREEN -->
+<div id="final-screen" class="screen">
+  <div class="final-card">
+    <div class="trophy" id="trophy">🏆</div>
+    <div class="final-title">Quiz Complete!</div>
+    <div class="final-player" id="final-player"></div>
+
+    <div class="final-stats">
+      <div class="stat-box">
+        <div class="stat-num" id="final-score">0</div>
+        <div class="stat-label">Total Score</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="final-correct">0</div>
+        <div class="stat-label">Correct</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="final-percent">0%</div>
+        <div class="stat-label">Accuracy</div>
+      </div>
+    </div>
+
+    <div id="grade-message" class="grade-message"></div>
+
+    <div class="review-list" id="review-list"></div>
+
+    <button id="restart-btn" class="btn-primary">Play Again</button>
+    <button id="review-toggle" class="btn-secondary">Show / Hide Review</button>
+  </div>
+</div>
+
+<script>
+// ==================== QUESTIONS DATA ====================
+const QUESTIONS = [
+  {
+    q: "Which sphere contains all the water on Earth?",
+    options: [
+      { text: "Atmosphere", correct: false },
+      { text: "Hydrosphere", correct: true },
+      { text: "Lithosphere", correct: false },
+      { text: "Biosphere", correct: false }
+    ]
+  },
+  {
+    q: "What layer of the Earth causes earthquakes and volcanic activity?",
+    options: [
+      { text: "Crust", correct: false },
+      { text: "Core", correct: false },
+      { text: "Mantle", correct: true },
+      { text: "Atmosphere", correct: false }
+    ]
+  },
+  {
+    q: "Spilling oil in the ocean harms mainly the…",
+    options: [
+      { text: "Atmosphere", correct: false },
+      { text: "Lithosphere", correct: false },
+      { text: "Biosphere", correct: false },
+      { text: "Hydrosphere", correct: true }
+    ]
+  },
+  {
+    q: "Which sphere includes all living things?",
+    options: [
+      { text: "Hydrosphere", correct: false },
+      { text: "Atmosphere", correct: false },
+      { text: "Biosphere", correct: true },
+      { text: "Lithosphere", correct: false }
+    ]
+  },
+  {
+    q: "Driving cars that release smoke mainly harms the…",
+    options: [
+      { text: "Atmosphere", correct: true },
+      { text: "Hydrosphere", correct: false },
+      { text: "Lithosphere", correct: false },
+      { text: "Biosphere", correct: false }
+    ]
+  },
+  {
+    q: "The crust is described as…",
+    options: [
+      { text: "Hot and moving", correct: false },
+      { text: "Made of water", correct: false },
+      { text: "The thinnest and outermost layer", correct: true },
+      { text: "Full of living things", correct: false }
+    ]
+  },
+  {
+    q: "Using chemical fertilizers mainly damages the…",
+    options: [
+      { text: "Atmosphere", correct: false },
+      { text: "Lithosphere", correct: true },
+      { text: "Hydrosphere", correct: false },
+      { text: "Biosphere", correct: false }
+    ]
+  },
+  {
+    q: "Which sphere surrounds the Earth and protects us from the sun's harmful rays?",
+    options: [
+      { text: "Biosphere", correct: false },
+      { text: "Hydrosphere", correct: false },
+      { text: "Lithosphere", correct: false },
+      { text: "Atmosphere", correct: true }
+    ]
+  },
+  {
+    q: "A factory dumps waste into a river. Which sphere is most affected?",
+    options: [
+      { text: "Atmosphere", correct: false },
+      { text: "Lithosphere", correct: false },
+      { text: "Hydrosphere", correct: true },
+      { text: "Biosphere", correct: false }
+    ]
+  },
+  {
+    q: "Cutting down trees in a forest mainly harms the…",
+    options: [
+      { text: "Atmosphere", correct: false },
+      { text: "Hydrosphere", correct: false },
+      { text: "Biosphere", correct: true },
+      { text: "Core", correct: false }
+    ]
+  },
+  {
+    q: "Maria is climbing a tall mountain in the Andes. As she climbs higher, it gets harder to breathe, the air feels thinner, and the temperature drops. Which sphere is making her climb so difficult?",
+    options: [
+      { text: "Hydrosphere", correct: false },
+      { text: "Biosphere", correct: false },
+      { text: "Atmosphere", correct: true },
+      { text: "Lithosphere", correct: false }
+    ]
+  },
+  {
+    q: "Scientists are studying a dying coral reef. The water temperature increased by 2°C, causing corals, fish, seaweed, and tiny organisms to become stressed and bleached. Which sphere includes these living organisms?",
+    options: [
+      { text: "Lithosphere", correct: false },
+      { text: "Biosphere", correct: true },
+      { text: "Atmosphere", correct: false },
+      { text: "Hydrosphere", correct: false }
+    ]
+  },
+  {
+    q: "During a dust storm in the Atacama Desert, strong winds pick up sand and soil from the ground and carry them high into the sky. Which TWO spheres are interacting?",
+    options: [
+      { text: "Biosphere and Hydrosphere", correct: false },
+      { text: "Lithosphere and Atmosphere", correct: true },
+      { text: "Hydrosphere and Lithosphere", correct: false },
+      { text: "Biosphere and Atmosphere", correct: false }
+    ]
+  },
+  {
+    q: "A village depends on groundwater stored deep underground in layers of rock and soil. Which sphere provides this essential water resource?",
+    options: [
+      { text: "Atmosphere", correct: false },
+      { text: "Biosphere", correct: false },
+      { text: "Hydrosphere", correct: true },
+      { text: "Lithosphere", correct: false }
+    ]
+  },
+  {
+    q: "A plastic bottle thrown into the ocean breaks into tiny pieces eaten by fish and sea creatures, poisoning them and entering the food chain. Which sphere is most directly being harmed?",
+    options: [
+      { text: "Atmosphere", correct: false },
+      { text: "Biosphere", correct: true },
+      { text: "Lithosphere", correct: false },
+      { text: "Hydrosphere", correct: false }
+    ]
+  }
+];
+
+// ==================== GAME STATE ====================
+const TIME_PER_Q = 30;
+const MAX_POINTS = 1000;
+const SHAPES = ["▲", "◆", "●", "■"];
+
+let gameState = {
+  playerName: "",
+  questions: [],
+  currentIndex: 0,
+  score: 0,
+  correctCount: 0,
+  timer: null,
+  timeLeft: TIME_PER_Q,
+  questionStartTime: 0,
+  answered: false,
+  history: []
+};
+
+// ==================== UTILITIES ====================
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+// ==================== START ====================
+const nameInput = document.getElementById("player-name");
+const startBtn = document.getElementById("start-btn");
+
+nameInput.addEventListener("input", () => {
+  startBtn.disabled = nameInput.value.trim().length === 0;
+});
+nameInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter" && !startBtn.disabled) startGame();
+});
+startBtn.addEventListener("click", startGame);
+
+function startGame() {
+  gameState.playerName = nameInput.value.trim() || "Student";
+  gameState.questions = shuffle(QUESTIONS).map(q => ({
+    q: q.q,
+    options: shuffle(q.options)
+  }));
+  gameState.currentIndex = 0;
+  gameState.score = 0;
+  gameState.correctCount = 0;
+  gameState.history = [];
+
+  document.getElementById("q-total").textContent = gameState.questions.length;
+  showScreen("question-screen");
+  loadQuestion();
+}
+
+// ==================== QUESTION FLOW ====================
+function loadQuestion() {
+  gameState.answered = false;
+  gameState.timeLeft = TIME_PER_Q;
+  gameState.questionStartTime = Date.now();
+
+  const current = gameState.questions[gameState.currentIndex];
+  document.getElementById("q-num").textContent = gameState.currentIndex + 1;
+  document.getElementById("current-score").textContent = gameState.score;
+  document.getElementById("question-text").textContent = current.q;
+  document.getElementById("timer-circle").textContent = TIME_PER_Q;
+  document.getElementById("timer-bar").style.width = "100%";
+
+  const grid = document.getElementById("answers-grid");
+  grid.innerHTML = "";
+  current.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = `answer-btn color-${i}`;
+    btn.innerHTML = `<span class="shape">${SHAPES[i]}</span><span>${opt.text}</span>`;
+    btn.addEventListener("click", () => handleAnswer(i, btn));
+    grid.appendChild(btn);
+  });
+
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(gameState.timer);
+  // Trigger bar transition
+  requestAnimationFrame(() => {
+    const bar = document.getElementById("timer-bar");
+    bar.style.transition = "width 1s linear";
+    bar.style.width = "100%";
+    requestAnimationFrame(() => {
+      bar.style.width = ((gameState.timeLeft - 1) / TIME_PER_Q * 100) + "%";
+    });
+  });
+
+  gameState.timer = setInterval(() => {
+    gameState.timeLeft--;
+    document.getElementById("timer-circle").textContent = gameState.timeLeft;
+    const pct = (gameState.timeLeft - 1) / TIME_PER_Q * 100;
+    document.getElementById("timer-bar").style.width = Math.max(0, pct) + "%";
+
+    if (gameState.timeLeft <= 0) {
+      clearInterval(gameState.timer);
+      if (!gameState.answered) handleTimeout();
+    }
+  }, 1000);
+}
+
+function handleAnswer(idx, btn) {
+  if (gameState.answered) return;
+  gameState.answered = true;
+  clearInterval(gameState.timer);
+
+  const current = gameState.questions[gameState.currentIndex];
+  const chosen = current.options[idx];
+  const isCorrect = chosen.correct;
+  const elapsed = (Date.now() - gameState.questionStartTime) / 1000;
+  const remainingFraction = Math.max(0, 1 - (elapsed / TIME_PER_Q));
+  // Kahoot-style scoring: 500 base + 500 * speed bonus, only if correct
+  const points = isCorrect ? Math.round(500 + 500 * remainingFraction) : 0;
+
+  if (isCorrect) {
+    gameState.score += points;
+    gameState.correctCount++;
+  }
+
+  // Highlight buttons
+  document.querySelectorAll(".answer-btn").forEach((b, i) => {
+    b.disabled = true;
+    if (current.options[i].correct) {
+      b.classList.add("correct");
+    } else if (i === idx) {
+      b.classList.add("wrong");
+    } else {
+      b.classList.add("dimmed");
+    }
+  });
+
+  // Save history
+  const correctOpt = current.options.find(o => o.correct);
+  gameState.history.push({
+    q: current.q,
+    chosen: chosen.text,
+    correct: correctOpt.text,
+    isCorrect,
+    points,
+    timedOut: false
+  });
+
+  setTimeout(() => showFeedback(isCorrect, false, points, correctOpt.text), 1500);
+}
+
+function handleTimeout() {
+  gameState.answered = true;
+  const current = gameState.questions[gameState.currentIndex];
+  const correctOpt = current.options.find(o => o.correct);
+
+  document.querySelectorAll(".answer-btn").forEach((b, i) => {
+    b.disabled = true;
+    if (current.options[i].correct) b.classList.add("correct");
+    else b.classList.add("dimmed");
+  });
+
+  gameState.history.push({
+    q: current.q,
+    chosen: "(no answer)",
+    correct: correctOpt.text,
+    isCorrect: false,
+    points: 0,
+    timedOut: true
+  });
+
+  setTimeout(() => showFeedback(false, true, 0, correctOpt.text), 1500);
+}
+
+function showFeedback(isCorrect, timedOut, points, correctText) {
+  showScreen("feedback-screen");
+  const icon = document.getElementById("feedback-icon");
+  const title = document.getElementById("feedback-title");
+  const ptsEl = document.getElementById("feedback-points");
+  const ans = document.getElementById("feedback-correct-answer");
+
+  title.className = "feedback-title";
+
+  if (timedOut) {
+    icon.textContent = "⏰";
+    title.textContent = "Time's up!";
+    title.classList.add("timeout");
+    ptsEl.textContent = "+0 points";
+  } else if (isCorrect) {
+    icon.textContent = "✅";
+    title.textContent = "Correct!";
+    title.classList.add("correct");
+    ptsEl.textContent = `+${points} points`;
+  } else {
+    icon.textContent = "❌";
+    title.textContent = "Incorrect";
+    title.classList.add("wrong");
+    ptsEl.textContent = "+0 points";
+  }
+
+  ans.innerHTML = `Correct answer: <strong>${correctText}</strong>`;
+
+  const nextBtn = document.getElementById("next-btn");
+  const isLast = gameState.currentIndex >= gameState.questions.length - 1;
+  nextBtn.textContent = isLast ? "See Results →" : "Next →";
+}
+
+document.getElementById("next-btn").addEventListener("click", () => {
+  gameState.currentIndex++;
+  if (gameState.currentIndex >= gameState.questions.length) {
+    showFinal();
+  } else {
+    showScreen("question-screen");
+    loadQuestion();
+  }
+});
+
+// ==================== FINAL ====================
+function showFinal() {
+  showScreen("final-screen");
+  const total = gameState.questions.length;
+  const pct = Math.round((gameState.correctCount / total) * 100);
+
+  document.getElementById("final-player").textContent = gameState.playerName;
+  document.getElementById("final-score").textContent = gameState.score;
+  document.getElementById("final-correct").textContent = `${gameState.correctCount} / ${total}`;
+  document.getElementById("final-percent").textContent = pct + "%";
+
+  const trophy = document.getElementById("trophy");
+  const gradeMsg = document.getElementById("grade-message");
+  gradeMsg.className = "grade-message";
+
+  if (pct >= 80) {
+    trophy.textContent = "🏆";
+    gradeMsg.textContent = "Excellent work! You're a sphere expert! 🌟";
+    gradeMsg.classList.add("grade-excellent");
+  } else if (pct >= 60) {
+    trophy.textContent = "🥈";
+    gradeMsg.textContent = "Good job! Review the ones you missed and try again!";
+    gradeMsg.classList.add("grade-good");
+  } else {
+    trophy.textContent = "📚";
+    gradeMsg.textContent = "Keep studying! Practice makes perfect.";
+    gradeMsg.classList.add("grade-keep");
+  }
+
+  // Review list
+  const reviewList = document.getElementById("review-list");
+  reviewList.innerHTML = "";
+  gameState.history.forEach((h, i) => {
+    const div = document.createElement("div");
+    div.className = "review-item " + (h.isCorrect ? "correct" : "wrong");
+    const mark = h.isCorrect ? "✅" : (h.timedOut ? "⏰" : "❌");
+    div.innerHTML = `
+      <div class="q-text"><strong>${i + 1}.</strong> ${h.q}</div>
+      <div class="result-line">${mark} Your answer: ${h.chosen} ${h.isCorrect ? "" : `| Correct: <strong>${h.correct}</strong>`} (+${h.points} pts)</div>
+    `;
+    reviewList.appendChild(div);
+  });
+}
+
+document.getElementById("restart-btn").addEventListener("click", () => {
+  nameInput.value = gameState.playerName;
+  startBtn.disabled = false;
+  showScreen("start-screen");
+});
+
+document.getElementById("review-toggle").addEventListener("click", () => {
+  const list = document.getElementById("review-list");
+  list.style.display = list.style.display === "none" ? "block" : "none";
+});
+</script>
+
+</body>
+</html>
