@@ -3,918 +3,728 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Earth's Spheres Quiz - 6th Grade</title>
+<title>Chile is a Gift — Project 2 | 6th Grade</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --chile-red: #D52B1E;
+    --chile-blue: #0039A6;
+    --chile-blue-light: #1E63D1;
+    --chile-blue-deep: #002577;
+    --chile-white: #FFFFFF;
+    --cream: #FFF8F0;
+    --soft-gray: #F4F6FA;
+    --text-dark: #1A2238;
+    --text-muted: #4A5568;
+    --shadow: 0 10px 30px rgba(0, 57, 166, 0.12);
+    --shadow-strong: 0 20px 50px rgba(0, 57, 166, 0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #46178f 0%, #864cbf 100%);
-    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: var(--soft-gray);
+    color: var(--text-dark);
+    line-height: 1.6;
+  }
+
+  .display { font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px; }
+
+  /* ===== HEADER ===== */
+  .hero {
+    position: relative;
+    background: linear-gradient(135deg, var(--chile-blue) 0%, var(--chile-blue-light) 100%);
+    color: white;
+    padding: 70px 24px 90px;
+    overflow: hidden;
+    text-align: center;
+  }
+  .hero::before, .hero::after {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+  .hero::before { background: white; top: -300px; right: -200px; }
+  .hero::after { background: var(--chile-red); bottom: -350px; left: -250px; opacity: 0.15; }
+
+  .flag-bar {
+    display: flex;
+    height: 8px;
+    width: 200px;
+    margin: 0 auto 30px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .flag-bar span { flex: 1; }
+  .flag-bar .b1 { background: var(--chile-white); }
+  .flag-bar .b2 { background: var(--chile-blue-deep); }
+  .flag-bar .b3 { background: var(--chile-red); }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.25);
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .hero .question {
+    font-size: clamp(1.05rem, 2vw, 1.4rem);
+    font-style: italic;
+    max-width: 700px;
+    margin: 0 auto;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+    font-weight: 400;
+  }
+  .hero .meta {
+    margin-top: 30px;
+    font-size: 0.9rem;
+    opacity: 0.85;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== CONTAINERS ===== */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 70px 0; }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .section-title h2 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: var(--chile-blue-deep);
+    margin-bottom: 12px;
+  }
+  .section-title p {
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: 1.05rem;
+  }
+  .section-title .underline {
+    width: 80px;
+    height: 4px;
+    background: var(--chile-red);
+    margin: 16px auto 0;
+    border-radius: 2px;
+  }
+
+  /* ===== PROBLEM / NARRATIVE ===== */
+  .problem-section {
+    background: white;
+    margin-top: -50px;
+    border-radius: 24px 24px 0 0;
+    position: relative;
+    z-index: 2;
+    box-shadow: var(--shadow);
+  }
+  .problem-card {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 20px 0;
+  }
+  .problem-card .quote-mark {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 5rem;
+    color: var(--chile-red);
+    line-height: 0.5;
+    opacity: 0.5;
+  }
+  .problem-card p {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 18px;
+    line-height: 1.75;
+  }
+  .problem-card p:last-child { margin-bottom: 0; }
+  .problem-card strong {
+    color: var(--chile-blue-deep);
+    background: linear-gradient(transparent 60%, rgba(213,43,30,0.15) 60%);
+    padding: 0 2px;
+  }
+
+  /* ===== LEARNING ROUTE ===== */
+  .route-section { background: var(--soft-gray); }
+  .route {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    position: relative;
+  }
+  .route::before {
+    content: '';
+    position: absolute;
+    top: 60px;
+    left: 12%;
+    right: 12%;
+    height: 3px;
+    background: repeating-linear-gradient(90deg, var(--chile-red) 0, var(--chile-red) 10px, transparent 10px, transparent 20px);
+    z-index: 0;
+  }
+  .route-step {
+    background: white;
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1;
+    border-top: 4px solid var(--chile-blue);
+  }
+  .route-step:hover { transform: translateY(-8px); }
+  .route-step.final { border-top-color: var(--chile-red); }
+  .route-step .pin {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--chile-blue), var(--chile-blue-light));
+    margin: 0 auto 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    color: #fff;
-    overflow-x: hidden;
+    color: white;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(0,57,166,0.3);
   }
-
-  .screen {
-    width: 100%;
-    max-width: 900px;
-    display: none;
-    animation: fadeIn 0.4s ease;
+  .route-step.final .pin {
+    background: linear-gradient(135deg, var(--chile-red), #FF5C4D);
+    box-shadow: 0 8px 20px rgba(213,43,30,0.35);
   }
-  .screen.active { display: block; }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ---------- START SCREEN ---------- */
-  .start-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 50px 40px;
-    text-align: center;
-    color: #333;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  }
-
-  .logo {
-    font-size: 64px;
+  .route-step h3 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.3rem;
+    color: var(--chile-blue-deep);
     margin-bottom: 10px;
   }
-
-  .start-card h1 {
-    color: #46178f;
-    font-size: 36px;
-    margin-bottom: 8px;
-    font-weight: 800;
+  .route-step.final h3 { color: var(--chile-red); }
+  .route-step p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
   }
 
-  .start-card .subtitle {
-    color: #666;
-    font-size: 18px;
+  /* ===== SUBJECTS ===== */
+  .subjects-section { background: white; }
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  .subject-card {
+    background: var(--soft-gray);
+    border-radius: 18px;
+    padding: 32px 26px;
+    transition: all 0.3s ease;
+    border-left: 5px solid var(--chile-blue);
+  }
+  .subject-card:nth-child(2) { border-left-color: var(--chile-red); }
+  .subject-card:nth-child(3) { border-left-color: var(--chile-blue-deep); }
+  .subject-card:hover {
+    background: white;
+    box-shadow: var(--shadow);
+    transform: translateY(-4px);
+  }
+  .subject-card .icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--chile-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    font-size: 1.8rem;
+  }
+  .subject-card:nth-child(2) .icon-circle { background: var(--chile-red); }
+  .subject-card:nth-child(3) .icon-circle { background: var(--chile-blue-deep); }
+  .subject-card h3 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.4rem;
+    color: var(--chile-blue-deep);
+    margin-bottom: 14px;
+  }
+  .subject-card ul { list-style: none; }
+  .subject-card li {
+    padding: 6px 0 6px 22px;
+    position: relative;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+  }
+  .subject-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 8px;
+    height: 8px;
+    background: var(--chile-red);
+    border-radius: 50%;
+  }
+  .subject-card:nth-child(2) li::before { background: var(--chile-blue); }
+
+  /* ===== KEYWORDS ===== */
+  .keywords-section {
+    background: linear-gradient(135deg, var(--chile-blue-deep) 0%, var(--chile-blue) 100%);
+    color: white;
+  }
+  .keywords-section .section-title h2 { color: white; }
+  .keywords-section .section-title p { color: rgba(255,255,255,0.85); }
+  .keywords {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .keyword {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    padding: 12px 22px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  .keyword:hover {
+    background: var(--chile-red);
+    border-color: var(--chile-red);
+    transform: scale(1.05);
+  }
+
+  /* ===== GALLERY ===== */
+  .gallery-section { background: var(--soft-gray); }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 220px 220px;
+    gap: 14px;
+  }
+  .gallery-item {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+  }
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .gallery-item:hover img { transform: scale(1.08); }
+  .gallery-item .caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 18px 14px;
+    background: linear-gradient(transparent, rgba(0,37,119,0.9));
+    color: white;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+  }
+  .gallery-item.large { grid-column: span 2; grid-row: span 2; }
+  .gallery-item.large .caption { font-size: 1.4rem; padding: 30px 24px 20px; }
+  .gallery-item.wide { grid-column: span 2; }
+
+  /* ===== AT HOME ===== */
+  .athome-section { background: white; }
+  .athome-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .athome-card {
+    text-align: center;
+    padding: 36px 24px;
+    background: var(--cream);
+    border-radius: 18px;
+    border: 2px dashed var(--chile-red);
+    transition: all 0.3s ease;
+  }
+  .athome-card:hover {
+    border-style: solid;
+    background: white;
+    box-shadow: var(--shadow);
+  }
+  .athome-card .icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .athome-card h4 {
+    font-family: 'Fredoka', sans-serif;
+    color: var(--chile-blue-deep);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  .athome-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* ===== PROFILE & SKILLS ===== */
+  .profile-section {
+    background: linear-gradient(180deg, var(--soft-gray) 0%, white 100%);
+  }
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 60px;
+  }
+  .profile-card {
+    background: white;
+    padding: 32px 26px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+  }
+  .profile-card:nth-child(1)::before { background: var(--chile-red); }
+  .profile-card:nth-child(2)::before { background: var(--chile-blue); }
+  .profile-card:nth-child(3)::before { background: var(--chile-blue-deep); }
+  .profile-card .star {
+    font-size: 2.5rem;
+    margin-bottom: 14px;
+  }
+  .profile-card h4 {
+    font-family: 'Fredoka', sans-serif;
+    color: var(--chile-blue-deep);
+    font-size: 1.4rem;
+    margin-bottom: 14px;
+  }
+  .profile-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .skills-wrap {
+    background: linear-gradient(135deg, var(--chile-red) 0%, #FF5C4D 100%);
+    border-radius: 24px;
+    padding: 50px 30px;
+    text-align: center;
+    color: white;
+    box-shadow: var(--shadow-strong);
+  }
+  .skills-wrap h3 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 2rem;
     margin-bottom: 30px;
   }
-
-  .name-input {
-    width: 100%;
-    max-width: 400px;
-    padding: 16px 20px;
-    font-size: 18px;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    text-align: center;
-    transition: border-color 0.2s;
-  }
-  .name-input:focus {
-    outline: none;
-    border-color: #46178f;
-  }
-
-  .btn-primary {
-    background: #46178f;
-    color: #fff;
-    border: none;
-    padding: 16px 50px;
-    font-size: 20px;
-    font-weight: 700;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
-    box-shadow: 0 4px 0 #2e0d63;
-  }
-  .btn-primary:hover { background: #5a1eaa; }
-  .btn-primary:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 #2e0d63;
-  }
-  .btn-primary:disabled {
-    background: #999;
-    cursor: not-allowed;
-    box-shadow: 0 4px 0 #666;
-  }
-
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-top: 30px;
-  }
-
-  .info-item {
-    background: #f5f0fb;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-  }
-  .info-item .num {
-    font-size: 28px;
-    font-weight: 800;
-    color: #46178f;
-  }
-  .info-item .label {
-    font-size: 13px;
-    color: #666;
-    margin-top: 4px;
-  }
-
-  /* ---------- QUESTION SCREEN ---------- */
-  .question-header {
+  .skills-list {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    color: #fff;
-    font-weight: 600;
-  }
-
-  .q-counter {
-    background: rgba(255,255,255,0.2);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 16px;
-  }
-
-  .score-display {
-    background: rgba(255,255,255,0.2);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 16px;
-  }
-
-  .timer-bar-container {
-    width: 100%;
-    height: 12px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 20px;
-  }
-
-  .timer-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #26d07c, #ffd147, #e21b3c);
-    width: 100%;
-    transition: width 1s linear;
-    border-radius: 6px;
-  }
-
-  .timer-circle {
-    position: absolute;
-    top: 50%;
-    left: 30px;
-    transform: translateY(-50%);
-    width: 70px;
-    height: 70px;
-    background: #fff;
-    color: #46178f;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 32px;
-    font-weight: 800;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    gap: 30px;
+    flex-wrap: wrap;
   }
-
-  .question-card {
-    background: #fff;
-    color: #333;
-    border-radius: 15px;
-    padding: 40px;
-    margin-bottom: 20px;
-    position: relative;
-    min-height: 140px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  }
-
-  .question-text {
-    font-size: 22px;
+  .skill-pill {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 16px 30px;
+    border-radius: 50px;
     font-weight: 600;
-    line-height: 1.4;
+    font-size: 1.05rem;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--chile-blue-deep);
+    color: white;
+    padding: 40px 24px 30px;
     text-align: center;
-    padding: 0 90px;
+  }
+  footer .flag-bar { margin-bottom: 20px; }
+  footer p { opacity: 0.85; font-size: 0.95rem; }
+  footer .school {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
   }
 
-  .answers-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-  }
-
-  .answer-btn {
-    border: none;
-    padding: 25px 20px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #fff;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: left;
-    transition: transform 0.1s, opacity 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    min-height: 100px;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
-  }
-  .answer-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-  }
-  .answer-btn:active:not(:disabled) {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
-  }
-  .answer-btn:disabled { cursor: default; }
-  .answer-btn.dimmed { opacity: 0.4; }
-
-  .answer-btn .shape {
-    font-size: 28px;
-    flex-shrink: 0;
-  }
-
-  .answer-btn.color-0 { background: #e21b3c; }
-  .answer-btn.color-1 { background: #1368ce; }
-  .answer-btn.color-2 { background: #ffd147; color: #333; }
-  .answer-btn.color-3 { background: #26890c; }
-
-  .answer-btn.correct {
-    background: #26d07c !important;
-    color: #fff !important;
-    transform: scale(1.03);
-  }
-  .answer-btn.wrong {
-    background: #c44 !important;
-    color: #fff !important;
-  }
-
-  /* ---------- FEEDBACK SCREEN ---------- */
-  .feedback-card {
-    background: #fff;
-    color: #333;
-    border-radius: 20px;
-    padding: 50px 40px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  }
-
-  .feedback-icon {
-    font-size: 80px;
-    margin-bottom: 15px;
-  }
-
-  .feedback-title {
-    font-size: 36px;
-    font-weight: 800;
-    margin-bottom: 10px;
-  }
-  .feedback-title.correct { color: #26d07c; }
-  .feedback-title.wrong { color: #e21b3c; }
-  .feedback-title.timeout { color: #999; }
-
-  .feedback-points {
-    font-size: 22px;
-    color: #46178f;
-    font-weight: 700;
-    margin-bottom: 20px;
-  }
-
-  .feedback-correct-answer {
-    background: #f5f0fb;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    font-size: 17px;
-    color: #555;
-  }
-  .feedback-correct-answer strong { color: #46178f; }
-
-  /* ---------- FINAL SCREEN ---------- */
-  .final-card {
-    background: #fff;
-    color: #333;
-    border-radius: 20px;
-    padding: 50px 40px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  }
-
-  .trophy { font-size: 90px; margin-bottom: 10px; }
-
-  .final-title {
-    font-size: 36px;
-    font-weight: 800;
-    color: #46178f;
-    margin-bottom: 5px;
-  }
-  .final-player {
-    font-size: 22px;
-    color: #666;
-    margin-bottom: 25px;
-  }
-
-  .final-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 25px;
-  }
-  .stat-box {
-    background: #f5f0fb;
-    padding: 20px 10px;
-    border-radius: 12px;
-  }
-  .stat-box .stat-num {
-    font-size: 32px;
-    font-weight: 800;
-    color: #46178f;
-  }
-  .stat-box .stat-label {
-    font-size: 13px;
-    color: #666;
-    margin-top: 5px;
-  }
-
-  .grade-message {
-    font-size: 20px;
-    font-weight: 600;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-  }
-  .grade-excellent { background: #d4f4e2; color: #1a7d3e; }
-  .grade-good { background: #fff3cd; color: #856404; }
-  .grade-keep { background: #f8d7da; color: #721c24; }
-
-  .review-list {
-    text-align: left;
-    margin-bottom: 25px;
-    max-height: 250px;
-    overflow-y: auto;
-    background: #fafafa;
-    padding: 15px;
-    border-radius: 10px;
-  }
-  .review-item {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
-  }
-  .review-item:last-child { border-bottom: none; }
-  .review-item .q-text { color: #333; margin-bottom: 4px; }
-  .review-item .result-line { font-size: 13px; }
-  .review-item.correct .result-line { color: #1a7d3e; }
-  .review-item.wrong .result-line { color: #721c24; }
-
-  .btn-secondary {
-    background: #fff;
-    color: #46178f;
-    border: 2px solid #46178f;
-    padding: 12px 30px;
-    font-size: 16px;
-    font-weight: 700;
-    border-radius: 10px;
-    cursor: pointer;
-    margin: 5px;
-  }
-  .btn-secondary:hover { background: #f5f0fb; }
-
-  /* ---------- RESPONSIVE ---------- */
-  @media (max-width: 600px) {
-    .answers-grid { grid-template-columns: 1fr; }
-    .question-text {
-      font-size: 18px;
-      padding: 0 10px;
-      margin-top: 80px;
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .hero { padding: 50px 20px 70px; }
+    section { padding: 50px 0; }
+    .route,
+    .subjects-grid,
+    .athome-grid,
+    .profile-grid {
+      grid-template-columns: 1fr;
     }
-    .timer-circle {
-      width: 60px;
-      height: 60px;
-      font-size: 26px;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
+    .route::before { display: none; }
+    .gallery {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: 180px 180px 180px;
     }
-    .question-card { padding: 25px 20px; }
-    .answer-btn { font-size: 16px; padding: 20px 15px; min-height: 80px; }
-    .start-card h1 { font-size: 28px; }
-    .info-grid { grid-template-columns: 1fr; }
-    .final-stats { grid-template-columns: 1fr; }
+    .gallery-item.large { grid-column: span 2; grid-row: span 1; }
+    .gallery-item.wide { grid-column: span 2; }
+    .problem-card { padding: 0 10px; }
+    .skills-list { gap: 14px; }
   }
 </style>
 </head>
 <body>
 
-<!-- START SCREEN -->
-<div id="start-screen" class="screen active">
-  <div class="start-card">
-    <div class="logo">🌍</div>
-    <h1>Earth's Spheres Quiz</h1>
-    <p class="subtitle">6th Grade — Test what you know!</p>
-    <input type="text" id="player-name" class="name-input" placeholder="Enter your name" maxlength="20">
-    <br>
-    <button id="start-btn" class="btn-primary" disabled>Start Game</button>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="flag-bar"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+    <span class="badge">Project 2 · 6th Grade</span>
+    <h1 class="display">Chile is a Gift</h1>
+    <p class="question">Why is Chile unique and different from other countries?</p>
+    <p class="meta">A letter for our families · Colegio Dunalastair</p>
+  </header>
 
-    <div class="info-grid">
-      <div class="info-item">
-        <div class="num">15</div>
-        <div class="label">Questions</div>
-      </div>
-      <div class="info-item">
-        <div class="num">30s</div>
-        <div class="label">Per question</div>
-      </div>
-      <div class="info-item">
-        <div class="num">1000</div>
-        <div class="label">Max points each</div>
+  <!-- PROBLEM / NARRATIVE -->
+  <section class="problem-section">
+    <div class="container">
+      <div class="problem-card">
+        <div class="quote-mark">&ldquo;</div>
+        <p>Wouldn't it be amazing to build a snowman, swim in the ocean, smell the exquisite essence of a green forest and visit a majestic volcano in just one single place? Is that even possible? Well, <strong>the answer is closer than you think</strong>. Just take a look around into your own country.</p>
+        <p>Chile's diverse landscapes, from <strong>icy Antarctica to the arid Atacama desert</strong>, make it an enticing destination. Its dramatic differences in customs, traditions and lifestyles — depending on the different geographical zones — are a significant pretext for tourists wanting to come back to our country every time they can.</p>
+        <p>But, <strong>how much of it do you really know?</strong> How much do you know about the country you live in? Would you be able to convince your family members to visit our country during the next holidays? Which highlights, activities and suggestions would you give to someone who would like to travel around Chile?</p>
       </div>
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- QUESTION SCREEN -->
-<div id="question-screen" class="screen">
-  <div class="question-header">
-    <div class="q-counter">Question <span id="q-num">1</span> / <span id="q-total">15</span></div>
-    <div class="score-display">Score: <span id="current-score">0</span></div>
-  </div>
-
-  <div class="timer-bar-container">
-    <div id="timer-bar" class="timer-bar"></div>
-  </div>
-
-  <div class="question-card">
-    <div class="timer-circle" id="timer-circle">30</div>
-    <div class="question-text" id="question-text"></div>
-  </div>
-
-  <div class="answers-grid" id="answers-grid"></div>
-</div>
-
-<!-- FEEDBACK SCREEN -->
-<div id="feedback-screen" class="screen">
-  <div class="feedback-card">
-    <div id="feedback-icon" class="feedback-icon"></div>
-    <div id="feedback-title" class="feedback-title"></div>
-    <div id="feedback-points" class="feedback-points"></div>
-    <div id="feedback-correct-answer" class="feedback-correct-answer"></div>
-    <button id="next-btn" class="btn-primary">Next →</button>
-  </div>
-</div>
-
-<!-- FINAL SCREEN -->
-<div id="final-screen" class="screen">
-  <div class="final-card">
-    <div class="trophy" id="trophy">🏆</div>
-    <div class="final-title">Quiz Complete!</div>
-    <div class="final-player" id="final-player"></div>
-
-    <div class="final-stats">
-      <div class="stat-box">
-        <div class="stat-num" id="final-score">0</div>
-        <div class="stat-label">Total Score</div>
+  <!-- LEARNING ROUTE -->
+  <section class="route-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Our Learning Route</h2>
+        <div class="underline"></div>
+        <p>Three milestones that guide students from research to a final creative product.</p>
       </div>
-      <div class="stat-box">
-        <div class="stat-num" id="final-correct">0</div>
-        <div class="stat-label">Correct</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" id="final-percent">0%</div>
-        <div class="stat-label">Accuracy</div>
+      <div class="route">
+        <div class="route-step">
+          <div class="pin">SP1</div>
+          <h3>Sub Product 1</h3>
+          <p>A poster of a Chilean zone and region, paired with a <strong>protection protocol manual</strong> for a natural hazard of that area.</p>
+        </div>
+        <div class="route-step">
+          <div class="pin">SP2</div>
+          <h3>Sub Product 2</h3>
+          <p>A <strong>tourism poster</strong> featuring an itinerary of a destination in Chile worth visiting.</p>
+        </div>
+        <div class="route-step final">
+          <div class="pin">FP</div>
+          <h3>Final Product</h3>
+          <p>A <strong>video or blog</strong> that integrates Sub Product 1 and Sub Product 2 into one promotional piece.</p>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div id="grade-message" class="grade-message"></div>
+  <!-- SUBJECTS -->
+  <section class="subjects-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>What We're Learning</h2>
+        <div class="underline"></div>
+        <p>Content from three subjects connected through the project.</p>
+      </div>
+      <div class="subjects-grid">
+        <div class="subject-card">
+          <div class="icon-circle">&#127757;</div>
+          <h3>Project</h3>
+          <ul>
+            <li>Locate Chile and identify its zones</li>
+            <li>Zone characteristics</li>
+            <li>Earth spheres</li>
+            <li>Natural environments and hazards</li>
+          </ul>
+        </div>
+        <div class="subject-card">
+          <div class="icon-circle">&#128290;</div>
+          <h3>Math</h3>
+          <ul>
+            <li>Four operations and word problems</li>
+            <li>Area of cubes and parallelepipeds</li>
+            <li>Volume of cubes and parallelepipeds</li>
+            <li>Tessellations with isometric movements</li>
+          </ul>
+        </div>
+        <div class="subject-card">
+          <div class="icon-circle">&#128218;</div>
+          <h3>English</h3>
+          <ul>
+            <li>PET practice — speaking</li>
+            <li>PET practice — reading</li>
+            <li>PET practice — writing</li>
+            <li>PET practice — listening</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <div class="review-list" id="review-list"></div>
+  <!-- KEYWORDS -->
+  <section class="keywords-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Key Words</h2>
+        <div class="underline"></div>
+        <p>The vocabulary that will accompany us throughout the project.</p>
+      </div>
+      <div class="keywords">
+        <span class="keyword">Natural environment</span>
+        <span class="keyword">Political administrative division</span>
+        <span class="keyword">Relationships</span>
+        <span class="keyword">Transfer of energy</span>
+        <span class="keyword">Photosynthesis</span>
+        <span class="keyword">Earth spheres</span>
+        <span class="keyword">Diversity</span>
+        <span class="keyword">Systems</span>
+        <span class="keyword">Interactions</span>
+        <span class="keyword">Balance</span>
+      </div>
+    </div>
+  </section>
 
-    <button id="restart-btn" class="btn-primary">Play Again</button>
-    <button id="review-toggle" class="btn-secondary">Show / Hide Review</button>
-  </div>
-</div>
+  <!-- GALLERY -->
+  <section class="gallery-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>The Landscapes We Explore</h2>
+        <div class="underline"></div>
+        <p>From the driest desert to the southern ice fields — Chile in one journey.</p>
+      </div>
+      <div class="gallery">
+        <div class="gallery-item large">
+          <img src="https://assets.explora.com/app/uploads/2023/11/Explore-Torres-del-Paine-National-Park-4.jpg" alt="Torres del Paine">
+          <div class="caption">Torres del Paine</div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://cdn.prod.website-files.com/5bb2cb199758ce1535f85891/674519f4889ed4f58760649b_marek-piwnicki-joxXZhefnhk-unsplash%20copy.jpg" alt="Atacama Desert">
+          <div class="caption">Atacama Desert</div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://static.workaway.info/gfx/foto/1/8/2/5/2/182526545271/xl/182526545271_166759925607675.jpg" alt="Pacific Coast">
+          <div class="caption">Pacific Coast</div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://static.wixstatic.com/media/2fe42d_67f5b9f2f1af4d3e8dfd590dc2dcaf31~mv2.jpg/v1/fill/w_1110,h_701,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/2fe42d_67f5b9f2f1af4d3e8dfd590dc2dcaf31~mv2.jpg" alt="Andes Mountain Range">
+          <div class="caption">The Andes</div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/12/39/5d/5a/img-20180302-135335-687.jpg?w=1200&h=-1&s=1" alt="Patagonia">
+          <div class="caption">Patagonia</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<script>
-// ==================== QUESTIONS DATA ====================
-const QUESTIONS = [
-  {
-    q: "Which sphere contains all the water on Earth?",
-    options: [
-      { text: "Atmosphere", correct: false },
-      { text: "Hydrosphere", correct: true },
-      { text: "Lithosphere", correct: false },
-      { text: "Biosphere", correct: false }
-    ]
-  },
-  {
-    q: "What layer of the Earth causes earthquakes and volcanic activity?",
-    options: [
-      { text: "Crust", correct: false },
-      { text: "Core", correct: false },
-      { text: "Mantle", correct: true },
-      { text: "Atmosphere", correct: false }
-    ]
-  },
-  {
-    q: "Spilling oil in the ocean harms mainly the…",
-    options: [
-      { text: "Atmosphere", correct: false },
-      { text: "Lithosphere", correct: false },
-      { text: "Biosphere", correct: false },
-      { text: "Hydrosphere", correct: true }
-    ]
-  },
-  {
-    q: "Which sphere includes all living things?",
-    options: [
-      { text: "Hydrosphere", correct: false },
-      { text: "Atmosphere", correct: false },
-      { text: "Biosphere", correct: true },
-      { text: "Lithosphere", correct: false }
-    ]
-  },
-  {
-    q: "Driving cars that release smoke mainly harms the…",
-    options: [
-      { text: "Atmosphere", correct: true },
-      { text: "Hydrosphere", correct: false },
-      { text: "Lithosphere", correct: false },
-      { text: "Biosphere", correct: false }
-    ]
-  },
-  {
-    q: "The crust is described as…",
-    options: [
-      { text: "Hot and moving", correct: false },
-      { text: "Made of water", correct: false },
-      { text: "The thinnest and outermost layer", correct: true },
-      { text: "Full of living things", correct: false }
-    ]
-  },
-  {
-    q: "Using chemical fertilizers mainly damages the…",
-    options: [
-      { text: "Atmosphere", correct: false },
-      { text: "Lithosphere", correct: true },
-      { text: "Hydrosphere", correct: false },
-      { text: "Biosphere", correct: false }
-    ]
-  },
-  {
-    q: "Which sphere surrounds the Earth and protects us from the sun's harmful rays?",
-    options: [
-      { text: "Biosphere", correct: false },
-      { text: "Hydrosphere", correct: false },
-      { text: "Lithosphere", correct: false },
-      { text: "Atmosphere", correct: true }
-    ]
-  },
-  {
-    q: "A factory dumps waste into a river. Which sphere is most affected?",
-    options: [
-      { text: "Atmosphere", correct: false },
-      { text: "Lithosphere", correct: false },
-      { text: "Hydrosphere", correct: true },
-      { text: "Biosphere", correct: false }
-    ]
-  },
-  {
-    q: "Cutting down trees in a forest mainly harms the…",
-    options: [
-      { text: "Atmosphere", correct: false },
-      { text: "Hydrosphere", correct: false },
-      { text: "Biosphere", correct: true },
-      { text: "Core", correct: false }
-    ]
-  },
-  {
-    q: "Maria is climbing a tall mountain in the Andes. As she climbs higher, it gets harder to breathe, the air feels thinner, and the temperature drops. Which sphere is making her climb so difficult?",
-    options: [
-      { text: "Hydrosphere", correct: false },
-      { text: "Biosphere", correct: false },
-      { text: "Atmosphere", correct: true },
-      { text: "Lithosphere", correct: false }
-    ]
-  },
-  {
-    q: "Scientists are studying a dying coral reef. The water temperature increased by 2°C, causing corals, fish, seaweed, and tiny organisms to become stressed and bleached. Which sphere includes these living organisms?",
-    options: [
-      { text: "Lithosphere", correct: false },
-      { text: "Biosphere", correct: true },
-      { text: "Atmosphere", correct: false },
-      { text: "Hydrosphere", correct: false }
-    ]
-  },
-  {
-    q: "During a dust storm in the Atacama Desert, strong winds pick up sand and soil from the ground and carry them high into the sky. Which TWO spheres are interacting?",
-    options: [
-      { text: "Biosphere and Hydrosphere", correct: false },
-      { text: "Lithosphere and Atmosphere", correct: true },
-      { text: "Hydrosphere and Lithosphere", correct: false },
-      { text: "Biosphere and Atmosphere", correct: false }
-    ]
-  },
-  {
-    q: "A village depends on groundwater stored deep underground in layers of rock and soil. Which sphere provides this essential water resource?",
-    options: [
-      { text: "Atmosphere", correct: false },
-      { text: "Biosphere", correct: false },
-      { text: "Hydrosphere", correct: true },
-      { text: "Lithosphere", correct: false }
-    ]
-  },
-  {
-    q: "A plastic bottle thrown into the ocean breaks into tiny pieces eaten by fish and sea creatures, poisoning them and entering the food chain. Which sphere is most directly being harmed?",
-    options: [
-      { text: "Atmosphere", correct: false },
-      { text: "Biosphere", correct: true },
-      { text: "Lithosphere", correct: false },
-      { text: "Hydrosphere", correct: false }
-    ]
-  }
-];
+  <!-- AT HOME -->
+  <section class="athome-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>How You Can Help at Home</h2>
+        <div class="underline"></div>
+        <p>Small activities at home that strengthen what we do in the classroom.</p>
+      </div>
+      <div class="athome-grid">
+        <div class="athome-card">
+          <span class="icon">&#127956;</span>
+          <h4>Explore Chile Together</h4>
+          <p>Visit places like Parque San Ramón, Alto Las Vizcachas or Cajón del Maipo. Pay attention to the local flora and fauna.</p>
+        </div>
+        <div class="athome-card">
+          <span class="icon">&#128187;</span>
+          <h4>Finish Eduten</h4>
+          <p>Encourage your child to complete the assigned exercises on the Eduten platform.</p>
+        </div>
+        <div class="athome-card">
+          <span class="icon">&#127909;</span>
+          <h4>Movies &amp; Books in English</h4>
+          <p>Watch films and read books in English. A great way to reinforce listening and reading skills.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-// ==================== GAME STATE ====================
-const TIME_PER_Q = 30;
-const MAX_POINTS = 1000;
-const SHAPES = ["▲", "◆", "●", "■"];
+  <!-- PROFILE & SKILLS -->
+  <section class="profile-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>The Dunalastair Student Profile</h2>
+        <div class="underline"></div>
+        <p>Three qualities we cultivate through every project.</p>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-card">
+          <div class="star">&#127775;</div>
+          <h4>Responsible Citizens</h4>
+          <p>Who, when acting, do so with a sense of responsibility towards themselves, their school community, their society and the environment.</p>
+        </div>
+        <div class="profile-card">
+          <div class="star">&#128161;</div>
+          <h4>Innovative</h4>
+          <p>Capable of seeing things in a new light — whether designing solutions to problems or crafting new ideas about how to do something — and willing to act on these insights.</p>
+        </div>
+        <div class="profile-card">
+          <div class="star">&#129504;</div>
+          <h4>Autonomous</h4>
+          <p>Self-governing, free agents who are nevertheless aware of the importance of collaboration in human affairs.</p>
+        </div>
+      </div>
 
-let gameState = {
-  playerName: "",
-  questions: [],
-  currentIndex: 0,
-  score: 0,
-  correctCount: 0,
-  timer: null,
-  timeLeft: TIME_PER_Q,
-  questionStartTime: 0,
-  answered: false,
-  history: []
-};
+      <div class="skills-wrap">
+        <h3>Skills We Develop</h3>
+        <div class="skills-list">
+          <div class="skill-pill">Communication</div>
+          <div class="skill-pill">Creativity</div>
+          <div class="skill-pill">Critical Thinking</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-// ==================== UTILITIES ====================
-function shuffle(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-
-// ==================== START ====================
-const nameInput = document.getElementById("player-name");
-const startBtn = document.getElementById("start-btn");
-
-nameInput.addEventListener("input", () => {
-  startBtn.disabled = nameInput.value.trim().length === 0;
-});
-nameInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter" && !startBtn.disabled) startGame();
-});
-startBtn.addEventListener("click", startGame);
-
-function startGame() {
-  gameState.playerName = nameInput.value.trim() || "Student";
-  gameState.questions = shuffle(QUESTIONS).map(q => ({
-    q: q.q,
-    options: shuffle(q.options)
-  }));
-  gameState.currentIndex = 0;
-  gameState.score = 0;
-  gameState.correctCount = 0;
-  gameState.history = [];
-
-  document.getElementById("q-total").textContent = gameState.questions.length;
-  showScreen("question-screen");
-  loadQuestion();
-}
-
-// ==================== QUESTION FLOW ====================
-function loadQuestion() {
-  gameState.answered = false;
-  gameState.timeLeft = TIME_PER_Q;
-  gameState.questionStartTime = Date.now();
-
-  const current = gameState.questions[gameState.currentIndex];
-  document.getElementById("q-num").textContent = gameState.currentIndex + 1;
-  document.getElementById("current-score").textContent = gameState.score;
-  document.getElementById("question-text").textContent = current.q;
-  document.getElementById("timer-circle").textContent = TIME_PER_Q;
-  document.getElementById("timer-bar").style.width = "100%";
-
-  const grid = document.getElementById("answers-grid");
-  grid.innerHTML = "";
-  current.options.forEach((opt, i) => {
-    const btn = document.createElement("button");
-    btn.className = `answer-btn color-${i}`;
-    btn.innerHTML = `<span class="shape">${SHAPES[i]}</span><span>${opt.text}</span>`;
-    btn.addEventListener("click", () => handleAnswer(i, btn));
-    grid.appendChild(btn);
-  });
-
-  startTimer();
-}
-
-function startTimer() {
-  clearInterval(gameState.timer);
-  // Trigger bar transition
-  requestAnimationFrame(() => {
-    const bar = document.getElementById("timer-bar");
-    bar.style.transition = "width 1s linear";
-    bar.style.width = "100%";
-    requestAnimationFrame(() => {
-      bar.style.width = ((gameState.timeLeft - 1) / TIME_PER_Q * 100) + "%";
-    });
-  });
-
-  gameState.timer = setInterval(() => {
-    gameState.timeLeft--;
-    document.getElementById("timer-circle").textContent = gameState.timeLeft;
-    const pct = (gameState.timeLeft - 1) / TIME_PER_Q * 100;
-    document.getElementById("timer-bar").style.width = Math.max(0, pct) + "%";
-
-    if (gameState.timeLeft <= 0) {
-      clearInterval(gameState.timer);
-      if (!gameState.answered) handleTimeout();
-    }
-  }, 1000);
-}
-
-function handleAnswer(idx, btn) {
-  if (gameState.answered) return;
-  gameState.answered = true;
-  clearInterval(gameState.timer);
-
-  const current = gameState.questions[gameState.currentIndex];
-  const chosen = current.options[idx];
-  const isCorrect = chosen.correct;
-  const elapsed = (Date.now() - gameState.questionStartTime) / 1000;
-  const remainingFraction = Math.max(0, 1 - (elapsed / TIME_PER_Q));
-  // Kahoot-style scoring: 500 base + 500 * speed bonus, only if correct
-  const points = isCorrect ? Math.round(500 + 500 * remainingFraction) : 0;
-
-  if (isCorrect) {
-    gameState.score += points;
-    gameState.correctCount++;
-  }
-
-  // Highlight buttons
-  document.querySelectorAll(".answer-btn").forEach((b, i) => {
-    b.disabled = true;
-    if (current.options[i].correct) {
-      b.classList.add("correct");
-    } else if (i === idx) {
-      b.classList.add("wrong");
-    } else {
-      b.classList.add("dimmed");
-    }
-  });
-
-  // Save history
-  const correctOpt = current.options.find(o => o.correct);
-  gameState.history.push({
-    q: current.q,
-    chosen: chosen.text,
-    correct: correctOpt.text,
-    isCorrect,
-    points,
-    timedOut: false
-  });
-
-  setTimeout(() => showFeedback(isCorrect, false, points, correctOpt.text), 1500);
-}
-
-function handleTimeout() {
-  gameState.answered = true;
-  const current = gameState.questions[gameState.currentIndex];
-  const correctOpt = current.options.find(o => o.correct);
-
-  document.querySelectorAll(".answer-btn").forEach((b, i) => {
-    b.disabled = true;
-    if (current.options[i].correct) b.classList.add("correct");
-    else b.classList.add("dimmed");
-  });
-
-  gameState.history.push({
-    q: current.q,
-    chosen: "(no answer)",
-    correct: correctOpt.text,
-    isCorrect: false,
-    points: 0,
-    timedOut: true
-  });
-
-  setTimeout(() => showFeedback(false, true, 0, correctOpt.text), 1500);
-}
-
-function showFeedback(isCorrect, timedOut, points, correctText) {
-  showScreen("feedback-screen");
-  const icon = document.getElementById("feedback-icon");
-  const title = document.getElementById("feedback-title");
-  const ptsEl = document.getElementById("feedback-points");
-  const ans = document.getElementById("feedback-correct-answer");
-
-  title.className = "feedback-title";
-
-  if (timedOut) {
-    icon.textContent = "⏰";
-    title.textContent = "Time's up!";
-    title.classList.add("timeout");
-    ptsEl.textContent = "+0 points";
-  } else if (isCorrect) {
-    icon.textContent = "✅";
-    title.textContent = "Correct!";
-    title.classList.add("correct");
-    ptsEl.textContent = `+${points} points`;
-  } else {
-    icon.textContent = "❌";
-    title.textContent = "Incorrect";
-    title.classList.add("wrong");
-    ptsEl.textContent = "+0 points";
-  }
-
-  ans.innerHTML = `Correct answer: <strong>${correctText}</strong>`;
-
-  const nextBtn = document.getElementById("next-btn");
-  const isLast = gameState.currentIndex >= gameState.questions.length - 1;
-  nextBtn.textContent = isLast ? "See Results →" : "Next →";
-}
-
-document.getElementById("next-btn").addEventListener("click", () => {
-  gameState.currentIndex++;
-  if (gameState.currentIndex >= gameState.questions.length) {
-    showFinal();
-  } else {
-    showScreen("question-screen");
-    loadQuestion();
-  }
-});
-
-// ==================== FINAL ====================
-function showFinal() {
-  showScreen("final-screen");
-  const total = gameState.questions.length;
-  const pct = Math.round((gameState.correctCount / total) * 100);
-
-  document.getElementById("final-player").textContent = gameState.playerName;
-  document.getElementById("final-score").textContent = gameState.score;
-  document.getElementById("final-correct").textContent = `${gameState.correctCount} / ${total}`;
-  document.getElementById("final-percent").textContent = pct + "%";
-
-  const trophy = document.getElementById("trophy");
-  const gradeMsg = document.getElementById("grade-message");
-  gradeMsg.className = "grade-message";
-
-  if (pct >= 80) {
-    trophy.textContent = "🏆";
-    gradeMsg.textContent = "Excellent work! You're a sphere expert! 🌟";
-    gradeMsg.classList.add("grade-excellent");
-  } else if (pct >= 60) {
-    trophy.textContent = "🥈";
-    gradeMsg.textContent = "Good job! Review the ones you missed and try again!";
-    gradeMsg.classList.add("grade-good");
-  } else {
-    trophy.textContent = "📚";
-    gradeMsg.textContent = "Keep studying! Practice makes perfect.";
-    gradeMsg.classList.add("grade-keep");
-  }
-
-  // Review list
-  const reviewList = document.getElementById("review-list");
-  reviewList.innerHTML = "";
-  gameState.history.forEach((h, i) => {
-    const div = document.createElement("div");
-    div.className = "review-item " + (h.isCorrect ? "correct" : "wrong");
-    const mark = h.isCorrect ? "✅" : (h.timedOut ? "⏰" : "❌");
-    div.innerHTML = `
-      <div class="q-text"><strong>${i + 1}.</strong> ${h.q}</div>
-      <div class="result-line">${mark} Your answer: ${h.chosen} ${h.isCorrect ? "" : `| Correct: <strong>${h.correct}</strong>`} (+${h.points} pts)</div>
-    `;
-    reviewList.appendChild(div);
-  });
-}
-
-document.getElementById("restart-btn").addEventListener("click", () => {
-  nameInput.value = gameState.playerName;
-  startBtn.disabled = false;
-  showScreen("start-screen");
-});
-
-document.getElementById("review-toggle").addEventListener("click", () => {
-  const list = document.getElementById("review-list");
-  list.style.display = list.style.display === "none" ? "block" : "none";
-});
-</script>
+  <!-- FOOTER -->
+  <footer>
+    <div class="flag-bar"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+    <p class="school">Colegio Dunalastair</p>
+    <p>Project 2 · 6th Grade · Chile is a Gift</p>
+  </footer>
 
 </body>
 </html>
