@@ -1,482 +1,730 @@
-
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-							<style>
-								body {
-									background-color: white; /* Ensure the iframe has a white background */
-								}
-
-								
-							</style>
-                        </head>
-                        <body>
-                            <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fraction Adventure!</title>
-    <style>
-        :root {
-            --primary: #4CAF50;
-            --secondary: #FF9800;
-            --background: #E8F5E9;
-            --text: #333;
-            --board-bg: #81C784;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chile is a Gift — Project 2 | 6th Grade</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --chile-red: #D52B1E;
+    --chile-blue: #0039A6;
+    --chile-blue-light: #1E63D1;
+    --chile-blue-deep: #002577;
+    --chile-white: #FFFFFF;
+    --cream: #FFF8F0;
+    --soft-gray: #F4F6FA;
+    --text-dark: #1A2238;
+    --text-muted: #4A5568;
+    --shadow: 0 10px 30px rgba(0, 57, 166, 0.12);
+    --shadow-strong: 0 20px 50px rgba(0, 57, 166, 0.18);
+  }
 
-        body {
-            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
-            background-color: var(--background);
-            color: var(--text);
-            text-align: center;
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        h1 {
-            color: var(--secondary);
-            text-shadow: 2px 2px 0px #fff;
-            margin-bottom: 5px;
-        }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--soft-gray);
+    color: var(--text-dark);
+    line-height: 1.6;
+  }
 
-        /* Tablero de juego adaptado para 20 pasos */
-        .board-container {
-            width: 100%;
-            max-width: 900px;
-            margin: 15px 0;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
+  .display { font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px; }
 
-        .board {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            position: relative;
-        }
+  /* ===== HEADER ===== */
+  .hero {
+    position: relative;
+    background: linear-gradient(135deg, var(--chile-blue) 0%, var(--chile-blue-light) 100%);
+    color: white;
+    padding: 70px 24px 90px;
+    overflow: hidden;
+    text-align: center;
+  }
+  .hero::before, .hero::after {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+  .hero::before { background: white; top: -300px; right: -200px; }
+  .hero::after { background: var(--chile-red); bottom: -350px; left: -250px; opacity: 0.15; }
 
-        .step {
-            width: 45px;
-            height: 45px;
-            background-color: var(--board-bg);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            color: white;
-            border: 3px solid #388E3C;
-            position: relative;
-            font-size: 14px;
-        }
+  .flag-bar {
+    display: flex;
+    height: 8px;
+    width: 200px;
+    margin: 0 auto 30px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .flag-bar span { flex: 1; }
+  .flag-bar .b1 { background: var(--chile-white); }
+  .flag-bar .b2 { background: var(--chile-blue-deep); }
+  .flag-bar .b3 { background: var(--chile-red); }
 
-        .step.active {
-            background-color: #2196F3;
-            border-color: #1565C0;
-            transform: scale(1.2);
-            box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
-        }
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.25);
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .hero .question {
+    font-size: clamp(1.05rem, 2vw, 1.4rem);
+    font-style: italic;
+    max-width: 700px;
+    margin: 0 auto;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+    font-weight: 400;
+  }
+  .hero .meta {
+    margin-top: 30px;
+    font-size: 0.9rem;
+    opacity: 0.85;
+    position: relative;
+    z-index: 1;
+  }
 
-        .step.finish { background-color: #FFD700; border-color: #F57F17; }
-        
-        .player-icon {
-            font-size: 25px;
-            position: absolute;
-            top: -15px;
-            left: 5px;
-        }
+  /* ===== CONTAINERS ===== */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 70px 0; }
 
-        /* Área de preguntas */
-        .question-area {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
-        }
+  .section-title {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .section-title h2 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: var(--chile-blue-deep);
+    margin-bottom: 12px;
+  }
+  .section-title p {
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: 1.05rem;
+  }
+  .section-title .underline {
+    width: 80px;
+    height: 4px;
+    background: var(--chile-red);
+    margin: 16px auto 0;
+    border-radius: 2px;
+  }
 
-        .level-indicator {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
+  /* ===== PROBLEM / NARRATIVE ===== */
+  .problem-section {
+    background: white;
+    margin-top: -50px;
+    border-radius: 24px 24px 0 0;
+    position: relative;
+    z-index: 2;
+    box-shadow: var(--shadow);
+  }
+  .problem-card {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 20px 0;
+  }
+  .problem-card .quote-mark {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 5rem;
+    color: var(--chile-red);
+    line-height: 0.5;
+    opacity: 0.5;
+  }
+  .problem-card p {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 18px;
+    line-height: 1.75;
+  }
+  .problem-card p:last-child { margin-bottom: 0; }
+  .problem-card strong {
+    color: var(--chile-blue-deep);
+    background: linear-gradient(transparent 60%, rgba(213,43,30,0.15) 60%);
+    padding: 0 2px;
+  }
 
-        .fraction-display {
-            font-size: 40px;
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-        }
+  /* ===== LEARNING ROUTE ===== */
+  .route-section { background: var(--soft-gray); }
+  .route {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    position: relative;
+  }
+  .route::before {
+    content: '';
+    position: absolute;
+    top: 60px;
+    left: 12%;
+    right: 12%;
+    height: 3px;
+    background: repeating-linear-gradient(90deg, var(--chile-red) 0, var(--chile-red) 10px, transparent 10px, transparent 20px);
+    z-index: 0;
+  }
+  .route-step {
+    background: white;
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1;
+    border-top: 4px solid var(--chile-blue);
+  }
+  .route-step:hover { transform: translateY(-8px); }
+  .route-step.final { border-top-color: var(--chile-red); }
+  .route-step .pin {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--chile-blue), var(--chile-blue-light));
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(0,57,166,0.3);
+  }
+  .route-step.final .pin {
+    background: linear-gradient(135deg, var(--chile-red), #FF5C4D);
+    box-shadow: 0 8px 20px rgba(213,43,30,0.35);
+  }
+  .route-step h3 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.3rem;
+    color: var(--chile-blue-deep);
+    margin-bottom: 10px;
+  }
+  .route-step.final h3 { color: var(--chile-red); }
+  .route-step p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
 
-        .fraction-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+  /* ===== SUBJECTS ===== */
+  .subjects-section { background: white; }
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  .subject-card {
+    background: var(--soft-gray);
+    border-radius: 18px;
+    padding: 32px 26px;
+    transition: all 0.3s ease;
+    border-left: 5px solid var(--chile-blue);
+  }
+  .subject-card:nth-child(2) { border-left-color: var(--chile-red); }
+  .subject-card:nth-child(3) { border-left-color: var(--chile-blue-deep); }
+  .subject-card:hover {
+    background: white;
+    box-shadow: var(--shadow);
+    transform: translateY(-4px);
+  }
+  .subject-card .icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--chile-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    font-size: 1.8rem;
+  }
+  .subject-card:nth-child(2) .icon-circle { background: var(--chile-red); }
+  .subject-card:nth-child(3) .icon-circle { background: var(--chile-blue-deep); }
+  .subject-card h3 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.4rem;
+    color: var(--chile-blue-deep);
+    margin-bottom: 14px;
+  }
+  .subject-card ul { list-style: none; }
+  .subject-card li {
+    padding: 6px 0 6px 22px;
+    position: relative;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+  }
+  .subject-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 8px;
+    height: 8px;
+    background: var(--chile-red);
+    border-radius: 50%;
+  }
+  .subject-card:nth-child(2) li::before { background: var(--chile-blue); }
 
-        .whole-number {
-            font-size: 45px;
-            font-weight: bold;
-        }
+  /* ===== KEYWORDS ===== */
+  .keywords-section {
+    background: linear-gradient(135deg, var(--chile-blue-deep) 0%, var(--chile-blue) 100%);
+    color: white;
+  }
+  .keywords-section .section-title h2 { color: white; }
+  .keywords-section .section-title p { color: rgba(255,255,255,0.85); }
+  .keywords {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .keyword {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    padding: 12px 22px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  .keyword:hover {
+    background: var(--chile-red);
+    border-color: var(--chile-red);
+    transform: scale(1.05);
+  }
 
-        .fraction {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 30px;
-        }
+  /* ===== GALLERY ===== */
+  .gallery-section { background: var(--soft-gray); }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 220px 220px;
+    gap: 14px;
+  }
+  .gallery-item {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+  }
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .gallery-item:hover img { transform: scale(1.08); }
+  .gallery-item .caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 18px 14px;
+    background: linear-gradient(transparent, rgba(0,37,119,0.9));
+    color: white;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+  }
+  .gallery-item.large { grid-column: span 2; grid-row: span 2; }
+  .gallery-item.large .caption { font-size: 1.4rem; padding: 30px 24px 20px; }
+  .gallery-item.wide { grid-column: span 2; }
 
-        .numerator { border-bottom: 3px solid var(--text); padding: 0 5px; }
-        .denominator { padding: 0 5px; }
+  /* ===== AT HOME ===== */
+  .athome-section { background: white; }
+  .athome-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .athome-card {
+    text-align: center;
+    padding: 36px 24px;
+    background: var(--cream);
+    border-radius: 18px;
+    border: 2px dashed var(--chile-red);
+    transition: all 0.3s ease;
+  }
+  .athome-card:hover {
+    border-style: solid;
+    background: white;
+    box-shadow: var(--shadow);
+  }
+  .athome-card .icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .athome-card h4 {
+    font-family: 'Fredoka', sans-serif;
+    color: var(--chile-blue-deep);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  .athome-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
 
-        .options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
+  /* ===== PROFILE & SKILLS ===== */
+  .profile-section {
+    background: linear-gradient(180deg, var(--soft-gray) 0%, white 100%);
+  }
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 60px;
+  }
+  .profile-card {
+    background: white;
+    padding: 32px 26px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+  }
+  .profile-card:nth-child(1)::before { background: var(--chile-red); }
+  .profile-card:nth-child(2)::before { background: var(--chile-blue); }
+  .profile-card:nth-child(3)::before { background: var(--chile-blue-deep); }
+  .profile-card .star {
+    font-size: 2.5rem;
+    margin-bottom: 14px;
+  }
+  .profile-card h4 {
+    font-family: 'Fredoka', sans-serif;
+    color: var(--chile-blue-deep);
+    font-size: 1.4rem;
+    margin-bottom: 14px;
+  }
+  .profile-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
 
-        button.option-btn {
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            padding: 10px;
-            min-height: 80px;
-            font-size: 22px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
-            box-shadow: 0 4px 0 #1976D2;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+  .skills-wrap {
+    background: linear-gradient(135deg, var(--chile-red) 0%, #FF5C4D 100%);
+    border-radius: 24px;
+    padding: 50px 30px;
+    text-align: center;
+    color: white;
+    box-shadow: var(--shadow-strong);
+  }
+  .skills-wrap h3 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+  .skills-list {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+  .skill-pill {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 16px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
 
-        button.option-btn:hover { background-color: #1E88E5; transform: translateY(2px); box-shadow: 0 2px 0 #1976D2; }
-        button.option-btn:active { transform: translateY(4px); box-shadow: none; }
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--chile-blue-deep);
+    color: white;
+    padding: 40px 24px 30px;
+    text-align: center;
+  }
+  footer .flag-bar { margin-bottom: 20px; }
+  footer p { opacity: 0.85; font-size: 0.95rem; }
+  footer .school {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
 
-        /* Feedback */
-        #feedback {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 18px;
-            display: none;
-            font-weight: bold;
-        }
-
-        .correct { background-color: #C8E6C9; color: #2E7D32; }
-        .incorrect { background-color: #FFCDD2; color: #C62828; }
-
-        .btn-next {
-            margin-top: 15px;
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: none;
-        }
-        
-        #victory { display: none; margin-top: 20px; }
-    </style>
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .hero { padding: 50px 20px 70px; }
+    section { padding: 50px 0; }
+    .route,
+    .subjects-grid,
+    .athome-grid,
+    .profile-grid {
+      grid-template-columns: 1fr;
+    }
+    .route::before { display: none; }
+    .gallery {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: 180px 180px 180px;
+    }
+    .gallery-item.large { grid-column: span 2; grid-row: span 1; }
+    .gallery-item.wide { grid-column: span 2; }
+    .problem-card { padding: 0 10px; }
+    .skills-list { gap: 14px; }
+  }
+</style>
 </head>
 <body>
 
-    <h1>🚀 Fraction Adventure! 🚀</h1>
-    <p>Solve the math problems to move forward. Reach the goal (20 points)!</p>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="flag-bar"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+    <span class="badge">Project 2 · 6th Grade</span>
+    <h1 class="display">Chile is a Gift</h1>
+    <p class="question">Why is Chile unique and different from other countries?</p>
+    <p class="meta">A letter for our families · Colegio Dunalastair</p>
+  </header>
 
-    <div class="board-container">
-        <div class="board" id="board">
-            <!-- Tablero generado por JS -->
-        </div>
+  <!-- PROBLEM / NARRATIVE -->
+  <section class="problem-section">
+    <div class="container">
+      <div class="problem-card">
+        <div class="quote-mark">&ldquo;</div>
+        <p>Wouldn't it be amazing to build a snowman, swim in the ocean, smell the exquisite essence of a green forest and visit a majestic volcano in just one single place? Is that even possible? Well, <strong>the answer is closer than you think</strong>. Just take a look around into your own country.</p>
+        <p>Chile's diverse landscapes, from <strong>icy Antarctica to the arid Atacama desert</strong>, make it an enticing destination. Its dramatic differences in customs, traditions and lifestyles — depending on the different geographical zones — are a significant pretext for tourists wanting to come back to our country every time they can.</p>
+        <p>But, <strong>how much of it do you really know?</strong> How much do you know about the country you live in? Would you be able to convince your family members to visit our country during the next holidays? Which highlights, activities and suggestions would you give to someone who would like to travel around Chile?</p>
+      </div>
     </div>
+  </section>
 
-    <div class="question-area" id="game-area">
-        <div class="level-indicator" id="level-indicator">Level 1: Same Denominator</div>
-        <div class="fraction-display" id="question-container">
-            <!-- Fracción generada por JS -->
+  <!-- LEARNING ROUTE -->
+  <section class="route-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Our Learning Route</h2>
+        <div class="underline"></div>
+        <p>Three milestones that guide students from research to a final creative product.</p>
+      </div>
+      <div class="route">
+        <div class="route-step">
+          <div class="pin">SP1</div>
+          <h3>Sub Product 1</h3>
+          <p>A poster of a Chilean zone and region, paired with a <strong>protection protocol manual</strong> for a natural hazard of that area.</p>
         </div>
-        
-        <div class="options" id="options">
-            <!-- Opciones generadas por JS -->
+        <div class="route-step">
+          <div class="pin">SP2</div>
+          <h3>Sub Product 2</h3>
+          <p>A <strong>tourism poster</strong> featuring an itinerary of a destination in Chile worth visiting.</p>
         </div>
-
-        <div id="feedback"></div>
-        <button class="btn-next" id="btn-next" onclick="nextTurn()">Next Question ➡️</button>
+        <div class="route-step final">
+          <div class="pin">FP</div>
+          <h3>Final Product</h3>
+          <p>A <strong>video or blog</strong> that integrates Sub Product 1 and Sub Product 2 into one promotional piece.</p>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div id="victory" class="question-area">
-        <h2>Congratulations! 🎉</h2>
-        <p>You have mastered adding and subtracting fractions!</p>
-        <div style="font-size: 80px;">🏆</div>
-        <button class="btn-next" style="display:inline-block;" onclick="location.reload()">Play Again</button>
+  <!-- SUBJECTS -->
+  <section class="subjects-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>What We're Learning</h2>
+        <div class="underline"></div>
+        <p>Content from three subjects connected through the project.</p>
+      </div>
+      <div class="subjects-grid">
+        <div class="subject-card">
+          <div class="icon-circle">&#127757;</div>
+          <h3>Project</h3>
+          <ul>
+            <li>Locate Chile and identify its zones</li>
+            <li>Zone characteristics</li>
+            <li>Earth spheres</li>
+            <li>Natural environments and hazards</li>
+          </ul>
+        </div>
+        <div class="subject-card">
+          <div class="icon-circle">&#128290;</div>
+          <h3>Math</h3>
+          <ul>
+            <li>Four operations and word problems</li>
+            <li>Area of cubes and parallelepipeds</li>
+            <li>Volume of cubes and parallelepipeds</li>
+            <li>Tessellations with isometric movements</li>
+          </ul>
+        </div>
+        <div class="subject-card">
+          <div class="icon-circle">&#128218;</div>
+          <h3>English</h3>
+          <ul>
+            <li>PET practice — speaking</li>
+            <li>PET practice — reading</li>
+            <li>PET practice — writing</li>
+            <li>PET practice — listening</li>
+          </ul>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <script>
-        const totalSteps = 20;
-        let currentStep = 0;
-        let currentAnswer = null;
-        let isAnswered = false;
+  <!-- KEYWORDS -->
+  <section class="keywords-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Key Words</h2>
+        <div class="underline"></div>
+        <p>The vocabulary that will accompany us throughout the project.</p>
+      </div>
+      <div class="keywords">
+        <span class="keyword">Natural environment</span>
+        <span class="keyword">Political administrative division</span>
+        <span class="keyword">Relationships</span>
+        <span class="keyword">Transfer of energy</span>
+        <span class="keyword">Photosynthesis</span>
+        <span class="keyword">Earth spheres</span>
+        <span class="keyword">Diversity</span>
+        <span class="keyword">Systems</span>
+        <span class="keyword">Interactions</span>
+        <span class="keyword">Balance</span>
+      </div>
+    </div>
+  </section>
 
-        // Construir tablero
-        const boardEl = document.getElementById('board');
-        for (let i = 0; i <= totalSteps; i++) {
-            const step = document.createElement('div');
-            step.className = `step ${i === totalSteps ? 'finish' : ''}`;
-            step.id = `step-${i}`;
-            step.innerText = i === 0 ? 'Start' : (i === totalSteps ? 'Goal' : i);
-            boardEl.appendChild(step);
-        }
+  <!-- GALLERY -->
+  <section class="gallery-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>The Landscapes We Explore</h2>
+        <div class="underline"></div>
+        <p>From the driest desert to the southern ice fields — Chile in one journey.</p>
+      </div>
+      <div class="gallery">
+        <div class="gallery-item large">
+          <img src="https://assets.explora.com/app/uploads/2023/11/Explore-Torres-del-Paine-National-Park-4.jpg" alt="Torres del Paine">
+          <div class="caption">Torres del Paine</div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://cdn.prod.website-files.com/5bb2cb199758ce1535f85891/674519f4889ed4f58760649b_marek-piwnicki-joxXZhefnhk-unsplash%20copy.jpg" alt="Atacama Desert">
+          <div class="caption">Atacama Desert</div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://static.workaway.info/gfx/foto/1/8/2/5/2/182526545271/xl/182526545271_166759925607675.jpg" alt="Pacific Coast">
+          <div class="caption">Pacific Coast</div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://static.wixstatic.com/media/2fe42d_67f5b9f2f1af4d3e8dfd590dc2dcaf31~mv2.jpg/v1/fill/w_1110,h_701,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/2fe42d_67f5b9f2f1af4d3e8dfd590dc2dcaf31~mv2.jpg" alt="Andes Mountain Range">
+          <div class="caption">The Andes</div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/12/39/5d/5a/img-20180302-135335-687.jpg?w=1200&h=-1&s=1" alt="Patagonia">
+          <div class="caption">Patagonia</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Utilidades matemáticas
-        function mcd(a, b) { return b === 0 ? a : mcd(b, a % b); }
-        function mcm(a, b) { return (a * b) / mcd(a, b); }
+  <!-- AT HOME -->
+  <section class="athome-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>How You Can Help at Home</h2>
+        <div class="underline"></div>
+        <p>Small activities at home that strengthen what we do in the classroom.</p>
+      </div>
+      <div class="athome-grid">
+        <div class="athome-card">
+          <span class="icon">&#127956;</span>
+          <h4>Explore Chile Together</h4>
+          <p>Visit places like Parque San Ramón, Alto Las Vizcachas or Cajón del Maipo. Pay attention to the local flora and fauna.</p>
+        </div>
+        <div class="athome-card">
+          <span class="icon">&#128187;</span>
+          <h4>Finish Eduten</h4>
+          <p>Encourage your child to complete the assigned exercises on the Eduten platform.</p>
+        </div>
+        <div class="athome-card">
+          <span class="icon">&#127909;</span>
+          <h4>Movies &amp; Books in English</h4>
+          <p>Watch films and read books in English. A great way to reinforce listening and reading skills.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Simplificar y convertir a mixto si es necesario para mostrar
-        function simplify(n, d) {
-            if (n === 0) return { w: 0, n: 0, d: 1 };
-            const divisor = mcd(Math.abs(n), Math.abs(d));
-            let sn = n / divisor;
-            let sd = d / divisor;
-            let w = 0;
-            
-            if (sn >= sd) {
-                w = Math.floor(sn / sd);
-                sn = sn % sd;
-            }
-            return { w, n: sn, d: sd };
-        }
+  <!-- PROFILE & SKILLS -->
+  <section class="profile-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>The Dunalastair Student Profile</h2>
+        <div class="underline"></div>
+        <p>Three qualities we cultivate through every project.</p>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-card">
+          <div class="star">&#127775;</div>
+          <h4>Responsible Citizens</h4>
+          <p>Who, when acting, do so with a sense of responsibility towards themselves, their school community, their society and the environment.</p>
+        </div>
+        <div class="profile-card">
+          <div class="star">&#128161;</div>
+          <h4>Innovative</h4>
+          <p>Capable of seeing things in a new light — whether designing solutions to problems or crafting new ideas about how to do something — and willing to act on these insights.</p>
+        </div>
+        <div class="profile-card">
+          <div class="star">&#129504;</div>
+          <h4>Autonomous</h4>
+          <p>Self-governing, free agents who are nevertheless aware of the importance of collaboration in human affairs.</p>
+        </div>
+      </div>
 
-        // Convertir mixto a impropia
-        function toImproper(w, n, d) {
-            return (w * d) + n;
-        }
+      <div class="skills-wrap">
+        <h3>Skills We Develop</h3>
+        <div class="skills-list">
+          <div class="skill-pill">Communication</div>
+          <div class="skill-pill">Creativity</div>
+          <div class="skill-pill">Critical Thinking</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Generar HTML de fracción
-        function formatFractionHTML(w, n, d) {
-            let html = '<div class="fraction-wrapper">';
-            if (w > 0) {
-                html += `<span class="whole-number">${w}</span>`;
-            }
-            if (n > 0 || (w === 0 && n === 0)) {
-                if (d === 1 || n === 0) {
-                    html += `<span style="font-size:40px">${n}</span>`;
-                } else {
-                    html += `
-                        <div class="fraction">
-                            <span class="numerator">${n}</span>
-                            <span class="denominator">${d}</span>
-                        </div>
-                    `;
-                }
-            }
-            html += '</div>';
-            return html;
-        }
+  <!-- FOOTER -->
+  <footer>
+    <div class="flag-bar"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+    <p class="school">Colegio Dunalastair</p>
+    <p>Project 2 · 6th Grade · Chile is a Gift</p>
+  </footer>
 
-        function updateBoard() {
-            document.querySelectorAll('.step').forEach(el => {
-                el.classList.remove('active');
-                const icon = el.querySelector('.player-icon');
-                if (icon) icon.remove();
-            });
-            const currentEl = document.getElementById(`step-${currentStep}`);
-            currentEl.classList.add('active');
-            currentEl.innerHTML += '<div class="player-icon">🚀</div>';
-        }
-
-        // Generar preguntas
-        function generateQuestion() {
-            isAnswered = false;
-            document.getElementById('feedback').style.display = 'none';
-            document.getElementById('btn-next').style.display = 'none';
-            document.getElementById('options').innerHTML = '';
-
-            let w1=0, n1, d1, w2=0, n2, d2, operator;
-            const isAddition = Math.random() > 0.4; // Ligeramente más sumas
-            operator = isAddition ? '+' : '-';
-
-            // DIFICULTAD SEGÚN POSICIÓN (20 Puntos)
-            if (currentStep < 5) {
-                document.getElementById('level-indicator').innerText = "Level 1: Same Denominator";
-                d1 = Math.floor(Math.random() * 8) + 3; 
-                d2 = d1;
-                n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
-                n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
-                if (!isAddition && n1 < n2) [n1, n2] = [n2, n1];
-            } else if (currentStep < 12) {
-                document.getElementById('level-indicator').innerText = "Level 2: Different Denominators";
-                const denoms = [2, 3, 4, 5, 6, 8, 10];
-                d1 = denoms[Math.floor(Math.random() * denoms.length)];
-                d2 = denoms[Math.floor(Math.random() * denoms.length)];
-                while (d1 === d2) d2 = denoms[Math.floor(Math.random() * denoms.length)];
-                n1 = Math.floor(Math.random() * d1) + 1;
-                n2 = Math.floor(Math.random() * d2) + 1;
-                
-                // Asegurar resta positiva
-                if (!isAddition && (n1/d1) < (n2/d2)) {
-                    [n1, n2] = [n2, n1]; [d1, d2] = [d2, d1];
-                }
-            } else {
-                document.getElementById('level-indicator').innerText = "Level 3: Mixed Numbers";
-                d1 = Math.floor(Math.random() * 4) + 2;
-                d2 = Math.floor(Math.random() * 4) + 2;
-                n1 = Math.floor(Math.random() * d1) + 1;
-                n2 = Math.floor(Math.random() * d2) + 1;
-                w1 = Math.floor(Math.random() * 3) + 1; // Entero de 1 a 3
-                w2 = Math.floor(Math.random() * 2) + 1;
-                
-                let val1 = w1 + (n1/d1);
-                let val2 = w2 + (n2/d2);
-                if (!isAddition && val1 < val2) {
-                    [w1, w2] = [w2, w1]; [n1, n2] = [n2, n1]; [d1, d2] = [d2, d1];
-                }
-            }
-
-            // Fracciones impropias para calcular la respuesta real
-            const impN1 = toImproper(w1, n1, d1);
-            const impN2 = toImproper(w2, n2, d2);
-            
-            const comunDenom = mcm(d1, d2);
-            const eqN1 = impN1 * (comunDenom / d1);
-            const eqN2 = impN2 * (comunDenom / d2);
-
-            let resN = isAddition ? (eqN1 + eqN2) : (eqN1 - eqN2);
-            let resD = comunDenom;
-            
-            const realAnswer = simplify(resN, resD);
-            currentAnswer = { ...realAnswer, type: 'correct' };
-
-            // Mostrar pregunta
-            const questionHTML = `
-                ${formatFractionHTML(w1, n1, d1)}
-                <span>${operator}</span>
-                ${formatFractionHTML(w2, n2, d2)}
-                <span>=</span>
-                <span style="font-size: 40px;">?</span>
-            `;
-            document.getElementById('question-container').innerHTML = questionHTML;
-
-            // Generar distractores con errores tipificados
-            let options = [currentAnswer];
-            
-            // Error 1: Sumar/restar hacia el lado (numerador con numerador, denominador con denominador)
-            let err1N = isAddition ? (impN1 + impN2) : Math.abs(impN1 - impN2);
-            let err1D = isAddition ? (d1 + d2) : Math.abs(d1 - d2);
-            if (err1D === 0) err1D = d1;
-            options.push({ ...simplify(err1N, err1D), type: 'error_across' });
-
-            // Error 2: Mal cálculo del numerador manteniendo el común múltiplo
-            options.push({ ...simplify(resN + (Math.floor(Math.random()*3)+1), resD), type: 'error_calc' });
-
-            // Error 3: Olvidar los enteros en mixtos, o simplemente otro error menor
-            if (w1 > 0 || w2 > 0) {
-                // Solo operó las fracciones y olvidó los enteros
-                let partEqN1 = n1 * (comunDenom / d1);
-                let partEqN2 = n2 * (comunDenom / d2);
-                let err3N = Math.abs(isAddition ? partEqN1 + partEqN2 : partEqN1 - partEqN2);
-                options.push({ ...simplify(err3N, comunDenom), type: 'error_mixed' });
-            } else {
-                options.push({ ...simplify(Math.abs(resN - 1) || 1, resD + 1), type: 'error_calc' });
-            }
-
-            // Filtrar duplicados visuales y asegurar 4 opciones
-            options = options.filter((v, i, a) => a.findIndex(t => (t.w === v.w && t.n === v.n && t.d === v.d)) === i);
-            while(options.length < 4) {
-                options.push({ ...simplify(Math.floor(Math.random()*15)+1, Math.floor(Math.random()*6)+2), type: 'error_random' });
-                options = options.filter((v, i, a) => a.findIndex(t => (t.w === v.w && t.n === v.n && t.d === v.d)) === i);
-            }
-
-            // Mezclar
-            options.sort(() => Math.random() - 0.5);
-
-            // Crear botones
-            const optionsContainer = document.getElementById('options');
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerHTML = formatFractionHTML(opt.w, opt.n, opt.d);
-                btn.onclick = () => checkAnswer(opt);
-                optionsContainer.appendChild(btn);
-            });
-        }
-
-        function checkAnswer(selectedOpt) {
-            if (isAnswered) return;
-            isAnswered = true;
-
-            const feedback = document.getElementById('feedback');
-            const btnNext = document.getElementById('btn-next');
-
-            if (selectedOpt.type === 'correct') {
-                feedback.innerHTML = "Correct! 🌟 Awesome job!";
-                feedback.className = "correct";
-                currentStep++;
-                updateBoard();
-            } else {
-                let hint = "Oops! Incorrect.<br>";
-                
-                // Feedback diferenciado según el tipo de distractor elegido
-                if (selectedOpt.type === 'error_across') {
-                    hint += "<strong>Tip:</strong> You cannot just add or subtract denominators. Find a common denominator first!";
-                } else if (selectedOpt.type === 'error_mixed') {
-                    hint += "<strong>Tip:</strong> Don't forget about the whole numbers! Try converting the mixed numbers into improper fractions first.";
-                } else if (selectedOpt.type === 'error_calc') {
-                    hint += "<strong>Tip:</strong> You are close! Double-check your addition or subtraction on the numerators.";
-                } else {
-                    hint += "<strong>Tip:</strong> Remember to find the Least Common Multiple (LCM) for the denominators before operating.";
-                }
-                
-                feedback.innerHTML = hint;
-                feedback.className = "incorrect";
-            }
-
-            feedback.style.display = "block";
-            
-            if (currentStep >= totalSteps) {
-                setTimeout(() => {
-                    document.getElementById('game-area').style.display = 'none';
-                    document.getElementById('victory').style.display = 'block';
-                }, 1200);
-            } else {
-                btnNext.style.display = "inline-block";
-            }
-        }
-
-        function nextTurn() {
-            generateQuestion();
-        }
-
-        window.onload = () => {
-            updateBoard();
-            generateQuestion();
-        }
-    </script>
 </body>
 </html>
-
-							<script>
-                            	
-							</script>
-                        </body>
-                        </html>
-                    
