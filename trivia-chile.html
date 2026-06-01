@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chile is a Gift — Trivia v2</title>
+<style>
+  :root{
+    --navy:#0f2a4a; --blue:#1c4f8a; --gold:#e8b53d;
+    --green:#2e9e5b; --red:#d94c4c;
+    --ink:#1d2733; --muted:#5b6b7d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh;
+    font-family:"Segoe UI",Calibri,system-ui,sans-serif;
+    background:linear-gradient(160deg,#eaf1fb 0%,#f3f6fb 100%);
+    color:var(--ink); line-height:1.5;
+    display:flex; flex-direction:column;
+  }
+  header{
+    background:linear-gradient(135deg,var(--navy),var(--blue));
+    color:#fff; padding:28px 20px 24px; text-align:center;
+  }
+  header h1{margin:0;font-size:1.9rem;letter-spacing:.5px;}
+  header p{margin:6px 0 0;opacity:.9;}
+  .wrap{max-width:780px;width:100%;margin:0 auto;padding:24px 18px 40px;flex:1;}
+
+  .instructions{
+    background:#fff;border-left:6px solid var(--gold);
+    border-radius:12px;padding:22px 26px;
+    box-shadow:0 6px 18px rgba(15,42,74,.08);
+  }
+  .instructions h2{margin:0 0 10px;color:var(--navy);font-size:1.3rem;}
+  .instructions p{margin:8px 0;color:var(--muted);}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:16px 0 4px;}
+  .legend span{display:inline-flex;align-items:center;gap:8px;font-size:.92rem;}
+  .dot{width:14px;height:14px;border-radius:4px;display:inline-block;}
+  .start-btn{
+    display:block;width:100%;margin-top:22px;
+    background:var(--gold);color:var(--navy);border:none;
+    padding:16px;border-radius:12px;font-size:1.15rem;font-weight:800;
+    cursor:pointer;font-family:inherit;letter-spacing:.5px;transition:.15s;
+  }
+  .start-btn:hover{background:#d8a52c;}
+
+  .progress-wrap{margin-bottom:18px;}
+  .progress-top{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px;font-weight:600;}
+  .bar{height:8px;background:#dce6f2;border-radius:6px;overflow:hidden;}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));width:0;transition:width .25s;}
+
+  .card{
+    background:#fff;border-radius:16px;padding:26px 26px 28px;
+    box-shadow:0 8px 24px rgba(15,42,74,.1);border:1px solid #e7edf5;
+    min-height:240px;
+  }
+
+  /* role-announce screen */
+  .role-screen{text-align:center;padding:30px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .role-qnum{font-size:1.1rem;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+  .role-big{
+    display:inline-block;font-size:1.7rem;font-weight:800;letter-spacing:1px;
+    padding:16px 34px;border-radius:16px;text-transform:uppercase;margin-bottom:16px;
+  }
+  .role-big.rep{background:#e6f0fb;color:var(--blue);}
+  .role-big.grp{background:#fff3d6;color:#9a6b00;}
+  .role-hint{font-size:1.1rem;color:var(--navy);max-width:440px;}
+
+  .meta{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .badge{font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:20px;}
+  .badge.rep{background:#e6f0fb;color:var(--blue);}
+  .badge.grp{background:#fff3d6;color:#9a6b00;}
+  .section-tag{font-size:.8rem;color:var(--muted);font-weight:600;}
+  .question{font-size:1.3rem;font-weight:700;margin:4px 0 18px;color:var(--navy);}
+  .question .qnum{color:var(--gold);}
+
+  .options{display:flex;flex-direction:column;gap:11px;}
+  .opt{text-align:left;width:100%;padding:14px 16px;border:2px solid #dde6f1;background:#fff;border-radius:10px;font-size:1.02rem;cursor:pointer;transition:.15s;color:var(--ink);font-family:inherit;}
+  .opt:hover{border-color:var(--blue);background:#f5f9ff;}
+  .opt.correct{border-color:var(--green);background:#e7f7ee;color:#1c6e3d;font-weight:700;}
+  .opt.wrong{border-color:var(--red);background:#fdeaea;color:#a82b2b;}
+  .opt:disabled{cursor:default;}
+
+  .feedback{margin-top:16px;padding:13px 16px;border-radius:10px;font-weight:700;display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:#e7f7ee;color:#1c6e3d;}
+  .feedback.no{background:#fdeaea;color:#a82b2b;}
+
+  .reveal-btn{background:var(--blue);color:#fff;border:none;padding:12px 22px;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;}
+  .reveal-btn:hover{background:var(--navy);}
+  .answer-box{display:none;margin-top:16px;padding:15px 18px;background:#e7f7ee;border-left:5px solid var(--green);border-radius:8px;color:#1c6e3d;font-weight:700;font-size:1.05rem;}
+  .answer-box.show{display:block;}
+  .answer-box .tag{display:block;font-size:.72rem;letter-spacing:1px;color:#2e9e5b;margin-bottom:5px;text-transform:uppercase;font-weight:800;}
+  .open-note{font-style:italic;color:var(--muted);font-weight:500;font-size:1rem;}
+
+  .nav{display:flex;justify-content:space-between;gap:12px;margin-top:22px;}
+  .nav button{flex:1;padding:14px;border-radius:11px;font-size:1.02rem;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:.15s;}
+  .prev-btn{background:#e3e9f1;color:var(--navy);}
+  .prev-btn:hover{background:#d3dce8;}
+  .prev-btn:disabled{opacity:.4;cursor:default;}
+  .next-btn{background:var(--navy);color:#fff;flex:2;}
+  .next-btn:hover{background:#0a1f38;}
+
+  .end{text-align:center;padding:20px;}
+  .end h2{color:var(--navy);font-size:1.6rem;margin-bottom:8px;}
+  .end p{color:var(--muted);}
+  .end button{margin-top:18px;}
+
+  .hidden{display:none;}
+  footer{text-align:center;color:var(--muted);font-size:.82rem;padding:16px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>🇨🇱 Chile is a Gift — Trivia</h1>
+  <p>Project Knowledge Challenge</p>
+</header>
+
+<div class="wrap">
+
+  <!-- START SCREEN -->
+  <div id="startScreen" class="instructions">
+    <h2>📋 Instructions</h2>
+    <p>This is a <strong>team competition by project groups</strong>. Each correct answer earns your team <strong>one point</strong>.</p>
+    <p>Before each question you will see who must answer: a single <strong>representative</strong> of the team, or the <strong>whole team on the mini whiteboards</strong>. The question only appears after you press Next, so get ready first!</p>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--blue);"></span> REPRESENTATIVE — one person answers</span>
+      <span><span class="dot" style="background:var(--gold);"></span> GROUP — everyone answers on the whiteboard</span>
+    </div>
+    <button class="start-btn" onclick="start()">▶ Start Trivia</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="hidden">
+    <div class="progress-wrap">
+      <div class="progress-top">
+        <span id="progressLabel">Question 1</span>
+        <span id="progressCount"></span>
+      </div>
+      <div class="bar"><i id="progressBar"></i></div>
+    </div>
+
+    <div id="card" class="card"></div>
+
+    <div class="nav">
+      <button class="prev-btn" id="prevBtn" onclick="go(-1)">◀ Previous</button>
+      <button class="next-btn" id="nextBtn" onclick="go(1)">Next ▶</button>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="endScreen" class="card end hidden">
+    <h2>🎉 That's all, teams!</h2>
+    <p>Great job answering the Chile is a Gift trivia.</p>
+    <button class="start-btn" onclick="restart()">↺ Start again</button>
+  </div>
+
+</div>
+
+<footer>🇨🇱 Chile is a Gift · Good luck, teams!</footer>
+
+<script>
+const questions = [
+  {sec:"Section 1 · Our Project", role:"rep", num:1, type:"reveal",
+   q:"What is the name of our project?", a:"Chile is a Gift ✅"},
+  {sec:"Section 1 · Our Project", role:"rep", num:2, type:"reveal",
+   q:"What is the guiding question of our project?", a:"Why is Chile unique and different from other countries? ✅"},
+  {sec:"Section 1 · Our Project", role:"rep", num:3, type:"reveal",
+   q:"What is the final product of the Chile is a Gift project?", a:"A video or blog that combines both subproducts ✅"},
+  {sec:"Section 1 · Our Project", role:"rep", num:4, type:"mc",
+   q:"According to Dunalastair's student profile, which of the following is NOT a characteristic we develop in this project?",
+   opts:["A) Responsible Citizens","B) Innovative","C) Passive and dependent"], correct:2},
+  {sec:"Section 1 · Our Project", role:"rep", num:5, type:"mc",
+   q:"What are the three main skills we develop in Chile is a Gift?",
+   opts:["A) Communication, Creativity, Critical Thinking","B) Reading, Writing, Calculation","C) Competition, Conformity, Control"], correct:0},
+  {sec:"Section 1 · Our Project", role:"grp", num:6, type:"reveal",
+   q:"How will we demonstrate Communication, Creativity, and Critical Thinking in Chile is a Gift?",
+   note:"Answer together on your whiteboard. The teachers will choose the most complete answer.",
+   a:"By working together, sharing ideas, creating original products, and explaining our learning using evidence."},
+
+  {sec:"Section 2 · Chile's Geography", role:"rep", num:7, type:"mc",
+   q:"How many main geographic zones does Chile have?",
+   opts:["A) 3 zones (North, Center, South)","B) 5 zones (each region has its own zone)","C) 5 zones (Far North, Near North, Central Zone, Near South and Far South)"], correct:2},
+  {sec:"Section 2 · Chile's Geography", role:"rep", num:8, type:"mc",
+   q:"What is the most arid desert in the world, located in northern Chile?",
+   opts:["A) Sahara Desert","B) Atacama Desert","C) Gobi Desert"], correct:1},
+  {sec:"Section 2 · Chile's Geography", role:"rep", num:9, type:"mc",
+   q:"What is the main characteristic of Chile's Central Zone in terms of climate?",
+   opts:["A) Desert climate with little rainfall","B) Temperate climate with marked seasons","C) Polar climate with extremely low temperatures"], correct:1},
+  {sec:"Section 2 · Chile's Geography", role:"rep", num:10, type:"mc",
+   q:"Which of the following is NOT a characteristic of Southern Chile?",
+   opts:["A) Green landscapes and lush forests","B) Presence of active volcanoes","C) Extremely desert climate with no rainfall"], correct:2},
+  {sec:"Section 2 · Chile's Geography", role:"rep", num:11, type:"mc",
+   q:"What is the name of Chile's administrative-political division that contains provinces?",
+   opts:["A) Cantons","B) Regions","C) Departments"], correct:1},
+  {sec:"Section 2 · Chile's Geography", role:"rep", num:12, type:"mc",
+   q:"Which of these extreme landscapes can be found in Chile in a single trip?",
+   opts:["A) Desert, mountains, forests, and glaciers","B) Only beaches and mountains","C) Only desert and volcanoes"], correct:0},
+  {sec:"Section 2 · Chile's Geography", role:"rep", num:13, type:"mc",
+   q:"What ocean surrounds Chile on its western side?",
+   opts:["A) Indian Ocean","B) Atlantic Ocean","C) Pacific Ocean"], correct:2},
+  {sec:"Section 2 · Chile's Geography", role:"grp", num:14, type:"open",
+   q:"What is the main geological reason why Chile has so much landscape diversity?"},
+
+  {sec:"Section 3 · Diversity & Unique Features", role:"grp", num:15, type:"open",
+   q:"What is a characteristic that makes Chile different from other countries?"},
+  {sec:"Section 3 · Diversity & Unique Features", role:"grp", num:16, type:"open",
+   q:"Which natural environments are present in Chile?"},
+  {sec:"Section 3 · Diversity & Unique Features", role:"grp", num:17, type:"open",
+   q:"Why is it important to protect Chile's natural diversity?"},
+  {sec:"Section 3 · Diversity & Unique Features", role:"grp", num:18, type:"open",
+   q:"According to the project problem, what is the reason tourists would want to return to Chile repeatedly?"},
+
+  {sec:"Section 4 · Natural Hazards", role:"rep", num:19, type:"reveal",
+   q:"What is a very common natural hazard in Chile?", a:"Earthquakes ✅"},
+  {sec:"Section 4 · Natural Hazards", role:"rep", num:20, type:"reveal",
+   q:"What is the main cause of earthquakes in Chile?", a:"The movement of tectonic plates ✅"},
+  {sec:"Section 4 · Natural Hazards", role:"rep", num:21, type:"reveal",
+   q:"What is a tsunami and how does it relate to earthquakes in Chile?", a:"It is a series of large ocean waves generated by underwater earthquakes ✅"},
+  {sec:"Section 4 · Natural Hazards", role:"rep", num:22, type:"reveal",
+   q:"What is a direct consequence of a volcanic eruption?", a:"The spread of volcanic ash that can affect the atmosphere and health ✅"},
+  {sec:"Section 4 · Natural Hazards", role:"grp", num:23, type:"open",
+   q:"What is an effective protection measure against earthquakes in Chile?"},
+  {sec:"Section 4 · Natural Hazards", role:"rep", num:24, type:"reveal",
+   q:"What is a drought?", a:"A prolonged period without rainfall that affects water supply ✅"},
+  {sec:"Section 4 · Natural Hazards", role:"rep", num:25, type:"mc",
+   q:"What is a natural hazard characteristic of Chile's Southern Zone?",
+   opts:["A) Only droughts","B) Floods and avalanches caused by excessive rainfall and snow","C) Only volcanic eruptions"], correct:1},
+  {sec:"Section 4 · Natural Hazards", role:"grp", num:26, type:"open",
+   q:'What is the importance of a "protection manual" against natural hazards in the context of our project?'},
+
+  {sec:"Section 5 · Earth Spheres", role:"rep", num:27, type:"reveal",
+   q:"How many main Earth spheres exist?", a:"4 spheres (lithosphere, hydrosphere, atmosphere, biosphere) ✅"},
+  {sec:"Section 5 · Earth Spheres", role:"rep", num:28, type:"reveal",
+   q:"What is the lithosphere?", a:"The solid layer of the Earth (rocks and soil) ✅"},
+  {sec:"Section 5 · Earth Spheres", role:"rep", num:29, type:"mc",
+   q:"What is the relationship between the atmosphere and photosynthesis?",
+   opts:["A) They have no relationship","B) The atmosphere provides the CO₂ that plants need for photosynthesis","C) Photosynthesis consumes the entire atmosphere"], correct:1},
+  {sec:"Section 5 · Earth Spheres", role:"grp", num:30, type:"mc",
+   q:"How do the hydrosphere and biosphere interact?",
+   opts:["A) They do not interact","B) Water from the hydrosphere is essential for life in the biosphere","C) The biosphere replaces the hydrosphere"], correct:1},
+];
+
+let idx = 0;
+let phase = 'role'; // 'role' = show who answers, 'question' = show the question
+const total = questions.length;
+
+const startScreen = document.getElementById('startScreen');
+const quiz = document.getElementById('quiz');
+const endScreen = document.getElementById('endScreen');
+const cardEl = document.getElementById('card');
+
+function start(){
+  startScreen.classList.add('hidden');
+  endScreen.classList.add('hidden');
+  quiz.classList.remove('hidden');
+  idx = 0; phase = 'role';
+  render();
+}
+function restart(){
+  endScreen.classList.add('hidden');
+  startScreen.classList.remove('hidden');
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function render(){
+  const q = questions[idx];
+  cardEl.dataset.answered = '';
+
+  if(phase === 'role'){
+    const cls = q.role === 'rep' ? 'rep' : 'grp';
+    const label = q.role === 'rep' ? 'Representative' : 'Group';
+    const hint = q.role === 'rep'
+      ? 'One representative from each team will answer this question.'
+      : 'The whole team answers together on the mini whiteboard.';
+    cardEl.innerHTML =
+      `<div class="role-screen">
+         <div class="role-qnum">Question ${q.num}</div>
+         <div class="role-big ${cls}">${label}</div>
+         <div class="role-hint">${hint}</div>
+       </div>`;
+    document.getElementById('nextBtn').textContent = 'Show question ▶';
+  } else {
+    const roleBadge = q.role === 'rep'
+      ? '<span class="badge rep">Representative</span>'
+      : '<span class="badge grp">Group</span>';
+    let body = '';
+    if(q.type === 'mc'){
+      body = '<div class="options">' +
+        q.opts.map((o,i)=>`<button class="opt" onclick="pick(this,${i===q.correct})">${esc(o)}</button>`).join('') +
+        '</div><div class="feedback"></div>';
+    } else if(q.type === 'reveal'){
+      const note = q.note ? `<p class="open-note">${esc(q.note)}</p>` : '';
+      const tag = q.role === 'grp' ? 'Sample answer · Teacher evaluates' : 'Answer';
+      body = note +
+        '<button class="reveal-btn" onclick="reveal(this)">Show answer</button>' +
+        `<div class="answer-box"><span class="tag">${tag}</span>${esc(q.a)}</div>`;
+    } else {
+      body = '<p class="open-note">Answer together on your whiteboard. The teachers will choose the most complete answer.</p>';
+    }
+    cardEl.innerHTML =
+      `<div class="meta">${roleBadge}<span class="section-tag">${esc(q.sec)}</span></div>` +
+      `<div class="question"><span class="qnum">${q.num}.</span> ${esc(q.q)}</div>` +
+      body;
+    document.getElementById('nextBtn').textContent = (idx === total-1) ? 'Finish ✔' : 'Next ▶';
+  }
+
+  document.getElementById('progressLabel').textContent = 'Question ' + (idx+1);
+  document.getElementById('progressCount').textContent = (idx+1) + ' / ' + total;
+  document.getElementById('progressBar').style.width = ((idx+1)/total*100) + '%';
+  document.getElementById('prevBtn').disabled = (idx === 0 && phase === 'role');
+}
+
+function go(dir){
+  if(dir === 1){
+    if(phase === 'role'){ phase = 'question'; render(); return; }
+    // phase === 'question'
+    if(idx === total-1){
+      quiz.classList.add('hidden');
+      endScreen.classList.remove('hidden');
+      return;
+    }
+    idx++; phase = 'role'; render();
+  } else {
+    if(phase === 'question'){ phase = 'role'; render(); return; }
+    // phase === 'role'
+    if(idx === 0) return;
+    idx--; phase = 'question'; render();
+  }
+}
+
+function pick(btn, isCorrect){
+  const fb = cardEl.querySelector('.feedback');
+  if(cardEl.dataset.answered === 'yes') return;
+  if(isCorrect){
+    cardEl.dataset.answered = 'yes';
+    btn.classList.add('correct');
+    cardEl.querySelectorAll('.opt').forEach(o=>o.disabled=true);
+    fb.textContent = '🎉 Congratulations!';
+    fb.className = 'feedback ok show';
+  } else {
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    fb.textContent = '❌ Try again!';
+    fb.className = 'feedback no show';
+  }
+}
+
+function reveal(btn){
+  cardEl.querySelector('.answer-box').classList.add('show');
+  btn.style.display = 'none';
+}
+</script>
+</body>
+</html>
