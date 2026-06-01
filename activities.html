@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chile is a Gift — Games</title>
+<style>
+  :root{
+    --navy:#0f2a4a; --blue:#1c4f8a; --gold:#e8b53d;
+    --ink:#1d2733; --muted:#5b6b7d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh;
+    font-family:"Segoe UI",Calibri,system-ui,sans-serif;
+    background:linear-gradient(160deg,#eaf1fb 0%,#f3f6fb 100%);
+    color:var(--ink); line-height:1.5;
+    display:flex; flex-direction:column;
+  }
+  header{
+    background:linear-gradient(135deg,var(--navy),var(--blue));
+    color:#fff; padding:36px 20px 30px; text-align:center;
+  }
+  header h1{margin:0;font-size:2rem;letter-spacing:.5px;}
+  header p{margin:8px 0 0;opacity:.9;font-size:1.05rem;}
+  .wrap{max-width:760px;width:100%;margin:0 auto;padding:30px 18px 50px;flex:1;}
+
+  .intro{text-align:center;color:var(--muted);margin-bottom:28px;font-size:1.05rem;}
+
+  .grid{display:grid;grid-template-columns:1fr;gap:18px;}
+  @media(min-width:560px){.grid{grid-template-columns:1fr 1fr;}}
+
+  .game{
+    display:flex;flex-direction:column;text-decoration:none;color:inherit;
+    background:#fff;border-radius:16px;padding:24px 24px 22px;
+    box-shadow:0 8px 22px rgba(15,42,74,.09);border:1px solid #e7edf5;
+    transition:.18s;
+  }
+  .game:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(15,42,74,.16);border-color:var(--gold);}
+  .game .ico{font-size:2.6rem;margin-bottom:10px;}
+  .game h2{margin:0 0 6px;color:var(--navy);font-size:1.25rem;}
+  .game p{margin:0 0 16px;color:var(--muted);font-size:.95rem;flex:1;}
+  .game .cta{
+    align-self:flex-start;background:var(--gold);color:var(--navy);
+    font-weight:800;padding:10px 20px;border-radius:10px;font-size:.98rem;letter-spacing:.3px;
+  }
+  .game:hover .cta{background:var(--navy);color:#fff;}
+
+  /* "coming soon" card */
+  .soon{opacity:.6;cursor:default;}
+  .soon:hover{transform:none;box-shadow:0 8px 22px rgba(15,42,74,.09);border-color:#e7edf5;}
+  .soon .cta{background:#dce6f2;color:var(--muted);}
+
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:20px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>🇨🇱 Chile is a Gift</h1>
+  <p>Games &amp; Activities</p>
+</header>
+
+<div class="wrap">
+  <p class="intro">Choose an activity to play 👇</p>
+
+  <div class="grid">
+
+    <!-- ===== TRIVIA (active) ===== -->
+    <a class="game" href="trivia-chile.html">
+      <div class="ico">🧠</div>
+      <h2>Trivia: Chile is a Gift</h2>
+      <p>Team competition by project groups. One question at a time, with representative and group turns.</p>
+      <span class="cta">Play ▶</span>
+    </a>
+
+    <!-- ===== Add more games by copying this block and changing href/text ===== -->
+    <div class="game soon">
+      <div class="ico">➕</div>
+      <h2>More games coming soon</h2>
+      <p>New activities will appear here.</p>
+      <span class="cta">Coming soon</span>
+    </div>
+
+  </div>
+</div>
+
+<footer>🇨🇱 Chile is a Gift · Have fun, teams!</footer>
+</body>
+</html>
