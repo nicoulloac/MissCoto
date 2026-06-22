@@ -173,6 +173,36 @@
   .toast.show{transform:translateX(-50%) translateY(0);}
   .hint{color:#6b5b8a;font-size:.85rem;font-weight:600;text-align:center;margin-top:6px;}
   .qcount{font-weight:800;color:var(--purple);text-align:center;margin-bottom:6px;}
+
+  /* Vocabulary review sheet */
+  .rv-topic{border:1px solid var(--soft);border-radius:16px;overflow:hidden;margin-bottom:14px;}
+  .rv-head{display:flex;align-items:center;gap:10px;padding:11px 16px;color:#fff;
+    background:linear-gradient(135deg,var(--purple),var(--blue));}
+  .rv-head .ic{font-size:1.3rem;} .rv-head h3{margin:0;font-size:1.05rem;}
+  .rv-head .count{margin-left:auto;background:rgba(255,255,255,.22);padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:800;}
+  .rv-table{width:100%;border-collapse:collapse;}
+  .rv-table th,.rv-table td{text-align:left;padding:9px 14px;font-size:.92rem;vertical-align:top;}
+  .rv-table th{background:var(--soft);color:var(--purple);text-transform:uppercase;letter-spacing:.5px;font-size:.68rem;}
+  .rv-table tbody tr{border-top:1px solid var(--soft);}
+  .rv-table tbody tr:nth-child(even){background:#faf7ff;}
+  .rv-word{font-weight:800;color:var(--ink);white-space:nowrap;}
+  .rv-para{color:#0f7a35;font-weight:700;}
+  .rv-ex{color:#6b5b8a;font-style:italic;}
+  .rv-block{background:var(--soft);border-radius:16px;padding:16px;margin-top:16px;}
+  .rv-h{margin:0 0 6px;color:var(--purple);}
+  .rv-pairgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:10px;}
+  .rv-pair{display:flex;align-items:center;gap:7px;background:#fff;border-radius:10px;padding:8px 10px;font-weight:800;font-size:.9rem;}
+  .rv-pair .a{color:var(--purple);} .rv-pair .arrow{color:var(--pink);} .rv-pair .b{color:#0f7a35;}
+  .rv-tips{margin:6px 0 0;padding-left:20px;} .rv-tips li{margin:6px 0;font-weight:600;color:#4a3a6b;}
+  @media print{
+    body{background:#fff;}
+    .hud,#confetti,#toast,.btn{display:none!important;}
+    .screen:not(#s-review){display:none!important;}
+    #s-review{display:block!important;}
+    .panel{box-shadow:none;border-radius:0;padding:0;}
+    .rv-topic,.rv-block{break-inside:avoid;}
+    .rv-head{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
 </style>
 </head>
 <body>
@@ -202,7 +232,11 @@
         <strong>🎓 Today's mission:</strong>
         <p style="margin:8px 0 0;font-weight:600;color:#4a3a6b;">
           Strengthen your <b>PET vocabulary</b> so you read faster and smarter. You'll learn to spot
-          <b>synonyms</b> and <b>paraphrases</b>, and use <b>context clues</b> to work out meaning — exactly what Cambridge examiners test.
+          <b>synonyms</b> and <b>paraphrases</b>, and use <b>context clues</b> to work out meaning — exactly the skills tested in
+          <b>Cambridge PET Reading Parts 1–6</b>.
+        </p>
+        <p style="margin:10px 0 0;font-weight:700;color:var(--purple);font-size:.9rem;">
+          📚 Topics: Travel · Education · Hobbies · Technology · Health · Shopping · Daily Life
         </p>
       </div>
       <div class="badges" id="badgeRow">
@@ -308,7 +342,7 @@
     <div class="panel">
       <div class="pill">Activity 5 · Reading Mini Challenge 📖</div>
       <h2>Work out the meaning from context</h2>
-      <div class="qcount">Text <span id="rdNum">1</span> / 5</div>
+      <div class="qcount">Text <span id="rdNum">1</span> / 6</div>
       <div class="qcard" style="text-align:left;">
         <p id="rdPassage" style="font-size:1.05rem;line-height:1.6;font-weight:600;"></p>
       </div>
@@ -368,7 +402,43 @@
       </div>
       <div class="badges" id="resBadgeRow"></div>
       <div class="row" style="margin-top:20px;">
+        <button class="btn alt" onclick="showReview()">📚 Vocabulary Review Sheet</button>
         <button class="btn big" onclick="location.reload()">↻ Play Again</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. VOCABULARY REVIEW SHEET -->
+  <section id="s-review" class="screen">
+    <div class="panel">
+      <div class="pill">Bonus · Vocabulary Review Sheet 📚</div>
+      <h2>PET Vocabulary by Topic &amp; Paraphrase</h2>
+      <p class="sub">High-frequency PET words, their everyday paraphrases and examples — perfect for revision before Reading Parts 1–6.</p>
+      <div class="row" style="justify-content:flex-start;margin:6px 0 16px;">
+        <button class="btn ghost" onclick="window.print()">🖨️ Print / Save as PDF</button>
+        <button class="btn green" onclick="goNext('result')">◀ Back to Results</button>
+      </div>
+      <div id="rvTopics"></div>
+
+      <div class="rv-block">
+        <h3 class="rv-h">🔁 Key Paraphrase Pairs</h3>
+        <p class="sub">In PET Reading the answer is usually the same idea in different words — learn these by heart:</p>
+        <div class="rv-pairgrid" id="rvPairs"></div>
+      </div>
+
+      <div class="rv-block">
+        <h3 class="rv-h">🧠 Reading Strategy Reminders (Parts 1–6)</h3>
+        <ul class="rv-tips">
+          <li><b>Look for synonyms:</b> the text may say "large" where the question says "big".</li>
+          <li><b>Identify paraphrases:</b> "He couldn't afford it" = "It was too expensive for him."</li>
+          <li><b>Use context clues:</b> the words around a new word usually explain its meaning.</li>
+          <li><b>Ignore unknown words</b> if they aren't needed to answer the question.</li>
+          <li><b>Focus on overall meaning</b> first, then read closely where the question points.</li>
+        </ul>
+      </div>
+
+      <div class="row" style="margin-top:16px;">
+        <button class="btn green" onclick="goNext('result')">◀ Back to Results</button>
       </div>
     </div>
   </section>
@@ -459,15 +529,15 @@ function startLesson(){ updateHUD(); goNext('warmup'); startWarmup(); }
 /* ============ 2. WARM-UP QUIZ ============ */
 const WARMUP = [
   {topic:'Travel', q:'Which word means "to get on a plane, train or bus"?', opts:['board','cancel','delay','queue'], a:0, ex:'"Board" means to get on transport, e.g. "Passengers may now board the train."'},
-  {topic:'Travel', q:'A "return ticket" lets you travel...', opts:['one way only','there and back','for free','first class'], a:1, ex:'A return (round-trip) ticket covers the journey there and back.'},
-  {topic:'School', q:'Your "timetable" shows...', opts:['your marks','when lessons happen','the school rules','your homework'], a:1, ex:'A timetable is the schedule of when your classes/lessons take place.'},
-  {topic:'School', q:'To "revise" before a test means to...', opts:['skip it','study again','arrive late','ask a friend'], a:1, ex:'"Revise" = study material again to prepare. A very common PET word.'},
-  {topic:'Free Time', q:'A "hobby" is something you do...', opts:['for work','for money','for fun in your free time','at school only'], a:2, ex:'A hobby is an enjoyable free-time activity, e.g. painting or football.'},
-  {topic:'Free Time', q:'If a film is "boring", it is...', opts:['exciting','not interesting','frightening','expensive'], a:1, ex:'"Boring" means dull / not interesting — the opposite of exciting.'},
-  {topic:'Shopping', q:'A "bargain" is something that is...', opts:['broken','very cheap / good value','sold out','too big'], a:1, ex:'A bargain is a good deal — cheap for what you get.'},
-  {topic:'Shopping', q:'To get a "refund" means the shop...', opts:['gives your money back','wraps your gift','delivers your order','closes early'], a:0, ex:'A refund = your money is returned, often when you return an item.'},
+  {topic:'Education', q:'To "revise" before an exam means to...', opts:['skip it','study again','arrive late','copy a friend'], a:1, ex:'"Revise" = study material again to prepare. A very common PET word.'},
+  {topic:'Hobbies', q:'If you "take up" a new hobby, you...', opts:['stop doing it','start doing it','dislike it','pay for it'], a:1, ex:'"Take up" a hobby = start doing it. A typical PET phrasal verb.'},
+  {topic:'Technology', q:'To "download" a file means to...', opts:['delete it','save it from the internet','print it on paper','turn it off'], a:1, ex:'Download = copy/save data from the internet onto your device.'},
+  {topic:'Technology', q:'You usually need to "charge" your phone when the battery is...', opts:['full','low','new','broken'], a:1, ex:'"Charge" = put power back into the battery.'},
   {topic:'Health', q:'If you feel "exhausted", you are...', opts:['very hungry','very tired','very happy','very cold'], a:1, ex:'"Exhausted" = extremely tired. A useful PET synonym for "very tired".'},
-  {topic:'Health', q:'A "chemist" (or pharmacy) is where you buy...', opts:['food','clothes','medicine','tickets'], a:2, ex:'At a chemist/pharmacy you buy medicine and health products.'}
+  {topic:'Shopping', q:'A "bargain" is something that is...', opts:['broken','very cheap / good value','sold out','too big'], a:1, ex:'A bargain is a good deal — cheap for what you get.'},
+  {topic:'Shopping', q:'If a shop offers a "discount", the price is...', opts:['higher','lower','the same','hidden'], a:1, ex:'A discount means money off, so the price is lower.'},
+  {topic:'Daily Life', q:'Your "chores" are the small jobs you do...', opts:['at the cinema','around the home','on holiday','at the doctor\'s'], a:1, ex:'Chores = regular household jobs, e.g. washing up or tidying your room.'},
+  {topic:'Education', q:'Your "timetable" shows...', opts:['your marks','when lessons happen','the school rules','your homework'], a:1, ex:'A timetable is the schedule of when your classes/lessons take place.'}
 ];
 let wuOrder=[], wuIdx=0, wuScore=0, wuTimer=null, wuTimeLeft=10, wuLocked=false;
 function startWarmup(){
@@ -688,7 +758,9 @@ const READING = [
   {p:'The instructions for building the model were very <b>confusing</b>. We read them three times but still did not understand what to do. In the end, we watched a video online to help us finish it.',
    w:'confusing', o:['easy to follow','hard to understand','interesting','short'], a:1, ex:'They read it three times and still didn\'t understand → confusing = hard to understand.'},
   {p:'Maria wanted to <b>attend</b> the science club, but it was already full. The teacher put her name on a waiting list and promised she could join the following month when a place became free.',
-   w:'attend', o:['leave','go to / take part in','pay for','start'], a:1, ex:'She wanted to be part of the club → attend = go to / take part in.'}
+   w:'attend', o:['leave','go to / take part in','pay for','start'], a:1, ex:'She wanted to be part of the club → attend = go to / take part in.'},
+  {p:'My old phone was very slow, so I decided to <b>upgrade</b> it. I installed the newest software and added more storage. Now it opens apps in seconds and never freezes, even when I have lots of programs running at the same time.',
+   w:'upgrade', o:['sell it cheaply','make it newer and better','switch it off','lose all the data'], a:1, ex:'New software + more storage so it works better → upgrade = improve to a newer, better version.'}
 ];
 let rdIdx=0, rdScore=0, rdLocked=false;
 function startReading(){ rdIdx=0; rdScore=0; renderReading(); }
@@ -708,11 +780,11 @@ function answerReading(choice){
   if(choice===q.a){ addPoints(120); rdScore++; $('rdFeed').textContent=rnd(PRAISE)+' +120 pts'; $('rdFeed').className='feedback good'; beep(true);}
   else{ $('rdFeed').textContent=rnd(ENCOURAGE); $('rdFeed').className='feedback bad'; beep(false);}
   $('rdExplain').textContent='💡 '+q.ex; $('rdExplain').style.display='block';
-  $('rdNext').style.display='inline-block'; $('rdNext').textContent=(rdIdx<4)?'Next ▶':'Finish ▶';
+  $('rdNext').style.display='inline-block'; $('rdNext').textContent=(rdIdx<5)?'Next ▶':'Finish ▶';
 }
 function rdNext(){
-  if(rdIdx<4){ rdIdx++; renderReading(); }
-  else{ if(rdScore>=4) addStar(); unlockBadge('reading'); toast('Reading done! '+rdScore+'/5'); goNext('strategy'); ensureStrategy(); }
+  if(rdIdx<5){ rdIdx++; renderReading(); }
+  else{ if(rdScore>=5) addStar(); unlockBadge('reading'); toast('Reading done! '+rdScore+'/6'); goNext('strategy'); ensureStrategy(); }
 }
 
 /* ============ 7. STRATEGY CARDS ============ */
@@ -756,11 +828,11 @@ const FINAL = [
   {type:'tf',q:'"Exhausted" means very tired.',a:true,ex:'True — exhausted = very tired.'},
   {type:'fill',q:'They decided to ___ a table at the café.',o:['book','cook','clean'],a:0,ex:'"Book a table" = reserve it.'},
   {type:'mc',q:'Which word means "to fix"?',o:['repair','break','throw','lose'],a:0,ex:'Repair = fix.'},
-  {type:'match',q:'"Begin" is closest to...',o:['start','finish','stop','end'],a:0,ex:'Begin = start.'},
+  {type:'mc',q:'To "switch on" a device means to...',o:['start it / turn it on','close it','clean it','sell it'],a:0,ex:'"Switch on" = turn on / start a device.'},
   {type:'tf',q:'"Enormous" means tiny.',a:false,ex:'False — enormous = very big.'},
   {type:'fill',q:'She wants to ___ money for a new phone.',o:['save','waste','lose'],a:0,ex:'"Save money" = keep it for later.'},
   {type:'mc',q:'"Opportunity" is closest to...',o:['chance','problem','rule','reason'],a:0,ex:'Opportunity = chance.'},
-  {type:'match',q:'"Choose" is closest to...',o:['select','refuse','forget','lose'],a:0,ex:'Choose = select.'},
+  {type:'mc',q:'To "tidy" your room means to...',o:['make it neat and in order','make it dirty','paint it','rent it'],a:0,ex:'Tidy (up) = make neat / put things in order — a common daily-life word.'},
   {type:'tf',q:'"Reply" means to answer.',a:true,ex:'True — reply = answer.'},
   {type:'fill',q:'We had to ___ for the bus in the rain.',o:['wait','hope','watch'],a:0,ex:'"Wait for" = stay until it comes.'},
   {type:'mc',q:'"Arrive" is closest in meaning to...',o:['get to','leave','depart','pass'],a:0,ex:'Arrive = get to.'}
@@ -835,6 +907,105 @@ function showResults(){
   const names={warmup:'🚀',match:'🔗',tf:'⚖️',cloze:'✏️',reading:'📖',strategy:'🧠',final:'🏆'};
   $('resBadgeRow').innerHTML=Object.keys(names).map(k=>
     '<div class="badge '+(state.badges[k]?'unlocked':'')+'"><span class="ic">'+names[k]+'</span>'+badgeName(k)+'</div>').join('');
+}
+
+/* ============ VOCABULARY REVIEW SHEET ============ */
+const REVIEW_TOPICS = [
+  {ic:'✈️',name:'Travel',rows:[
+    ['board','get on (a plane/train/bus)','Passengers may now board the train.'],
+    ['depart','leave','The flight departs at 9 a.m.'],
+    ['delay','make something late','Our train was delayed by an hour.'],
+    ['luggage','bags / suitcases','Don\'t leave your luggage here.'],
+    ['return ticket','a ticket there and back','A return ticket is cheaper than two singles.'],
+    ['reserve / book','keep a place in advance','I booked a seat online.'],
+    ['journey / trip','a piece of travel','The journey takes two hours.'],
+    ['arrive','get to a place','We arrived at the hotel late.']
+  ]},
+  {ic:'🎓',name:'Education',rows:[
+    ['revise','study again before a test','I need to revise for my exam.'],
+    ['timetable','schedule of lessons','Maths is first on my timetable.'],
+    ['subject','a thing you study','My favourite subject is science.'],
+    ['hand in','give to the teacher / submit','Hand in your homework on Friday.'],
+    ['marks / grades','scores for your work','She got top marks in English.'],
+    ['improve','get better','My writing has improved a lot.'],
+    ['term','part of the school year','The summer term ends in July.'],
+    ['attend','go to / take part in','All students must attend the lesson.']
+  ]},
+  {ic:'🎨',name:'Hobbies & Free Time',rows:[
+    ['take up','start (a hobby)','She took up painting last year.'],
+    ['join','become a member of','I want to join the chess club.'],
+    ['enjoy','like (doing)','I enjoy playing football.'],
+    ['keen on','very interested in','He\'s keen on photography.'],
+    ['boring','not interesting','The film was really boring.'],
+    ['exciting','very interesting / thrilling','The match was exciting.'],
+    ['practise','do regularly to get better','I practise the guitar every day.'],
+    ['collect','gather things you like','He collects football stickers.']
+  ]},
+  {ic:'💻',name:'Technology',rows:[
+    ['download','save from the internet','I downloaded the new app.'],
+    ['upload','send to the internet','She uploaded her photos online.'],
+    ['charge','put power in the battery','Remember to charge your phone.'],
+    ['switch on / off','turn on / off a device','Switch off your laptop at night.'],
+    ['install','put a program on a device','I installed a new game.'],
+    ['upgrade','make newer / better','He upgraded his old phone.'],
+    ['connect','join to a network','Connect to the wifi here.'],
+    ['device','a machine like a phone/tablet','Turn off all devices, please.']
+  ]},
+  {ic:'🩺',name:'Health',rows:[
+    ['exhausted','very tired','I was exhausted after the race.'],
+    ['chemist / pharmacy','shop for medicine','Buy it at the chemist\'s.'],
+    ['painful','hurting','My knee is very painful.'],
+    ['recover','get better / get well','She recovered after a week.'],
+    ['healthy','good for you / in good health','Fruit is a healthy snack.'],
+    ['appointment','an arranged meeting','I have a dental appointment.'],
+    ['rest','relax / not do much','The doctor told me to rest.'],
+    ['injury','harm to the body','He had a knee injury.']
+  ]},
+  {ic:'🛍️',name:'Shopping',rows:[
+    ['purchase','buy','You can purchase tickets online.'],
+    ['bargain','good value / very cheap','These shoes were a real bargain.'],
+    ['discount','money off the price','Students get a 10% discount.'],
+    ['refund','money given back','I got a refund for the broken toy.'],
+    ['inexpensive','cheap / low price','A nice, inexpensive café.'],
+    ['afford','have enough money for','I can\'t afford that jacket.'],
+    ['receipt','proof of what you paid','Keep your receipt, please.'],
+    ['customer','a person who buys','The shop was full of customers.']
+  ]},
+  {ic:'🏠',name:'Daily Life',rows:[
+    ['chores','small jobs at home','I do my chores after school.'],
+    ['tidy (up)','make neat / in order','Please tidy your room.'],
+    ['borrow','take and give back later','Can I borrow your pen?'],
+    ['lend','give for a short time','She lent me her umbrella.'],
+    ['repair / fix','mend something broken','Dad repaired my bike.'],
+    ['nearly','almost','I\'m nearly finished.'],
+    ['usually','most of the time','I usually walk to school.'],
+    ['opportunity','a chance','It\'s a great opportunity to learn.']
+  ]}
+];
+const REVIEW_PAIRS = [
+  ['purchase','buy'],['receive','get'],['difficult','hard'],['depart','leave'],
+  ['opportunity','chance'],['nearly','almost'],['improve','get better'],['choose','select'],
+  ['arrive','get to'],['inexpensive','cheap'],['enormous','very big'],['repair','fix'],
+  ['begin','start'],['reply','answer'],['permitted','allowed'],['enjoy','like']
+];
+let reviewBuilt=false;
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function buildReview(){
+  if(reviewBuilt) return; reviewBuilt=true;
+  $('rvTopics').innerHTML = REVIEW_TOPICS.map(t=>
+    '<div class="rv-topic"><div class="rv-head"><span class="ic">'+t.ic+'</span><h3>'+t.name+'</h3>'+
+    '<span class="count">'+t.rows.length+' words</span></div>'+
+    '<table class="rv-table"><thead><tr><th>Word</th><th>Means / paraphrase</th><th>Example</th></tr></thead><tbody>'+
+    t.rows.map(r=>'<tr><td class="rv-word">'+esc(r[0])+'</td><td class="rv-para">'+esc(r[1])+'</td><td class="rv-ex">'+esc(r[2])+'</td></tr>').join('')+
+    '</tbody></table></div>').join('');
+  $('rvPairs').innerHTML = REVIEW_PAIRS.map(p=>
+    '<div class="rv-pair"><span class="a">'+p[0]+'</span><span class="arrow">→</span><span class="b">'+p[1]+'</span></div>').join('');
+}
+function showReview(){
+  buildReview();
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $('s-review').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 /* wire screens that need init when navigated */
