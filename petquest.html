@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PET Vocabulary Quest 🎯 — B1 Preliminary Prep</title>
+<style>
+  :root{
+    --bg1:#5b2be0; --bg2:#9b30ff; --bg3:#ff4dd6;
+    --purple:#7b2ff7; --pink:#ff3d8b; --blue:#1fa2ff; --teal:#12d6c4;
+    --green:#22c55e; --red:#ef4444; --yellow:#ffd23f; --orange:#ff8a00;
+    --ink:#23104d; --card:#ffffff; --soft:#f3efff;
+    --shadow:0 12px 30px rgba(40,10,90,.25);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;color:var(--ink);}
+  body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#7b2ff7,#ff3d8b 55%,#ff8a00);
+    background-attachment:fixed;
+    overflow-x:hidden;
+  }
+  .app{max-width:920px;margin:0 auto;padding:14px 14px 60px;}
+
+  /* Top HUD */
+  .hud{
+    position:sticky;top:0;z-index:50;
+    background:rgba(35,16,77,.55);backdrop-filter:blur(8px);
+    border-radius:18px;padding:10px 14px;margin-bottom:14px;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    box-shadow:var(--shadow);
+  }
+  .hud .logo{font-weight:900;color:#fff;font-size:1.05rem;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+  .hud .stat{background:rgba(255,255,255,.18);color:#fff;font-weight:800;
+    padding:6px 12px;border-radius:999px;font-size:.85rem;display:flex;align-items:center;gap:5px;}
+  .hud .spacer{flex:1;}
+  .progress-wrap{width:100%;margin-top:8px;}
+  .progress-track{height:12px;background:rgba(255,255,255,.25);border-radius:999px;overflow:hidden;}
+  .progress-fill{height:100%;width:0;border-radius:999px;
+    background:linear-gradient(90deg,var(--yellow),var(--teal));transition:width .6s cubic-bezier(.2,.9,.3,1);}
+  .progress-label{color:#fff;font-size:.72rem;font-weight:700;margin-top:4px;opacity:.9;}
+
+  /* Cards / screens */
+  .screen{display:none;animation:pop .5s cubic-bezier(.2,.9,.3,1);}
+  .screen.active{display:block;}
+  @keyframes pop{from{opacity:0;transform:translateY(24px) scale(.97);}to{opacity:1;transform:none;}}
+  .panel{
+    background:var(--card);border-radius:26px;padding:26px;box-shadow:var(--shadow);
+  }
+  h1{font-size:2rem;margin:.2em 0;line-height:1.1;}
+  h2{font-size:1.5rem;margin:.1em 0 .3em;}
+  .sub{color:#6b5b8a;font-weight:600;}
+  .pill{display:inline-block;background:var(--soft);color:var(--purple);font-weight:800;
+    padding:6px 14px;border-radius:999px;font-size:.8rem;margin-bottom:8px;}
+
+  /* Buttons */
+  .btn{
+    border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:1.05rem;
+    color:#fff;padding:15px 28px;border-radius:16px;
+    background:linear-gradient(180deg,var(--pink),#d61f6e);
+    box-shadow:0 6px 0 #a8155a, var(--shadow);transition:transform .08s, box-shadow .08s;
+  }
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #a8155a;}
+  .btn.alt{background:linear-gradient(180deg,var(--blue),#0d7fd1);box-shadow:0 6px 0 #0a63a3,var(--shadow);}
+  .btn.alt:active{box-shadow:0 2px 0 #0a63a3;}
+  .btn.ghost{background:linear-gradient(180deg,#8b7bb5,#6b5b8a);box-shadow:0 6px 0 #4e4068,var(--shadow);}
+  .btn.green{background:linear-gradient(180deg,#34d058,#1ca546);box-shadow:0 6px 0 #14823a,var(--shadow);}
+  .btn.big{font-size:1.3rem;padding:18px 40px;}
+  .center{text-align:center;}
+  .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;}
+
+  /* Option grid (Kahoot style) */
+  .qcard{background:linear-gradient(135deg,#fff,#f7f2ff);border-radius:20px;padding:22px;margin-bottom:14px;text-align:center;}
+  .qtopic{font-size:.78rem;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:1px;}
+  .qtext{font-size:1.35rem;font-weight:800;margin:10px 0 4px;}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  .opt{
+    border:none;cursor:pointer;font-family:inherit;color:#fff;font-weight:800;font-size:1.05rem;
+    padding:20px 14px;border-radius:16px;text-align:left;position:relative;
+    transition:transform .1s, filter .1s;min-height:64px;display:flex;align-items:center;gap:10px;
+  }
+  .opt:hover{filter:brightness(1.08);}
+  .opt:active{transform:scale(.97);}
+  .opt .sym{font-size:1.3rem;}
+  .opt:nth-child(1){background:#e93b66;}
+  .opt:nth-child(2){background:#2d7ff0;}
+  .opt:nth-child(3){background:#f5a623;}
+  .opt:nth-child(4){background:#1bbf8a;}
+  .opt.correct{background:#1ca546!important;animation:bounceIn .5s;}
+  .opt.wrong{background:#b5b5c4!important;opacity:.7;}
+  .opt.show-correct{outline:4px solid #ffd23f;}
+  @keyframes bounceIn{0%{transform:scale(.8);}50%{transform:scale(1.08);}100%{transform:scale(1);}}
+  @media(max-width:560px){.opts{grid-template-columns:1fr;}}
+
+  .feedback{margin-top:14px;font-weight:800;font-size:1.05rem;min-height:26px;}
+  .feedback.good{color:var(--green);}
+  .feedback.bad{color:var(--red);}
+  .explain{background:var(--soft);border-radius:14px;padding:12px 16px;margin-top:10px;font-weight:600;color:#4a3a6b;font-size:.95rem;text-align:left;}
+
+  /* Timer */
+  .timer{display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:8px;font-weight:800;color:var(--purple);}
+  .timer .bar{width:160px;height:10px;background:#eee;border-radius:999px;overflow:hidden;}
+  .timer .bar > i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red));transition:width 1s linear;}
+
+  /* Matching game */
+  .match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col h3{text-align:center;color:var(--purple);margin:.2em 0;}
+  .chip{
+    background:linear-gradient(180deg,#fff,#f1ebff);border:2px solid #d9ccff;border-radius:12px;
+    padding:9px 8px;margin:6px 0;font-weight:800;font-size:.95rem;text-align:center;cursor:pointer;user-select:none;
+    transition:transform .12s, box-shadow .12s, opacity .25s, max-height .25s;box-shadow:0 3px 0 #d9ccff;
+  }
+  .chip.selected{outline:4px solid var(--yellow);background:linear-gradient(180deg,#fff7d6,#ffe98a);transform:scale(1.04);}
+  .chip.dragging{opacity:.4;}
+  .chip.matched{max-height:0;padding:0;margin:0;border:0;opacity:0;overflow:hidden;}
+  .drop{
+    min-height:46px;border:3px dashed #c9b8f5;border-radius:12px;margin:6px 0;
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:#8b7bb5;padding:6px;
+    transition:background .15s,border-color .15s;font-size:.95rem;
+  }
+  .drop.armed{border-color:var(--yellow);background:#fffbe8;}
+  .drop .label{font-size:.78rem;color:var(--purple);text-transform:uppercase;letter-spacing:.5px;}
+  .sel-bar{
+    position:sticky;top:96px;z-index:20;margin:10px 0;padding:10px 14px;border-radius:14px;text-align:center;
+    font-weight:800;background:var(--soft);color:#8b7bb5;border:2px dashed #d9ccff;transition:all .2s;
+  }
+  .sel-bar.active{background:linear-gradient(180deg,#fff7d6,#ffe98a);color:var(--ink);border-color:var(--yellow);}
+  .drop.over{background:#efe7ff;border-color:var(--purple);}
+  .drop.filled{border-style:solid;}
+  .drop.correct{background:linear-gradient(180deg,#bff5d0,#86e6a5);border-color:#34d058;color:#0f7a35;}
+  .drop.incorrect{background:#ffd9d9;border-color:#ef4444;color:#b91c1c;}
+  .target-word{font-weight:900;color:var(--ink);}
+  @media(max-width:560px){.match-wrap{grid-template-columns:1fr;} .match-col.left{order:2;} .match-col.right{order:1;}}
+
+  /* Strategy cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;}
+  .flip{background:transparent;height:170px;perspective:1000px;cursor:pointer;}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d;}
+  .flip.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center;color:#fff;box-shadow:var(--shadow);}
+  .flip-front{background:linear-gradient(135deg,var(--purple),var(--blue));}
+  .flip-front .ic{font-size:2.4rem;margin-bottom:8px;}
+  .flip-front .t{font-weight:900;font-size:1.05rem;}
+  .flip-back{background:linear-gradient(135deg,var(--teal),#0fa99b);transform:rotateY(180deg);font-weight:600;font-size:.92rem;}
+
+  /* Badges */
+  .badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+  .badge{width:74px;text-align:center;font-size:.66rem;font-weight:800;color:#6b5b8a;opacity:.35;transition:opacity .4s, transform .4s;}
+  .badge .ic{font-size:2rem;display:block;filter:grayscale(1);}
+  .badge.unlocked{opacity:1;transform:scale(1.05);}
+  .badge.unlocked .ic{filter:none;animation:bounceIn .6s;}
+
+  /* True/False */
+  .tf-row{display:flex;gap:14px;justify-content:center;margin-top:14px;}
+  .tf-btn{flex:1;max-width:180px;font-size:1.2rem;}
+
+  /* Stars */
+  .stars{font-size:1.6rem;letter-spacing:4px;}
+
+  /* Result */
+  .scorebig{font-size:4rem;font-weight:900;background:linear-gradient(90deg,var(--pink),var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .rank{font-size:1.6rem;font-weight:900;margin:6px 0;}
+
+  /* Confetti */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
+  .conf{position:absolute;width:10px;height:14px;opacity:.95;animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+
+  .toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-80px);
+    background:var(--ink);color:#fff;font-weight:800;padding:12px 22px;border-radius:999px;
+    z-index:998;box-shadow:var(--shadow);transition:transform .4s;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .hint{color:#6b5b8a;font-size:.85rem;font-weight:600;text-align:center;margin-top:6px;}
+  .qcount{font-weight:800;color:var(--purple);text-align:center;margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div id="confetti"></div>
+<div id="toast" class="toast"></div>
+
+<div class="app">
+  <!-- HUD -->
+  <div class="hud">
+    <div class="logo">🎯 PET Vocabulary Quest</div>
+    <div class="spacer"></div>
+    <div class="stat">⭐ <span id="hudPoints">0</span> pts</div>
+    <div class="stat">🔥 <span id="hudStars">0</span></div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div id="progFill" class="progress-fill"></div></div>
+      <div class="progress-label"><span id="progPct">0</span>% complete · <span id="progStage">Welcome</span></div>
+    </div>
+  </div>
+
+  <!-- 1. WELCOME -->
+  <section id="s-welcome" class="screen active">
+    <div class="panel center">
+      <div class="pill">B1 Preliminary · Reading Parts 1–6</div>
+      <h1>PET Vocabulary Quest 🎯</h1>
+      <p class="sub">Level up your English word power!</p>
+      <div style="background:var(--soft);border-radius:18px;padding:18px;margin:18px 0;text-align:left;">
+        <strong>🎓 Today's mission:</strong>
+        <p style="margin:8px 0 0;font-weight:600;color:#4a3a6b;">
+          Strengthen your <b>PET vocabulary</b> so you read faster and smarter. You'll learn to spot
+          <b>synonyms</b> and <b>paraphrases</b>, and use <b>context clues</b> to work out meaning — exactly what Cambridge examiners test.
+        </p>
+      </div>
+      <div class="badges" id="badgeRow">
+        <div class="badge" data-b="warmup"><span class="ic">🚀</span>Warm-Up</div>
+        <div class="badge" data-b="match"><span class="ic">🔗</span>Matcher</div>
+        <div class="badge" data-b="tf"><span class="ic">⚖️</span>Judge</div>
+        <div class="badge" data-b="cloze"><span class="ic">✏️</span>Builder</div>
+        <div class="badge" data-b="reading"><span class="ic">📖</span>Reader</div>
+        <div class="badge" data-b="strategy"><span class="ic">🧠</span>Strategist</div>
+        <div class="badge" data-b="final"><span class="ic">🏆</span>Champion</div>
+      </div>
+      <div class="row" style="margin-top:22px;">
+        <button class="btn big" onclick="startLesson()">▶ Start Lesson</button>
+      </div>
+      <p class="hint">⏱️ Approx. 45 minutes · 7 activities · Earn points, stars & badges!</p>
+    </div>
+  </section>
+
+  <!-- 2. WARM-UP QUIZ -->
+  <section id="s-warmup" class="screen">
+    <div class="panel">
+      <div class="pill">Activity 1 · Warm-Up Challenge 🚀</div>
+      <h2>Kahoot-style Vocabulary Blast</h2>
+      <p class="sub">Answer fast for the points! Each question has a timer.</p>
+      <div class="timer"><span>⏱️</span><div class="bar"><i id="wuTimerBar"></i></div><span id="wuTimerTxt">20</span></div>
+      <div class="qcount">Question <span id="wuNum">1</span> / 10</div>
+      <div id="wuArea"></div>
+      <div class="feedback" id="wuFeed"></div>
+      <div class="explain" id="wuExplain" style="display:none;"></div>
+      <div class="row" style="margin-top:14px;">
+        <button class="btn green" id="wuNext" style="display:none;" onclick="warmupNext()">Next ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. SYNONYM MATCHING -->
+  <section id="s-match" class="screen">
+    <div class="panel">
+      <div class="pill">Activity 2 · Synonym Match 🔗</div>
+      <h2>Match each formal word to its everyday paraphrase</h2>
+      <p class="sub">① Tap a <b>word</b> on the left, then ② tap its <b>paraphrase</b> on the right. (Drag &amp; drop also works on a computer.)</p>
+      <p class="hint">Matched: <b><span id="matchCount">0</span> / 15</b></p>
+      <div class="sel-bar" id="selBar">👆 Tap a word to begin…</div>
+      <div class="match-wrap">
+        <div class="match-col left">
+          <h3>Words</h3>
+          <div id="matchWords"></div>
+        </div>
+        <div class="match-col right">
+          <h3>Paraphrases</h3>
+          <div id="matchDrops"></div>
+        </div>
+      </div>
+      <div class="feedback" id="matchFeed"></div>
+      <div class="row" style="margin-top:14px;">
+        <button class="btn ghost" onclick="resetMatch()">↺ Reset</button>
+        <button class="btn green" id="matchNext" style="display:none;" onclick="goNext('tf')">Continue ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. TRUE / FALSE -->
+  <section id="s-tf" class="screen">
+    <div class="panel">
+      <div class="pill">Activity 3 · True or False ⚖️</div>
+      <h2>Is the meaning correct?</h2>
+      <div class="qcount">Statement <span id="tfNum">1</span> / 10</div>
+      <div class="qcard">
+        <div class="qtext" id="tfText"></div>
+      </div>
+      <div class="tf-row">
+        <button class="btn green tf-btn" onclick="answerTF(true)">✔ TRUE</button>
+        <button class="btn tf-btn" style="background:linear-gradient(180deg,#ef4444,#c01e1e);box-shadow:0 6px 0 #8f1414,var(--shadow);" onclick="answerTF(false)">✗ FALSE</button>
+      </div>
+      <div class="feedback" id="tfFeed"></div>
+      <div class="explain" id="tfExplain" style="display:none;"></div>
+      <div class="row" style="margin-top:14px;">
+        <button class="btn green" id="tfNext" style="display:none;" onclick="tfNext()">Next ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. COMPLETE THE SENTENCE -->
+  <section id="s-cloze" class="screen">
+    <div class="panel">
+      <div class="pill">Activity 4 · Complete the Sentence ✏️</div>
+      <h2>Choose the word that fits</h2>
+      <div class="qcount">Sentence <span id="czNum">1</span> / 10</div>
+      <div class="qcard">
+        <div class="qtext" id="czText"></div>
+      </div>
+      <div class="opts" id="czOpts"></div>
+      <div class="feedback" id="czFeed"></div>
+      <div class="explain" id="czExplain" style="display:none;"></div>
+      <div class="row" style="margin-top:14px;">
+        <button class="btn green" id="czNext" style="display:none;" onclick="czNext()">Next ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. READING MINI CHALLENGE -->
+  <section id="s-reading" class="screen">
+    <div class="panel">
+      <div class="pill">Activity 5 · Reading Mini Challenge 📖</div>
+      <h2>Work out the meaning from context</h2>
+      <div class="qcount">Text <span id="rdNum">1</span> / 5</div>
+      <div class="qcard" style="text-align:left;">
+        <p id="rdPassage" style="font-size:1.05rem;line-height:1.6;font-weight:600;"></p>
+      </div>
+      <p style="font-weight:800;text-align:center;">What does <span class="target-word" id="rdWord"></span> most likely mean here?</p>
+      <div class="opts" id="rdOpts"></div>
+      <div class="feedback" id="rdFeed"></div>
+      <div class="explain" id="rdExplain" style="display:none;"></div>
+      <div class="row" style="margin-top:14px;">
+        <button class="btn green" id="rdNext" style="display:none;" onclick="rdNext()">Next ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. STRATEGY -->
+  <section id="s-strategy" class="screen">
+    <div class="panel center">
+      <div class="pill">Activity 6 · Reading Strategy 🧠</div>
+      <h2>5 Examiner Secrets — tap each card!</h2>
+      <p class="sub">Flip every card to unlock your Strategist badge.</p>
+      <div class="cards" id="stratCards"></div>
+      <div class="row" style="margin-top:18px;">
+        <button class="btn green" id="stratNext" style="display:none;" onclick="goNext('final')">I'm ready for the final quiz ▶</button>
+      </div>
+      <p class="hint" id="stratHint">Cards flipped: 0 / 5</p>
+    </div>
+  </section>
+
+  <!-- 8. FINAL QUIZ -->
+  <section id="s-final" class="screen">
+    <div class="panel">
+      <div class="pill">Final Challenge · PET Vocabulary Quiz 🏆</div>
+      <h2 id="fqTitle">20 mixed questions — give it your best!</h2>
+      <div class="timer"><span>⏱️</span><div class="bar"><i id="fqTimerBar"></i></div><span id="fqTimerTxt">15</span></div>
+      <div class="qcount">Question <span id="fqNum">1</span> / 20 · Score <span id="fqScore">0</span></div>
+      <div id="fqArea"></div>
+      <div class="feedback" id="fqFeed"></div>
+      <div class="explain" id="fqExplain" style="display:none;"></div>
+      <div class="row" style="margin-top:14px;">
+        <button class="btn green" id="fqNext" style="display:none;" onclick="fqNext()">Next ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="s-result" class="screen">
+    <div class="panel center">
+      <div class="pill">Lesson Complete! 🎉</div>
+      <h1>Your Results</h1>
+      <div class="scorebig" id="resScore">0%</div>
+      <div class="stars" id="resStars">☆☆☆☆☆</div>
+      <div class="rank" id="resRank"></div>
+      <p class="sub" id="resMsg"></p>
+      <div style="background:var(--soft);border-radius:16px;padding:16px;margin:14px 0;text-align:left;">
+        <div>⭐ Total points: <b id="resPoints">0</b></div>
+        <div>📊 Final quiz: <b id="resFq">0/20</b></div>
+        <div>🏅 Badges unlocked: <b id="resBadges">0/7</b></div>
+      </div>
+      <div class="badges" id="resBadgeRow"></div>
+      <div class="row" style="margin-top:20px;">
+        <button class="btn big" onclick="location.reload()">↻ Play Again</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ============ GLOBAL STATE ============ */
+const STAGES = ['welcome','warmup','match','tf','cloze','reading','strategy','final','result'];
+const STAGE_LABEL = {welcome:'Welcome',warmup:'Warm-Up',match:'Synonym Match',tf:'True / False',cloze:'Sentences',reading:'Reading',strategy:'Strategy',final:'Final Quiz',result:'Results'};
+let state = { points:0, stars:0, badges:{} };
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function $(id){return document.getElementById(id);}
+
+function updateHUD(){
+  $('hudPoints').textContent = state.points;
+  $('hudStars').textContent = state.stars;
+}
+function addPoints(p){ state.points += p; updateHUD(); }
+function addStar(){ state.stars++; updateHUD(); }
+
+function setProgress(stage){
+  const idx = STAGES.indexOf(stage);
+  const pct = Math.round((idx/(STAGES.length-1))*100);
+  $('progFill').style.width = pct+'%';
+  $('progPct').textContent = pct;
+  $('progStage').textContent = STAGE_LABEL[stage]||stage;
+}
+
+function showScreen(stage){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $('s-'+stage).classList.add('active');
+  setProgress(stage);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goNext(stage){ showScreen(stage); if(stage==='strategy') ensureStrategy(); if(stage==='final') startFinal(); }
+
+function unlockBadge(key){
+  if(state.badges[key]) return;
+  state.badges[key]=true;
+  document.querySelectorAll('.badge[data-b="'+key+'"]').forEach(b=>b.classList.add('unlocked'));
+  toast('🏅 Badge unlocked: '+badgeName(key)+'!');
+  confetti(40);
+}
+function badgeName(k){return {warmup:'Warm-Up Hero',match:'Master Matcher',tf:'Meaning Judge',cloze:'Sentence Builder',reading:'Context Reader',strategy:'Strategist',final:'PET Champion'}[k];}
+
+/* ============ TOAST + CONFETTI + SOUND ============ */
+let toastT;
+function toast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2200);
+}
+function confetti(n=60){
+  const box=$('confetti'); const colors=['#ffd23f','#ff3d8b','#1fa2ff','#12d6c4','#7b2ff7','#ff8a00'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div'); c.className='conf';
+    c.style.left=Math.random()*100+'vw';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDuration=(1.6+Math.random()*1.6)+'s';
+    c.style.animationDelay=(Math.random()*.3)+'s';
+    c.style.transform='rotate('+Math.random()*360+'deg)';
+    box.appendChild(c);
+    setTimeout(()=>c.remove(),3600);
+  }
+}
+/* tiny WebAudio beeps (no external files) */
+let actx;
+function beep(ok){
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.connect(g); g.connect(actx.destination);
+    o.type='triangle';
+    if(ok){ o.frequency.setValueAtTime(660,actx.currentTime); o.frequency.setValueAtTime(880,actx.currentTime+.08);}
+    else{ o.frequency.setValueAtTime(220,actx.currentTime); }
+    g.gain.setValueAtTime(.18,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+.25);
+    o.start(); o.stop(actx.currentTime+.26);
+  }catch(e){}
+}
+
+const PRAISE = ['Awesome! 🌟','Brilliant! 🎉','Nice work! 👏','You got it! ✅','Smart thinking! 🧠','Excellent! 🚀','Spot on! 🎯'];
+const ENCOURAGE = ['Not quite — keep going! 💪','Good try! Learn & move on. 📚','Almost! You\'ll get the next one. 🌈','No worries — every miss teaches you. ✨'];
+const rnd = a => a[Math.floor(Math.random()*a.length)];
+
+function startLesson(){ updateHUD(); goNext('warmup'); startWarmup(); }
+
+/* ============ 2. WARM-UP QUIZ ============ */
+const WARMUP = [
+  {topic:'Travel', q:'Which word means "to get on a plane, train or bus"?', opts:['board','cancel','delay','queue'], a:0, ex:'"Board" means to get on transport, e.g. "Passengers may now board the train."'},
+  {topic:'Travel', q:'A "return ticket" lets you travel...', opts:['one way only','there and back','for free','first class'], a:1, ex:'A return (round-trip) ticket covers the journey there and back.'},
+  {topic:'School', q:'Your "timetable" shows...', opts:['your marks','when lessons happen','the school rules','your homework'], a:1, ex:'A timetable is the schedule of when your classes/lessons take place.'},
+  {topic:'School', q:'To "revise" before a test means to...', opts:['skip it','study again','arrive late','ask a friend'], a:1, ex:'"Revise" = study material again to prepare. A very common PET word.'},
+  {topic:'Free Time', q:'A "hobby" is something you do...', opts:['for work','for money','for fun in your free time','at school only'], a:2, ex:'A hobby is an enjoyable free-time activity, e.g. painting or football.'},
+  {topic:'Free Time', q:'If a film is "boring", it is...', opts:['exciting','not interesting','frightening','expensive'], a:1, ex:'"Boring" means dull / not interesting — the opposite of exciting.'},
+  {topic:'Shopping', q:'A "bargain" is something that is...', opts:['broken','very cheap / good value','sold out','too big'], a:1, ex:'A bargain is a good deal — cheap for what you get.'},
+  {topic:'Shopping', q:'To get a "refund" means the shop...', opts:['gives your money back','wraps your gift','delivers your order','closes early'], a:0, ex:'A refund = your money is returned, often when you return an item.'},
+  {topic:'Health', q:'If you feel "exhausted", you are...', opts:['very hungry','very tired','very happy','very cold'], a:1, ex:'"Exhausted" = extremely tired. A useful PET synonym for "very tired".'},
+  {topic:'Health', q:'A "chemist" (or pharmacy) is where you buy...', opts:['food','clothes','medicine','tickets'], a:2, ex:'At a chemist/pharmacy you buy medicine and health products.'}
+];
+let wuOrder=[], wuIdx=0, wuScore=0, wuTimer=null, wuTimeLeft=10, wuLocked=false;
+function startWarmup(){
+  wuOrder = shuffle(WARMUP.map((_,i)=>i)); wuIdx=0; wuScore=0;
+  renderWarmup();
+}
+function renderWarmup(){
+  wuLocked=false;
+  const q = WARMUP[wuOrder[wuIdx]];
+  $('wuNum').textContent = wuIdx+1;
+  $('wuFeed').textContent=''; $('wuFeed').className='feedback';
+  $('wuExplain').style.display='none'; $('wuNext').style.display='none';
+  const optOrder = shuffle(q.opts.map((o,i)=>({o,i})));
+  let html = '<div class="qcard"><div class="qtopic">'+q.topic+'</div><div class="qtext">'+q.q+'</div></div><div class="opts">';
+  optOrder.forEach(item=>{
+    html += '<button class="opt" data-i="'+item.i+'" onclick="answerWarmup('+item.i+',this)"><span class="sym">●</span>'+item.o+'</button>';
+  });
+  html += '</div>';
+  $('wuArea').innerHTML = html;
+  startWuTimer();
+}
+function startWuTimer(){
+  clearInterval(wuTimer); wuTimeLeft=20;
+  $('wuTimerTxt').textContent=wuTimeLeft; $('wuTimerBar').style.width='100%';
+  wuTimer=setInterval(()=>{
+    wuTimeLeft--; $('wuTimerTxt').textContent=Math.max(0,wuTimeLeft);
+    $('wuTimerBar').style.width=(wuTimeLeft/20*100)+'%';
+    if(wuTimeLeft<=0){ clearInterval(wuTimer); if(!wuLocked) answerWarmup(-1,null); }
+  },1000);
+}
+function answerWarmup(choice,btn){
+  if(wuLocked) return; wuLocked=true; clearInterval(wuTimer);
+  const q = WARMUP[wuOrder[wuIdx]];
+  const correct = choice===q.a;
+  document.querySelectorAll('#wuArea .opt').forEach(b=>{
+    const i=+b.dataset.i;
+    if(i===q.a) b.classList.add('correct','show-correct');
+    else b.classList.add('wrong');
+    b.disabled=true;
+  });
+  if(correct){
+    const bonus = Math.max(0,wuTimeLeft); const pts=100+bonus*5;
+    addPoints(pts); wuScore++;
+    $('wuFeed').textContent=rnd(PRAISE)+' +'+pts+' pts'; $('wuFeed').className='feedback good';
+    beep(true);
+  }else{
+    $('wuFeed').textContent = choice===-1? '⏰ Time\'s up! ':rnd(ENCOURAGE);
+    $('wuFeed').className='feedback bad'; beep(false);
+  }
+  $('wuExplain').textContent='💡 '+q.ex; $('wuExplain').style.display='block';
+  $('wuNext').style.display='inline-block';
+  $('wuNext').textContent = (wuIdx<9)?'Next ▶':'Finish Warm-Up ▶';
+}
+function warmupNext(){
+  if(wuIdx<9){ wuIdx++; renderWarmup(); }
+  else{
+    if(wuScore>=7) addStar();
+    unlockBadge('warmup');
+    toast('Warm-Up done! '+wuScore+'/10 correct');
+    goNext('match'); buildMatch();
+  }
+}
+
+/* ============ 3. SYNONYM MATCHING ============ */
+const PAIRS = [
+  ['purchase','buy'],['receive','get'],['difficult','hard'],['depart','leave'],
+  ['opportunity','chance'],['nearly','almost'],['improve','get better'],['choose','select'],
+  ['arrive','get to'],['inexpensive','cheap'],['enormous','very big'],['repair','fix'],
+  ['begin','start'],['reply','answer'],['enjoy','like']
+];
+let matchSel=null, matchDone=0;
+function setSelBar(text,active){
+  const b=$('selBar'); if(!b) return;
+  b.innerHTML=text; b.classList.toggle('active',!!active);
+}
+function buildMatch(){
+  matchDone=0; matchSel=null; $('matchCount').textContent=0;
+  $('matchFeed').textContent=''; $('matchNext').style.display='none';
+  setSelBar('👆 Tap a word to begin…',false);
+  const words = shuffle(PAIRS.map((p,i)=>({t:p[0],id:i})));
+  const drops = shuffle(PAIRS.map((p,i)=>({t:p[1],id:i})));
+  $('matchWords').innerHTML = words.map(w=>
+    '<div class="chip" draggable="true" data-id="'+w.id+'" id="chip-'+w.id+'">'+w.t+'</div>').join('');
+  $('matchDrops').innerHTML = drops.map(d=>
+    '<div class="drop" data-id="'+d.id+'"><span class="label">≈ '+d.t+'</span></div>').join('');
+  attachMatchEvents();
+}
+function attachMatchEvents(){
+  document.querySelectorAll('#matchWords .chip').forEach(ch=>{
+    ch.addEventListener('dragstart',e=>{e.dataTransfer.setData('text',ch.dataset.id);ch.classList.add('dragging');});
+    ch.addEventListener('dragend',()=>ch.classList.remove('dragging'));
+    ch.addEventListener('click',()=>{ // tap mode
+      if(ch.classList.contains('matched')) return;
+      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+      matchSel = ch.dataset.id; ch.classList.add('selected');
+      setSelBar('Selected: <b>'+ch.textContent+'</b> → now tap its paraphrase ⬇',true);
+      document.querySelectorAll('#matchDrops .drop:not(.correct)').forEach(d=>d.classList.add('armed'));
+    });
+  });
+  document.querySelectorAll('#matchDrops .drop').forEach(dp=>{
+    dp.addEventListener('dragover',e=>{e.preventDefault();dp.classList.add('over');});
+    dp.addEventListener('dragleave',()=>dp.classList.remove('over'));
+    dp.addEventListener('drop',e=>{e.preventDefault();dp.classList.remove('over');tryMatch(e.dataTransfer.getData('text'),dp);});
+    dp.addEventListener('click',()=>{ if(matchSel!==null) tryMatch(matchSel,dp); });
+  });
+}
+function tryMatch(wordId,dp){
+  if(dp.classList.contains('correct')) return;
+  const chip=$('chip-'+wordId);
+  if(!chip||chip.classList.contains('matched')) return;
+  document.querySelectorAll('#matchDrops .drop').forEach(d=>d.classList.remove('armed'));
+  if(wordId===dp.dataset.id){
+    const labelTxt = dp.querySelector('.label').textContent.replace('≈ ','');
+    chip.classList.add('matched','selected'); chip.classList.remove('selected'); chip.draggable=false;
+    dp.classList.add('filled','correct');
+    dp.innerHTML = '<span><b>'+chip.textContent+'</b> ≈ '+labelTxt+' ✓</span>';
+    matchDone++; $('matchCount').textContent=matchDone; matchSel=null;
+    addPoints(60); beep(true);
+    $('matchFeed').textContent=rnd(PRAISE)+' +60 pts'; $('matchFeed').className='feedback good';
+    setSelBar(matchDone<PAIRS.length?'✅ Matched! Tap the next word…':'',matchDone<PAIRS.length?false:false);
+    if(matchDone===PAIRS.length) matchComplete();
+  }else{
+    dp.classList.add('incorrect'); beep(false);
+    $('matchFeed').textContent='❌ Not a match — try again!'; $('matchFeed').className='feedback bad';
+    setTimeout(()=>dp.classList.remove('incorrect'),500);
+    matchSel=null; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+    setSelBar('👆 Tap a word to begin…',false);
+  }
+}
+function resetMatch(){ buildMatch(); }
+function matchComplete(){
+  addStar(); unlockBadge('match'); confetti(80);
+  $('matchFeed').textContent='🎉 All 15 matched! Perfect!'; $('matchFeed').className='feedback good';
+  $('matchNext').style.display='inline-block';
+}
+
+/* ============ 4. TRUE / FALSE ============ */
+const TF = [
+  {s:'"Purchase" means buy.',a:true,ex:'Correct — purchase = buy.'},
+  {s:'"Depart" means arrive.',a:false,ex:'False — depart = leave, the opposite of arrive.'},
+  {s:'"Enormous" means very small.',a:false,ex:'False — enormous = very big / huge.'},
+  {s:'"Reply" means answer.',a:true,ex:'Correct — to reply is to answer.'},
+  {s:'"Inexpensive" means cheap.',a:true,ex:'Correct — inexpensive = cheap / low price.'},
+  {s:'"Repair" means break.',a:false,ex:'False — repair = fix / mend something broken.'},
+  {s:'"Nearly" means almost.',a:true,ex:'Correct — nearly = almost, e.g. "nearly finished".'},
+  {s:'"Exhausted" means full of energy.',a:false,ex:'False — exhausted = very tired.'},
+  {s:'"Improve" means get better.',a:true,ex:'Correct — to improve is to get better.'},
+  {s:'"Cancel" means continue.',a:false,ex:'False — cancel = stop / call off something planned.'}
+];
+let tfOrder=[], tfIdx=0, tfScore=0, tfLocked=false;
+function startTF(){ tfOrder=shuffle(TF.map((_,i)=>i)); tfIdx=0; tfScore=0; renderTF(); }
+function renderTF(){
+  tfLocked=false;
+  const q=TF[tfOrder[tfIdx]];
+  $('tfNum').textContent=tfIdx+1; $('tfText').textContent=q.s;
+  $('tfFeed').textContent=''; $('tfExplain').style.display='none'; $('tfNext').style.display='none';
+}
+function answerTF(val){
+  if(tfLocked) return; tfLocked=true;
+  const q=TF[tfOrder[tfIdx]];
+  if(val===q.a){ addPoints(80); tfScore++; $('tfFeed').textContent=rnd(PRAISE)+' +80 pts'; $('tfFeed').className='feedback good'; beep(true);}
+  else{ $('tfFeed').textContent=rnd(ENCOURAGE); $('tfFeed').className='feedback bad'; beep(false);}
+  $('tfExplain').textContent='💡 '+q.ex; $('tfExplain').style.display='block';
+  $('tfNext').style.display='inline-block';
+  $('tfNext').textContent=(tfIdx<9)?'Next ▶':'Finish ▶';
+}
+function tfNext(){
+  if(tfIdx<9){ tfIdx++; renderTF(); }
+  else{ if(tfScore>=7) addStar(); unlockBadge('tf'); toast('True/False done! '+tfScore+'/10'); goNext('cloze'); startCloze(); }
+}
+
+/* ============ 5. COMPLETE THE SENTENCE ============ */
+const CLOZE = [
+  {s:'I usually ___ the bus to school.',o:['take','borrow','spend','repair'],a:0,ex:'We "take" public transport. "Take the bus/train".'},
+  {s:'She wants to ___ some money to buy a new bike.',o:['waste','save','lose','spend'],a:1,ex:'"Save money" = keep it for later. Here she is collecting money to buy something.'},
+  {s:'Could you ___ me your pen for a moment, please?',o:['lend','borrow','give away','sell'],a:0,ex:'You "lend" something TO someone; you "borrow" FROM someone.'},
+  {s:'We had to ___ for the train because it was late.',o:['wait','hope','look','watch'],a:0,ex:'"Wait for" = stay until something happens.'},
+  {s:'This jacket is too expensive — I can\'t ___ it.',o:['afford','spend','cost','pay'],a:0,ex:'"Afford" = have enough money for. "I can\'t afford it."'},
+  {s:'Remember to ___ your homework on Monday.',o:['hand in','take off','give up','look after'],a:0,ex:'"Hand in" = submit/give to the teacher.'},
+  {s:'The doctor told him to ___ in bed for two days.',o:['stay','sit','stand','go'],a:0,ex:'"Stay in bed" = remain there to rest.'},
+  {s:'They decided to ___ a table at the restaurant.',o:['book','buy','order','cook'],a:0,ex:'"Book a table" = reserve it in advance.'},
+  {s:'I really ___ playing football at the weekend.',o:['enjoy','bored','interest','fun'],a:0,ex:'"Enjoy + -ing": "I enjoy playing". A common PET pattern.'},
+  {s:'Please ___ off your phone during the lesson.',o:['turn','put','take','get'],a:0,ex:'"Turn off" = switch off a device.'}
+];
+let czOrder=[], czIdx=0, czScore=0, czLocked=false;
+function startCloze(){ czOrder=shuffle(CLOZE.map((_,i)=>i)); czIdx=0; czScore=0; renderCloze(); }
+function renderCloze(){
+  czLocked=false;
+  const q=CLOZE[czOrder[czIdx]];
+  $('czNum').textContent=czIdx+1;
+  $('czText').innerHTML=q.s.replace('___','<u style="color:var(--pink)">______</u>');
+  $('czFeed').textContent=''; $('czExplain').style.display='none'; $('czNext').style.display='none';
+  const ord=shuffle(q.o.map((o,i)=>({o,i})));
+  $('czOpts').innerHTML = ord.map(it=>'<button class="opt" data-i="'+it.i+'" onclick="answerCloze('+it.i+')"><span class="sym">●</span>'+it.o+'</button>').join('');
+}
+function answerCloze(choice){
+  if(czLocked) return; czLocked=true;
+  const q=CLOZE[czOrder[czIdx]];
+  document.querySelectorAll('#czOpts .opt').forEach(b=>{const i=+b.dataset.i;if(i===q.a)b.classList.add('correct','show-correct');else b.classList.add('wrong');b.disabled=true;});
+  if(choice===q.a){ addPoints(90); czScore++; $('czFeed').textContent=rnd(PRAISE)+' +90 pts'; $('czFeed').className='feedback good'; beep(true);}
+  else{ $('czFeed').textContent=rnd(ENCOURAGE); $('czFeed').className='feedback bad'; beep(false);}
+  $('czExplain').textContent='💡 '+q.ex; $('czExplain').style.display='block';
+  $('czNext').style.display='inline-block'; $('czNext').textContent=(czIdx<9)?'Next ▶':'Finish ▶';
+}
+function czNext(){
+  if(czIdx<9){ czIdx++; renderCloze(); }
+  else{ if(czScore>=7) addStar(); unlockBadge('cloze'); toast('Sentences done! '+czScore+'/10'); goNext('reading'); startReading(); }
+}
+
+/* ============ 6. READING MINI CHALLENGE ============ */
+const READING = [
+  {p:'Last summer my family went on holiday to Spain. Our flight was delayed for three hours, so we waited at the airport for a long time. We were all <b>weary</b> by the time we reached the hotel, and we fell asleep straight away.',
+   w:'weary', o:['excited','very tired','hungry','angry'], a:1, ex:'After a long delay and falling asleep at once, "weary" means very tired.'},
+  {p:'The new shopping centre is <b>spacious</b>. There is plenty of room to walk around, the corridors are wide, and even on busy Saturdays it never feels crowded. Many people say it is the most comfortable place to shop in the city.',
+   w:'spacious', o:['having lots of space','very expensive','badly lit','far away'], a:0, ex:'"Wide corridors", "plenty of room", "never crowded" tell you spacious = having lots of space.'},
+  {p:'Tom is a <b>reliable</b> friend. If he says he will meet you at six o\'clock, he is always there on time. He never forgets a promise, and you can trust him completely whenever you need help.',
+   w:'reliable', o:['funny','can be trusted','wealthy','tall'], a:1, ex:'"Always on time", "never forgets", "you can trust him" → reliable = can be trusted.'},
+  {p:'The instructions for building the model were very <b>confusing</b>. We read them three times but still did not understand what to do. In the end, we watched a video online to help us finish it.',
+   w:'confusing', o:['easy to follow','hard to understand','interesting','short'], a:1, ex:'They read it three times and still didn\'t understand → confusing = hard to understand.'},
+  {p:'Maria wanted to <b>attend</b> the science club, but it was already full. The teacher put her name on a waiting list and promised she could join the following month when a place became free.',
+   w:'attend', o:['leave','go to / take part in','pay for','start'], a:1, ex:'She wanted to be part of the club → attend = go to / take part in.'}
+];
+let rdIdx=0, rdScore=0, rdLocked=false;
+function startReading(){ rdIdx=0; rdScore=0; renderReading(); }
+function renderReading(){
+  rdLocked=false;
+  const q=READING[rdIdx];
+  $('rdNum').textContent=rdIdx+1;
+  $('rdPassage').innerHTML=q.p; $('rdWord').textContent='"'+q.w+'"';
+  $('rdFeed').textContent=''; $('rdExplain').style.display='none'; $('rdNext').style.display='none';
+  const ord=shuffle(q.o.map((o,i)=>({o,i})));
+  $('rdOpts').innerHTML=ord.map(it=>'<button class="opt" data-i="'+it.i+'" onclick="answerReading('+it.i+')"><span class="sym">●</span>'+it.o+'</button>').join('');
+}
+function answerReading(choice){
+  if(rdLocked) return; rdLocked=true;
+  const q=READING[rdIdx];
+  document.querySelectorAll('#rdOpts .opt').forEach(b=>{const i=+b.dataset.i;if(i===q.a)b.classList.add('correct','show-correct');else b.classList.add('wrong');b.disabled=true;});
+  if(choice===q.a){ addPoints(120); rdScore++; $('rdFeed').textContent=rnd(PRAISE)+' +120 pts'; $('rdFeed').className='feedback good'; beep(true);}
+  else{ $('rdFeed').textContent=rnd(ENCOURAGE); $('rdFeed').className='feedback bad'; beep(false);}
+  $('rdExplain').textContent='💡 '+q.ex; $('rdExplain').style.display='block';
+  $('rdNext').style.display='inline-block'; $('rdNext').textContent=(rdIdx<4)?'Next ▶':'Finish ▶';
+}
+function rdNext(){
+  if(rdIdx<4){ rdIdx++; renderReading(); }
+  else{ if(rdScore>=4) addStar(); unlockBadge('reading'); toast('Reading done! '+rdScore+'/5'); goNext('strategy'); ensureStrategy(); }
+}
+
+/* ============ 7. STRATEGY CARDS ============ */
+const STRAT = [
+  {ic:'🔍',t:'Look for synonyms',b:'The answer often uses a different word with the same meaning. "Big" in the text may be "large" in the question.'},
+  {ic:'🔁',t:'Identify paraphrases',b:'Whole ideas are reworded. "He couldn\'t afford it" = "It was too expensive for him."'},
+  {ic:'🧩',t:'Use context clues',b:'Don\'t panic at a new word. The sentences around it usually explain what it means.'},
+  {ic:'⏭️',t:'Ignore unknown words',b:'You don\'t need every word. Skip a hard word if it isn\'t needed to answer the question.'},
+  {ic:'🌍',t:'Focus on overall meaning',b:'Read for the general message first, then look closely only where the question points you.'}
+];
+let stratBuilt=false, stratFlipped=0;
+function ensureStrategy(){
+  if(stratBuilt) return; stratBuilt=true;
+  $('stratCards').innerHTML = STRAT.map((c,i)=>
+    '<div class="flip" id="flip-'+i+'" onclick="flipCard('+i+')">'+
+      '<div class="flip-inner">'+
+        '<div class="flip-face flip-front"><span class="ic">'+c.ic+'</span><span class="t">'+c.t+'</span><small style="margin-top:6px;opacity:.85;">tap to reveal</small></div>'+
+        '<div class="flip-face flip-back">'+c.b+'</div>'+
+      '</div></div>').join('');
+}
+function flipCard(i){
+  const el=$('flip-'+i);
+  if(!el.classList.contains('flipped')){
+    el.classList.add('flipped'); stratFlipped++; beep(true); addPoints(20);
+    $('stratHint').textContent='Cards flipped: '+stratFlipped+' / 5';
+    if(stratFlipped===5){ unlockBadge('strategy'); addStar(); $('stratNext').style.display='inline-block'; $('stratHint').textContent='🎉 All strategies unlocked! Ready for the final quiz.'; }
+  }
+}
+
+/* ============ 8. FINAL QUIZ (20 mixed) ============ */
+const FINAL = [
+  {type:'mc',q:'Choose the synonym of "purchase".',o:['buy','sell','return','borrow'],a:0,ex:'Purchase = buy.'},
+  {type:'tf',q:'"Depart" means to leave.',a:true,ex:'True — depart = leave.'},
+  {type:'fill',q:'I can\'t ___ this jacket; it costs too much.',o:['afford','spend','cost'],a:0,ex:'"Afford" = have enough money for.'},
+  {type:'mc',q:'Which word means "almost"?',o:['nearly','rarely','clearly','hardly'],a:0,ex:'Nearly = almost.'},
+  {type:'match',q:'"Receive" is closest in meaning to...',o:['get','give','send','keep'],a:0,ex:'Receive = get.'},
+  {type:'tf',q:'"Inexpensive" means expensive.',a:false,ex:'False — inexpensive = cheap.'},
+  {type:'fill',q:'Please ___ in your homework tomorrow.',o:['hand','take','put'],a:0,ex:'"Hand in" = submit.'},
+  {type:'mc',q:'A "bargain" is something that is...',o:['good value / cheap','broken','heavy','rare'],a:0,ex:'A bargain = good value, cheap.'},
+  {type:'match',q:'"Difficult" is closest to...',o:['hard','easy','simple','quick'],a:0,ex:'Difficult = hard.'},
+  {type:'tf',q:'"Exhausted" means very tired.',a:true,ex:'True — exhausted = very tired.'},
+  {type:'fill',q:'They decided to ___ a table at the café.',o:['book','cook','clean'],a:0,ex:'"Book a table" = reserve it.'},
+  {type:'mc',q:'Which word means "to fix"?',o:['repair','break','throw','lose'],a:0,ex:'Repair = fix.'},
+  {type:'match',q:'"Begin" is closest to...',o:['start','finish','stop','end'],a:0,ex:'Begin = start.'},
+  {type:'tf',q:'"Enormous" means tiny.',a:false,ex:'False — enormous = very big.'},
+  {type:'fill',q:'She wants to ___ money for a new phone.',o:['save','waste','lose'],a:0,ex:'"Save money" = keep it for later.'},
+  {type:'mc',q:'"Opportunity" is closest to...',o:['chance','problem','rule','reason'],a:0,ex:'Opportunity = chance.'},
+  {type:'match',q:'"Choose" is closest to...',o:['select','refuse','forget','lose'],a:0,ex:'Choose = select.'},
+  {type:'tf',q:'"Reply" means to answer.',a:true,ex:'True — reply = answer.'},
+  {type:'fill',q:'We had to ___ for the bus in the rain.',o:['wait','hope','watch'],a:0,ex:'"Wait for" = stay until it comes.'},
+  {type:'mc',q:'"Arrive" is closest in meaning to...',o:['get to','leave','depart','pass'],a:0,ex:'Arrive = get to.'}
+];
+let fqOrder=[], fqIdx=0, fqScore=0, fqLocked=false, fqTimer=null, fqTimeLeft=15;
+function startFinal(){ fqOrder=shuffle(FINAL.map((_,i)=>i)); fqIdx=0; fqScore=0; $('fqScore').textContent=0; renderFinal(); }
+function renderFinal(){
+  fqLocked=false;
+  const q=FINAL[fqOrder[fqIdx]];
+  $('fqNum').textContent=fqIdx+1;
+  $('fqFeed').textContent=''; $('fqExplain').style.display='none'; $('fqNext').style.display='none';
+  let label = {mc:'Multiple choice',tf:'True or False',fill:'Complete the sentence',match:'Matching'}[q.type];
+  let html='<div class="qcard"><div class="qtopic">'+label+'</div><div class="qtext">'+
+    (q.type==='fill'?q.q.replace('___','<u style="color:var(--pink)">______</u>'):q.q)+'</div></div>';
+  if(q.type==='tf'){
+    html+='<div class="tf-row"><button class="btn green tf-btn" onclick="answerFinal(1)">✔ TRUE</button>'+
+      '<button class="btn tf-btn" style="background:linear-gradient(180deg,#ef4444,#c01e1e);box-shadow:0 6px 0 #8f1414,var(--shadow);" onclick="answerFinal(0)">✗ FALSE</button></div>';
+  }else{
+    const ord=shuffle(q.o.map((o,i)=>({o,i})));
+    html+='<div class="opts">'+ord.map(it=>'<button class="opt" data-i="'+it.i+'" onclick="answerFinal('+it.i+')"><span class="sym">●</span>'+it.o+'</button>').join('')+'</div>';
+  }
+  $('fqArea').innerHTML=html;
+  startFqTimer();
+}
+function startFqTimer(){
+  clearInterval(fqTimer); fqTimeLeft=15;
+  $('fqTimerTxt').textContent=fqTimeLeft; $('fqTimerBar').style.width='100%';
+  fqTimer=setInterval(()=>{
+    fqTimeLeft--; $('fqTimerTxt').textContent=Math.max(0,fqTimeLeft); $('fqTimerBar').style.width=(fqTimeLeft/15*100)+'%';
+    if(fqTimeLeft<=0){ clearInterval(fqTimer); if(!fqLocked) answerFinal(-99); }
+  },1000);
+}
+function answerFinal(choice){
+  if(fqLocked) return; fqLocked=true; clearInterval(fqTimer);
+  const q=FINAL[fqOrder[fqIdx]];
+  const correctVal = q.type==='tf' ? (q.a?1:0) : q.a;
+  const correct = choice===correctVal;
+  if(q.type!=='tf'){
+    document.querySelectorAll('#fqArea .opt').forEach(b=>{const i=+b.dataset.i;if(i===q.a)b.classList.add('correct','show-correct');else b.classList.add('wrong');b.disabled=true;});
+  }else{
+    document.querySelectorAll('#fqArea .tf-btn').forEach(b=>b.disabled=true);
+  }
+  if(correct){ const bonus=Math.max(0,fqTimeLeft); const pts=100+bonus*5; addPoints(pts); fqScore++; $('fqScore').textContent=fqScore;
+    $('fqFeed').textContent=rnd(PRAISE)+' +'+pts+' pts'; $('fqFeed').className='feedback good'; beep(true);}
+  else{ $('fqFeed').textContent=(choice===-99?'⏰ Time\'s up! ':rnd(ENCOURAGE)); $('fqFeed').className='feedback bad'; beep(false);}
+  $('fqExplain').textContent='💡 '+q.ex; $('fqExplain').style.display='block';
+  $('fqNext').style.display='inline-block'; $('fqNext').textContent=(fqIdx<19)?'Next ▶':'See My Results 🏆';
+}
+function fqNext(){
+  if(fqIdx<19){ fqIdx++; renderFinal(); }
+  else{ if(fqScore>=14) addStar(); unlockBadge('final'); showResults(); }
+}
+
+/* ============ RESULTS ============ */
+function showResults(){
+  goNext('result');
+  const pct=Math.round(fqScore/20*100);
+  $('resScore').textContent=pct+'%';
+  $('resPoints').textContent=state.points;
+  $('resFq').textContent=fqScore+'/20';
+  const nb=Object.keys(state.badges).filter(k=>state.badges[k]).length;
+  $('resBadges').textContent=nb+'/7';
+  // stars rating from pct
+  const filled = pct>=90?5:pct>=75?4:pct>=60?3:pct>=40?2:1;
+  $('resStars').textContent='★'.repeat(filled)+'☆'.repeat(5-filled);
+  let rank,msg;
+  if(pct>=80){ rank='PET Vocabulary Master ⭐'; msg='Outstanding! Your vocabulary and reading skills are exam-ready.'; confetti(160);}
+  else if(pct>=50){ rank='PET Vocabulary Explorer 🚀'; msg='Great progress! A little more practice and you\'ll be a Master.'; confetti(90);}
+  else{ rank='Keep Practising 💪'; msg='Good effort! Review the explanations and try again — you\'ll improve fast.';}
+  $('resRank').textContent=rank; $('resMsg').textContent=msg;
+  // badge row
+  const names={warmup:'🚀',match:'🔗',tf:'⚖️',cloze:'✏️',reading:'📖',strategy:'🧠',final:'🏆'};
+  $('resBadgeRow').innerHTML=Object.keys(names).map(k=>
+    '<div class="badge '+(state.badges[k]?'unlocked':'')+'"><span class="ic">'+names[k]+'</span>'+badgeName(k)+'</div>').join('');
+}
+
+/* wire screens that need init when navigated */
+function startTFwrap(){}
+document.addEventListener('DOMContentLoaded',()=>{ updateHUD(); setProgress('welcome'); });
+/* hook tf start when entering */
+const _goNext=goNext;
+goNext=function(stage){_goNext(stage); if(stage==='tf') startTF();};
+</script>
+</body>
+</html>
