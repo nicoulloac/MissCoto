@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geometry Vault 🚀 — Surface Area & Volume Escape</title>
+<style>
+  :root{
+    --navy:#1f3a5f; --navy2:#2b507f; --teal:#2a9d8f; --teal-d:#1f7a6f;
+    --light:#dbeef0; --bg:#0e1b2c; --panel:#ffffff; --gold:#f4c14b;
+    --good:#2a9d8f; --bad:#e76f51; --gray:#5a6b7b; --water:#7ec8e3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',Tahoma,system-ui,sans-serif;
+    background:radial-gradient(circle at 50% -10%,#244166 0%,#0e1b2c 70%);
+    min-height:100vh;color:#22303f;display:flex;justify-content:center;padding:18px;
+  }
+  .app{width:100%;max-width:720px}
+  .card{background:var(--panel);border-radius:18px;padding:26px 24px 30px;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  h1{font-family:Georgia,'Times New Roman',serif;color:var(--navy);font-size:30px;line-height:1.15;margin-bottom:6px}
+  .sub{color:var(--teal-d);font-weight:700;font-size:16px;margin-bottom:14px}
+  .lead{color:var(--gray);font-size:15px;line-height:1.5;margin-bottom:16px}
+  .toolbox{background:var(--light);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--navy);line-height:1.7;margin-bottom:16px}
+  .toolbox b{color:var(--teal-d)}
+  .btn{background:var(--teal);color:#fff;border:none;border-radius:12px;padding:14px 22px;font-size:17px;font-weight:700;cursor:pointer;transition:transform .08s,background .15s;width:100%}
+  .btn:hover{background:var(--teal-d)} .btn:active{transform:scale(.98)}
+  .btn.secondary{background:var(--navy)} .btn.secondary:hover{background:var(--navy2)}
+
+  .setup{display:flex;flex-direction:column;gap:10px;margin-bottom:8px}
+  .seg{display:flex;gap:8px}
+  .seg button{flex:1;background:#f4f7fa;border:2px solid #dbe3ec;border-radius:12px;padding:11px;font-weight:700;color:var(--navy);cursor:pointer;font-size:14px}
+  .seg button.on{background:#eef8f7;border-color:var(--teal);color:var(--teal-d)}
+  .setlabel{font-size:13px;font-weight:700;color:var(--gray);margin:6px 0 -2px}
+  .toggle{display:flex;align-items:center;justify-content:space-between;background:#f4f7fa;border:2px solid #dbe3ec;border-radius:12px;padding:11px 14px;cursor:pointer}
+  .toggle.on{background:#fff7e6;border-color:var(--gold)}
+  .toggle b{color:var(--navy);font-size:14px}
+  .switch{width:46px;height:26px;border-radius:999px;background:#cdd6df;position:relative;transition:.2s}
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+  .toggle.on .switch{background:var(--gold)} .toggle.on .switch::after{left:23px}
+
+  .hud{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .locks{font-size:20px;letter-spacing:2px}
+  .pill{background:var(--navy);color:#fff;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700}
+  .pill.gold{background:var(--gold);color:#3a2e00} .pill.teal{background:var(--teal)}
+  .progress{height:9px;background:#e4eaf0;border-radius:999px;overflow:hidden;margin-bottom:8px}
+  .progress > div{height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));width:0;transition:width .4s}
+  .timer{height:7px;background:#e4eaf0;border-radius:999px;overflow:hidden;margin-bottom:16px;display:none}
+  .timer.show{display:block}
+  .timer > div{height:100%;background:var(--gold);width:100%;transition:width 1s linear}
+  .timer > div.low{background:var(--bad)}
+
+  .tag{display:inline-block;background:var(--light);color:var(--navy);font-weight:700;font-size:12px;padding:4px 12px;border-radius:999px;margin-bottom:12px;letter-spacing:.4px}
+  .qtext{font-size:19px;line-height:1.45;color:var(--navy);font-weight:600;margin-bottom:14px}
+  .figure{display:flex;justify-content:center;margin:6px 0 16px} .figure svg{max-width:100%;height:auto}
+
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .opt{background:#f4f7fa;border:2px solid #dbe3ec;border-radius:12px;padding:14px;font-size:17px;font-weight:600;color:var(--navy);cursor:pointer;text-align:center;transition:.12s}
+  .opt:hover{border-color:var(--teal);background:#eef8f7}
+  .opt.correct{background:#e3f5f1;border-color:var(--good);color:var(--teal-d)}
+  .opt.wrong{background:#fde9e3;border-color:var(--bad);color:var(--bad)}
+  .opt.dim{opacity:.45}
+
+  .fillrow{display:flex;gap:10px}
+  .fillrow input{flex:1;font-size:20px;padding:13px 14px;border:2px solid #dbe3ec;border-radius:12px;text-align:center;font-weight:700;color:var(--navy);outline:none}
+  .fillrow input:focus{border-color:var(--teal)}
+  .fillrow button{flex:0 0 auto;padding:0 20px;border:none;border-radius:12px;background:var(--navy);color:#fff;font-weight:700;cursor:pointer}
+
+  .feedback{margin-top:16px;border-radius:12px;padding:14px 16px;font-size:15px;line-height:1.5;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{background:#e3f5f1;color:var(--teal-d);border-left:5px solid var(--good)}
+  .feedback.no{background:#fde9e3;color:#a23b25;border-left:5px solid var(--bad)}
+  .feedback b{display:block;margin-bottom:4px;font-size:16px}
+  .bonus{display:inline-block;background:var(--gold);color:#3a2e00;border-radius:999px;padding:2px 10px;font-weight:800;font-size:13px;margin-left:6px}
+  .next{margin-top:14px}
+
+  .center{text-align:center} .big{font-size:54px;margin:10px 0}
+  .scoreline{font-size:18px;color:var(--navy);margin:6px 0 4px;font-weight:600}
+  .medal{font-size:20px;color:var(--teal-d);font-weight:800;margin:10px 0 18px}
+  .small{font-size:13px;color:var(--gray);margin-top:14px}
+  .hidden{display:none}
+  @media(max-width:480px){.opts{grid-template-columns:1fr} h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="app"><div class="card">
+
+  <!-- ============ START ============ -->
+  <div id="start">
+    <h1>🚀 Geometry Vault</h1>
+    <div class="sub">Surface Area & Volume — Escape Game</div>
+    <p class="lead">You are locked inside the <b>Geometry Vault</b>! Solve the challenges about cubes and rectangular prisms to collect keys and escape. Every skill from the review guide is here — surface area, volume, missing measurements 🔍, nets, counting cubes, word problems and tricky error-spotting. 🔑</p>
+    <div class="toolbox">
+      🧰 <b>Toolbox</b><br>
+      • Cube surface area = <b>6 × (side × side)</b> &nbsp; · &nbsp; Cube volume = <b>side³</b><br>
+      • Prism surface area = <b>2 × (l·w + l·h + w·h)</b><br>
+      • Prism volume = <b>length × width × height</b><br>
+      • Missing side = <b>volume ÷ (the other two sides)</b><br>
+      • Surface area → <b>cm²</b> &nbsp;·&nbsp; Volume → <b>cm³</b>
+    </div>
+    <div class="setup">
+      <div class="setlabel">How long is your escape?</div>
+      <div class="seg" id="lenSeg">
+        <button data-n="8">Quick · 8 locks</button>
+        <button data-n="12" class="on">Standard · 12 locks</button>
+        <button data-n="16">Full Vault · 16</button>
+      </div>
+      <div class="setlabel">Difficulty</div>
+      <div class="seg" id="diffSeg">
+        <button data-d="easy">Easy</button>
+        <button data-d="medium" class="on">Medium</button>
+        <button data-d="hard">Hard</button>
+      </div>
+      <div class="toggle" id="kahootToggle" onclick="toggleKahoot()">
+        <b>⏱ Kahoot mode — race the clock for bonus points</b>
+        <div class="switch"></div>
+      </div>
+    </div>
+    <button class="btn" onclick="startGame()" style="margin-top:8px">Enter the Vault ▶</button>
+    <p class="small center">New problems every game. Replay as many times as you like! 💪</p>
+  </div>
+
+  <!-- ============ GAME ============ -->
+  <div id="game" class="hidden">
+    <div class="hud">
+      <span class="pill teal" id="roundPill">Lock 1</span>
+      <span class="locks" id="locks"></span>
+      <span class="pill gold" id="scorePill">★ 0</span>
+    </div>
+    <div class="progress"><div id="bar"></div></div>
+    <div class="timer" id="timerWrap"><div id="timerBar"></div></div>
+
+    <span class="tag" id="tag">Challenge</span>
+    <div class="qtext" id="qtext"></div>
+    <div class="figure" id="figure"></div>
+    <div id="answerArea"></div>
+
+    <div class="feedback" id="feedback"></div>
+    <button class="btn next hidden" id="nextBtn" onclick="nextRound()">Next lock ▶</button>
+  </div>
+
+  <!-- ============ END ============ -->
+  <div id="end" class="hidden center">
+    <div class="big" id="endEmoji">🎉</div>
+    <h1 id="endTitle">You escaped!</h1>
+    <div class="scoreline" id="endScore"></div>
+    <div class="medal" id="endMedal"></div>
+    <div class="locks" id="endLocks" style="margin-bottom:18px"></div>
+    <button class="btn" onclick="startGame()">Play again 🔄</button>
+    <button class="btn secondary" style="margin-top:10px" onclick="backHome()">Change settings</button>
+    <p class="small">Every game makes new problems — perfect for practising before the test! 💪</p>
+  </div>
+
+</div></div>
+
+<script>
+/* ===================== helpers ===================== */
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rand(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const NAVY="#1f3a5f",EDGE="#1f3a5f",FILL="#dbeef0",TOP="#c5e3e6",SIDE="#aed4d8",WATER="#7ec8e3";
+
+/* difficulty ranges */
+let DIFF="medium";
+function R(){ // returns {cube:[min,max], side:[min,max] for prisms}
+  if(DIFF==="easy")   return {cs:[2,5], pl:[2,6], pw:[2,5], ph:[2,5]};
+  if(DIFF==="hard")   return {cs:[5,12],pl:[6,15],pw:[4,9], ph:[4,9]};
+  return {cs:[3,9], pl:[3,12],pw:[2,8], ph:[2,7]};
+}
+
+/* ===================== SVG figures ===================== */
+function svgCube(label){
+  const L=120,d=46;
+  return `<svg viewBox="0 0 ${L+d+70} ${L+d+56}" width="220">
+    <polygon points="20,${d+10},${20+d},10 ${20+d+L},10 ${20+L},${d+10}" fill="${TOP}" stroke="${EDGE}" stroke-width="2.5"/>
+    <polygon points="${20+L},${d+10} ${20+d+L},10 ${20+d+L},${L+10} ${20+L},${d+L+10}" fill="${SIDE}" stroke="${EDGE}" stroke-width="2.5"/>
+    <rect x="20" y="${d+10}" width="${L}" height="${L}" fill="${FILL}" stroke="${EDGE}" stroke-width="2.5"/>
+    <text x="${20+L/2}" y="${d+L+44}" text-anchor="middle" font-family="Segoe UI" font-size="20" font-weight="700" fill="${NAVY}">${label}</text>
+  </svg>`;
+}
+// la=length(front-bottom), lb=width(depth/right), lc=height(left). Each a full string e.g. "9 cm" or "x".
+function svgPrism(la,lb,lc,opt={}){
+  const W=150,H=105,d=52, gx=72, gy=12;
+  let water="";
+  if(opt.waterFrac!==undefined){
+    const wy = H*(1-opt.waterFrac);
+    water=`<rect x="0" y="${d+wy}" width="${W}" height="${H-wy}" fill="${WATER}" opacity=".75"/>
+           <polygon points="${W},${d+wy} ${W+d},${wy} ${W+d},${d} ${W},${d}" fill="${WATER}" opacity=".5"/>
+           <line x1="0" y1="${d+wy}" x2="${W}" y2="${d+wy}" stroke="#2b7fa3" stroke-width="2"/>`;
+  }
+  return `<svg viewBox="0 0 ${W+d+gx+50} ${H+d+gy+50}" width="300">
+    <g transform="translate(${gx},${gy})">
+    <polygon points="0,${d} ${d},0 ${W+d},0 ${W},${d}" fill="${TOP}" stroke="${EDGE}" stroke-width="2.5"/>
+    <polygon points="${W},${d} ${W+d},0 ${W+d},${H} ${W},${H+d}" fill="${SIDE}" stroke="${EDGE}" stroke-width="2.5"/>
+    <rect x="0" y="${d}" width="${W}" height="${H}" fill="${FILL}" stroke="${EDGE}" stroke-width="2.5"/>
+    ${water}
+    <rect x="0" y="${d}" width="${W}" height="${H}" fill="none" stroke="${EDGE}" stroke-width="2.5"/>
+    <text x="${W/2}" y="${H+d+32}" text-anchor="middle" font-family="Segoe UI" font-size="19" font-weight="700" fill="${NAVY}">${la}</text>
+    <text x="-12" y="${d+H/2+6}" text-anchor="end" font-family="Segoe UI" font-size="19" font-weight="700" fill="${NAVY}">${lc}</text>
+    <text x="${W+d/2+12}" y="${d/2+8}" text-anchor="start" font-family="Segoe UI" font-size="19" font-weight="700" fill="${NAVY}">${lb}</text>
+    </g></svg>`;
+}
+// unit-cube solid: w across, h up (front), d deep
+function svgUnitCubes(w,h,d){
+  const u=30,dx=15,dy=15,m=14;
+  const X=m, Y=m+d*dy;
+  const VW=w*u+d*dx+2*m, VH=h*u+d*dy+2*m;
+  let s=`<svg viewBox="0 0 ${VW} ${VH}" width="${Math.min(260,VW*1.4)}">`;
+  // top
+  s+=`<polygon points="${X},${Y} ${X+d*dx},${Y-d*dy} ${X+w*u+d*dx},${Y-d*dy} ${X+w*u},${Y}" fill="${TOP}" stroke="${EDGE}" stroke-width="1.6"/>`;
+  for(let i=1;i<w;i++) s+=`<line x1="${X+i*u}" y1="${Y}" x2="${X+i*u+d*dx}" y2="${Y-d*dy}" stroke="${EDGE}" stroke-width="1"/>`;
+  for(let j=1;j<d;j++) s+=`<line x1="${X+j*dx}" y1="${Y-j*dy}" x2="${X+w*u+j*dx}" y2="${Y-j*dy}" stroke="${EDGE}" stroke-width="1"/>`;
+  // right
+  s+=`<polygon points="${X+w*u},${Y} ${X+w*u+d*dx},${Y-d*dy} ${X+w*u+d*dx},${Y-d*dy+h*u} ${X+w*u},${Y+h*u}" fill="${SIDE}" stroke="${EDGE}" stroke-width="1.6"/>`;
+  for(let j=1;j<d;j++) s+=`<line x1="${X+w*u+j*dx}" y1="${Y-j*dy}" x2="${X+w*u+j*dx}" y2="${Y-j*dy+h*u}" stroke="${EDGE}" stroke-width="1"/>`;
+  for(let i=1;i<h;i++) s+=`<line x1="${X+w*u}" y1="${Y+i*u}" x2="${X+w*u+d*dx}" y2="${Y-d*dy+i*u}" stroke="${EDGE}" stroke-width="1"/>`;
+  // front grid
+  for(let i=0;i<w;i++)for(let j=0;j<h;j++)
+    s+=`<rect x="${X+i*u}" y="${Y+j*u}" width="${u}" height="${u}" fill="${FILL}" stroke="${EDGE}" stroke-width="1.3"/>`;
+  s+=`</svg>`; return s;
+}
+// net of cube with one face labelled
+function svgNetCube(label){
+  const s=56, cells=[[1,0],[0,1],[1,1],[2,1],[1,2],[1,3]];
+  let r=""; cells.forEach(([x,y])=>{r+=`<rect x="${x*s+8}" y="${y*s+8}" width="${s}" height="${s}" fill="${FILL}" stroke="${EDGE}" stroke-width="2"/>`;});
+  return `<svg viewBox="0 0 ${3*s+16} ${4*s+16}" width="170">${r}
+    <text x="${s+8+s/2}" y="${s+8+s/2+5}" text-anchor="middle" font-family="Segoe UI" font-size="15" font-weight="700" fill="${NAVY}">${label}</text></svg>`;
+}
+// net of prism with face areas; one is "?"
+function svgNetAreas(A,B,C,missing){
+  // layout: top=B, left=C, front=A, right=C, bottom=?, back=A
+  const s=70;
+  const cells={top:[1,0,B],left:[0,1,C],front:[1,1,A],right:[2,1,C],bottom:[1,2,missing?"?":B],back:[3,1,A]};
+  let r="";
+  for(const k in cells){const [x,y,v]=cells[k];
+    const isQ=(v==="?");
+    r+=`<rect x="${x*s+8}" y="${y*s+8}" width="${s}" height="${s}" fill="${isQ?'#fff3df':FILL}" stroke="${EDGE}" stroke-width="2"/>
+        <text x="${x*s+8+s/2}" y="${y*s+8+s/2+5}" text-anchor="middle" font-family="Segoe UI" font-size="15" font-weight="700" fill="${isQ?'#b8860b':NAVY}">${v}${isQ?'':' cm²'}</text>`;}
+  return `<svg viewBox="0 0 ${4*s+16} ${3*s+16}" width="300">${r}</svg>`;
+}
+
+/* ===================== option builder ===================== */
+function makeOptions(correct,distractors){
+  let set=[correct];
+  for(const d of distractors){const v=Math.round(d); if(v!==correct&&!set.includes(v)&&v>0)set.push(v);}
+  let g=0;
+  while(set.length<4&&g++<60){
+    const f=Math.max(1,correct+rand(-Math.max(2,Math.round(correct*0.35)),Math.round(correct*0.45)));
+    if(!set.includes(f))set.push(f);
+  }
+  return shuffle(set.slice(0,4));
+}
+
+/* ===================== generators ===================== */
+function gCubeSA(){const r=R();const s=rand(r.cs[0],r.cs[1]);const a=6*s*s;
+  return{tag:"Surface area · Cube",q:`Find the <b>total surface area</b> of this cube.`,fig:svgCube(s+" cm"),mode:"num",unit:"cm²",correct:a,
+    opts:makeOptions(a,[s*s,s*s*s,6*s,4*s*s]),sol:`6 × (${s} × ${s}) = 6 × ${s*s} = <b>${a} cm²</b>. A cube has 6 equal faces.`};}
+function gCubeV(){const r=R();const s=rand(r.cs[0],r.cs[1]);const v=s*s*s;
+  return{tag:"Volume · Cube",q:`Find the <b>volume</b> of this cube.`,fig:svgCube(s+" cm"),mode:"num",unit:"cm³",correct:v,
+    opts:makeOptions(v,[s*s,6*s*s,3*s]),sol:`${s} × ${s} × ${s} = <b>${v} cm³</b>.`};}
+function gPrismV(){const r=R();const l=rand(r.pl[0],r.pl[1]),w=rand(r.pw[0],r.pw[1]),h=rand(r.ph[0],r.ph[1]);const v=l*w*h;
+  return{tag:"Volume · Prism",q:`Find the <b>volume</b> of this box.`,fig:svgPrism(l+" cm",w+" cm",h+" cm"),mode:"num",unit:"cm³",correct:v,
+    opts:makeOptions(v,[l+w+h,2*(l*w+l*h+w*h),l*w]),sol:`${l} × ${w} × ${h} = <b>${v} cm³</b>. Volume = length × width × height.`};}
+function gPrismSA(){const r=R();const l=rand(r.pl[0],Math.min(9,r.pl[1])),w=rand(r.pw[0],6),h=rand(r.ph[0],6);const sa=2*(l*w+l*h+w*h);
+  return{tag:"Surface area · Prism",q:`Find the <b>total surface area</b> of this box.`,fig:svgPrism(l+" cm",w+" cm",h+" cm"),mode:"num",unit:"cm²",correct:sa,
+    opts:makeOptions(sa,[l*w+l*h+w*h,l*w*h,2*(l+w+h)]),sol:`2 × (${l}·${w} + ${l}·${h} + ${w}·${h}) = 2 × ${l*w+l*h+w*h} = <b>${sa} cm²</b>.`};}
+
+/* ---- Q24 style: cuboid with x, given volume ---- */
+function gMissingFig(){const r=R();const a=rand(2,6),b=rand(2,6),x=rand(2,8);const v=a*b*x;
+  const figs=[svgPrism(a+" cm",b+" cm","x"),svgPrism(a+" cm","x",b+" cm"),svgPrism("x",b+" cm",a+" cm")];
+  return{tag:"Missing side · given volume",q:`The volume of this cuboid is <b>${v} cm³</b>. What is the missing length <b>x</b>?`,
+    fig:figs[rand(0,2)],mode:"num",unit:"cm",correct:x,
+    opts:makeOptions(x,[v-a*b,a*b,v-x]),sol:`x = volume ÷ (other two sides) = ${v} ÷ (${a} × ${b}) = ${v} ÷ ${a*b} = <b>${x} cm</b>.`};}
+function gMissingText(){const w=rand(2,6),d=rand(2,6),h=rand(2,9);const base=w*d;const v=base*h;
+  return{tag:"Missing dimension",q:`A box has a <b>volume of ${v} cm³</b>. Its base measures <b>${w} cm × ${d} cm</b>. What is its <b>height</b>?`,
+    fig:"",mode:"num",unit:"cm",correct:h,opts:makeOptions(h,[v-base,base,v-h]),
+    sol:`Height = volume ÷ base area = ${v} ÷ ${base} = <b>${h} cm</b>.`};}
+
+/* ---- unit cubes representation (Q20) ---- */
+function gCubeCount(){const w=rand(2,4),h=rand(2,4),d=rand(2,3);const v=w*h*d;
+  return{tag:"Counting cubes",q:`This solid is built from unit cubes. <b>How many unit cubes</b> is it made of? (That is its volume in cubic units.)`,
+    fig:svgUnitCubes(w,h,d),mode:"num",unit:"cubes",correct:v,
+    opts:makeOptions(v,[w*h,w+h+d,w*h+d]),sol:`Layers help: ${h} layers × (${w} × ${d} = ${w*d}) cubes each = <b>${v} cubes</b>.`};}
+function gLayers(){const layers=rand(2,5),per=rand(4,12);const v=layers*per;
+  return{tag:"Cubes · layers",q:`A prism is built from unit cubes. It has <b>${layers} layers</b>, and each layer has <b>${per} cubes</b>. What is its volume (in cubes)?`,
+    fig:"",mode:"num",unit:"cubes",correct:v,opts:makeOptions(v,[layers+per,per,layers*layers]),
+    sol:`Volume = layers × cubes per layer = ${layers} × ${per} = <b>${v} cubes</b>.`};}
+
+/* ---- nets ---- */
+function gNetCube(){const a=rand(2,9)*rand(2,4);const total=6*a;
+  return{tag:"Nets · Cube",q:`This is the net of a cube. Each square has an area of <b>${a} cm²</b>. What is the <b>total surface area</b>?`,
+    fig:svgNetCube(a+" cm²"),mode:"num",unit:"cm²",correct:total,opts:makeOptions(total,[a,4*a,a+6]),
+    sol:`A cube net has 6 squares: 6 × ${a} = <b>${total} cm²</b>.`};}
+function gNetMissing(){const l=rand(3,7),w=rand(2,6),h=rand(2,6);const A=l*w,B=l*h,C=w*h;
+  return{tag:"Nets · missing face",q:`This net of a prism shows the area of each face. What is the area of the <b>missing face (?)</b>?`,
+    fig:svgNetAreas(A,B,C,true),mode:"num",unit:"cm²",correct:B,opts:makeOptions(B,[A,C,A+C]),
+    sol:`Opposite faces are equal. The face opposite the ? has area ${B} cm², so <b>? = ${B} cm²</b>.`};}
+
+/* ---- word problems (Q22, Q25, Q27, Q9, Q14) ---- */
+function gWordTanks(){const n=rand(2,4),l=rand(2,6),w=rand(2,5),h=rand(3,8);const each=l*w*h;const tot=each*n;
+  return{tag:"Word problem · Volume",q:`An ocean park has <b>${n} identical fish tanks</b>. Each tank measures <b>${l} m × ${w} m × ${h} m</b>. What is the <b>total volume</b> of all the tanks together?`,
+    fig:"",mode:"num",unit:"m³",correct:tot,opts:makeOptions(tot,[each,each*(n+1),l+w+h]),
+    sol:`Each tank = ${l}×${w}×${h} = ${each} m³. All ${n}: ${each} × ${n} = <b>${tot} m³</b>.`};}
+function gWordTower(){const l=rand(3,8),w=rand(2,5),h=rand(2,4),n=rand(3,8);const one=l*w*h;const tot=one*n;
+  return{tag:"Word problem · Volume",q:`A block is <b>${l} cm long, ${w} cm wide and ${h} cm tall</b>. What is the volume of a <b>tower built from ${n} of these blocks</b>?`,
+    fig:"",mode:"num",unit:"cm³",correct:tot,opts:makeOptions(tot,[one,l+w+h,one+n]),
+    sol:`One block = ${l}×${w}×${h} = ${one} cm³. Tower of ${n}: ${one} × ${n} = <b>${tot} cm³</b>.`};}
+function gWordWater(){const l=rand(3,6),w=rand(3,6),H=rand(5,9);let frac=[0.25,0.5,0.4,0.6][rand(0,3)];
+  let hw=Math.max(1,Math.round(H*frac)); if(hw>=H)hw=H-1; const remaining=l*w*(H-hw);
+  return{tag:"Word problem · Capacity",q:`This tank is <b>${l} cm × ${w} cm × ${H} cm</b>. It already holds water up to <b>${hw} cm</b> high. How much <b>more water</b> is needed to fill it completely?`,
+    fig:svgPrism(l+" cm",w+" cm",H+" cm",{waterFrac:hw/H}),mode:"num",unit:"cm³",correct:remaining,
+    opts:makeOptions(remaining,[l*w*H,l*w*hw,l*w*(H-hw)+l*w]),
+    sol:`Empty space = ${l} × ${w} × (${H} − ${hw}) = ${l*w} × ${H-hw} = <b>${remaining} cm³</b>.`};}
+function gWordGift(){const s=rand(4,10);const sa=6*s*s;
+  return{tag:"Word problem · Surface area",q:`Mateo wraps a <b>cube-shaped gift</b> with a side of <b>${s} cm</b>. How much wrapping paper does he need to cover it completely?`,
+    fig:"",mode:"num",unit:"cm²",correct:sa,opts:makeOptions(sa,[s*s*s,s*s,6*s]),
+    sol:`Paper = surface area = 6 × (${s} × ${s}) = <b>${sa} cm²</b>.`};}
+function gWordCereal(){const l=rand(8,16),w=rand(4,9),h=rand(3,7);const v=l*w*h;
+  return{tag:"Word problem · Volume",q:`A cereal box measures <b>${l} cm × ${w} cm × ${h} cm</b>. What is its <b>volume</b>?`,
+    fig:svgPrism(l+" cm",w+" cm",h+" cm"),mode:"num",unit:"cm³",correct:v,opts:makeOptions(v,[l+w+h,2*(l*w+l*h+w*h),l*w]),
+    sol:`${l} × ${w} × ${h} = <b>${v} cm³</b>.`};}
+
+/* ---- concept / Kahoot MC ---- */
+function gError(){const l=rand(4,8),w=rand(3,6),h=rand(2,5);
+  const opts=[{t:`Add the sides: ${l}+${w}+${h} = ${l+w+h}`,ok:false},
+    {t:`Multiply: ${l}×${w}×${h} = ${l*w*h}`,ok:true},
+    {t:`Multiply two sides: ${l}×${w} = ${l*w}`,ok:false},
+    {t:`Use 6×${l}×${w} = ${6*l*w}`,ok:false}];
+  return{tag:"Find the mistake",q:`Tomás found the volume of a ${l}×${w}×${h} cm box by <i>adding</i> the sides. <b>Which is the correct way</b> to find the volume?`,
+    fig:"",mode:"mcq",opts:shuffle(opts),sol:`Volume = length × width × height = ${l}×${w}×${h} = <b>${l*w*h} cm³</b>. You multiply, never add.`};}
+function gErrorSA(){
+  const opts=[{t:"She forgot to multiply each area by 2 (each face has an equal opposite face).",ok:true},
+    {t:"She should add only one face.",ok:false},
+    {t:"She needed the volume to find surface area.",ok:false},
+    {t:"A cube has more faces than a prism.",ok:false}];
+  return{tag:"Find the mistake",q:`Martina added the areas of only the <b>3 different faces</b> of a prism and stopped there. <b>What did she do wrong?</b>`,
+    fig:"",mode:"mcq",opts:shuffle(opts),sol:`A prism has 3 <i>pairs</i> of equal faces, so each of the 3 areas must be <b>multiplied by 2</b>.`};}
+function gUnits(){const which=rand(0,1);const thing=which===0?"surface area":"volume";
+  const opts=[{t:"square units (cm²)",ok:which===0},{t:"cubic units (cm³)",ok:which===1},
+    {t:"single units (cm)",ok:false},{t:"kilograms (kg)",ok:false}];
+  return{tag:"Concepts · Units",q:`In which units do we measure <b>${thing}</b>?`,fig:"",mode:"mcq",opts:shuffle(opts),
+    sol:which===0?`Surface area covers a flat amount → <b>square units (cm²)</b>.`:`Volume fills space → <b>cubic units (cm³)</b>.`};}
+function gCompare(){let a=rand(3,7),b=rand(3,7);while(b===a)b=rand(3,7);const big=a>b?a:b;
+  const opts=[{t:`The ${a} cm cube`,ok:a>b},{t:`The ${b} cm cube`,ok:b>a},{t:"They need the same",ok:false},{t:"You can't tell",ok:false}];
+  return{tag:"Comparing shapes",q:`Two gift cubes have sides of <b>${a} cm</b> and <b>${b} cm</b>. Which needs <b>more wrapping paper</b>?`,fig:"",mode:"mcq",opts:shuffle(opts),
+    sol:`SA(${a})=${6*a*a} cm², SA(${b})=${6*b*b} cm². The bigger side (${big} cm) needs more paper.`};}
+function gTrueFalse(){
+  const bank=[
+    {s:"A rectangular prism can have faces of different sizes.",ok:true,why:"Its 3 pairs of faces can all be different rectangles."},
+    {s:"Volume tells you how much paper you need to cover a box.",ok:false,why:"That is surface area. Volume is the space inside."},
+    {s:"A cube has 6 equal square faces.",ok:true,why:"Every face of a cube is the same square."},
+    {s:"To find volume you add length + width + height.",ok:false,why:"You multiply: length × width × height."},
+    {s:"Surface area is measured in cubic units.",ok:false,why:"Surface area uses square units (cm²)."},
+  ];
+  const c=bank[rand(0,bank.length-1)];
+  const opts=[{t:"True ✅",ok:c.ok},{t:"False ❌",ok:!c.ok}];
+  return{tag:"True or False",q:`<b>True or False?</b> ${c.s}`,fig:"",mode:"mcq",opts:opts,sol:`<b>${c.ok?'True':'False'}.</b> ${c.why}`};}
+
+/* ---- fill in the blank (completar) ---- */
+function gFillWord(){
+  const bank=[
+    {q:`Complete the formula: Volume of a prism = length × ______ × height.`,ans:["width"],ph:"one word",sol:`length × <b>width</b> × height.`},
+    {q:`Complete: Surface area is measured in ______ units (one word).`,ans:["square"],ph:"one word",sol:`Surface area → <b>square</b> units (cm²).`},
+    {q:`Complete: Volume is measured in ______ units (one word).`,ans:["cubic"],ph:"one word",sol:`Volume → <b>cubic</b> units (cm³).`},
+    {q:`A cube has ______ equal square faces. (write the number as a word or digit)`,ans:["6","six"],ph:"number",sol:`A cube has <b>6</b> faces.`},
+  ];
+  const c=bank[rand(0,bank.length-1)];
+  return{tag:"Complete the blank",q:c.q,fig:"",mode:"fill",fillType:"word",answers:c.ans,ph:c.ph,sol:c.sol};
+}
+function gFillNum(){const s=rand(2,9);const type=rand(0,1);
+  if(type===0){const v=s*s*s;return{tag:"Complete the blank",q:`Type the answer: A cube with a side of <b>${s} cm</b> has a volume of ______ cm³.`,
+    fig:svgCube(s+" cm"),mode:"fill",fillType:"num",answers:[String(v)],ph:"number",sol:`${s}×${s}×${s} = <b>${v} cm³</b>.`};}
+  const a=6*s*s;return{tag:"Complete the blank",q:`Type the answer: A cube with a side of <b>${s} cm</b> has a surface area of ______ cm².`,
+    fig:svgCube(s+" cm"),mode:"fill",fillType:"num",answers:[String(a)],ph:"number",sol:`6×(${s}×${s}) = <b>${a} cm²</b>.`};}
+
+/* pools */
+const CORE=[gCubeSA,gCubeV,gPrismV,gPrismSA,gMissingFig,gMissingText,gCubeCount,gNetMissing,gWordTanks,gWordWater,gErrorSA,gFillNum];
+const EXTRA=[gNetCube,gLayers,gWordTower,gWordGift,gWordCereal,gError,gUnits,gCompare,gTrueFalse,gFillWord];
+const ALL=[...CORE,...EXTRA];
+
+function buildRounds(n){
+  const plan=[];
+  shuffle([...CORE]).forEach(f=>plan.push(f));
+  while(plan.length<n)plan.push(ALL[rand(0,ALL.length-1)]);
+  // avoid back-to-back duplicate generator
+  let chosen=shuffle(plan).slice(0,n);
+  for(let i=1;i<chosen.length;i++) if(chosen[i]===chosen[i-1]){const j=(i+1)%chosen.length;[chosen[i],chosen[j]]=[chosen[j],chosen[i]];}
+  return chosen.map(f=>f());
+}
+
+/* ===================== state & flow ===================== */
+let rounds=[],idx=0,score=0,keys=0,locked=false,total=12,kahoot=false;
+let timer=null,timeLeft=0,TIME=30;
+
+document.querySelectorAll('#lenSeg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#lenSeg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');total=+b.dataset.n;});
+document.querySelectorAll('#diffSeg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#diffSeg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');DIFF=b.dataset.d;});
+function toggleKahoot(){kahoot=!kahoot;document.getElementById('kahootToggle').classList.toggle('on',kahoot);}
+
+function startGame(){
+  rounds=buildRounds(total);idx=0;score=0;keys=0;
+  document.getElementById('start').classList.add('hidden');
+  document.getElementById('end').classList.add('hidden');
+  document.getElementById('game').classList.remove('hidden');
+  document.getElementById('timerWrap').classList.toggle('show',kahoot);
+  renderRound();
+}
+function backHome(){document.getElementById('end').classList.add('hidden');document.getElementById('game').classList.add('hidden');document.getElementById('start').classList.remove('hidden');}
+function lockStr(n,t){return "🔑".repeat(n)+"🔒".repeat(Math.max(0,t-n));}
+
+function renderRound(){
+  locked=false; clearInterval(timer);
+  const r=rounds[idx];
+  document.getElementById('roundPill').textContent=`Lock ${idx+1} / ${total}`;
+  document.getElementById('scorePill').textContent=`★ ${score}`;
+  document.getElementById('locks').textContent=lockStr(keys,total);
+  document.getElementById('bar').style.width=`${idx/total*100}%`;
+  document.getElementById('tag').textContent=r.tag;
+  document.getElementById('qtext').innerHTML=r.q;
+  document.getElementById('figure').innerHTML=r.fig||"";
+  const fb=document.getElementById('feedback');fb.className="feedback";fb.innerHTML="";
+  document.getElementById('nextBtn').classList.add('hidden');
+
+  const area=document.getElementById('answerArea');
+  if(r.mode==="mcq"){
+    area.innerHTML=`<div class="opts" id="opts"></div>`;const box=document.getElementById('opts');
+    r.opts.forEach((o,i)=>{const b=document.createElement('div');b.className='opt';b.innerHTML=o.t;b.onclick=()=>answerMCQ(i,b);box.appendChild(b);});
+  }else if(r.mode==="num"){
+    area.innerHTML=`<div class="opts" id="opts"></div>`;const box=document.getElementById('opts');
+    r.opts.forEach(val=>{const b=document.createElement('div');b.className='opt';b.innerHTML=`${val} ${r.unit}`;b.onclick=()=>answerNum(val,b);box.appendChild(b);});
+  }else{ // fill
+    area.innerHTML=`<div class="fillrow"><input id="fillInput" placeholder="${r.ph}" autocomplete="off"><button onclick="answerFill()">Check</button></div>`;
+    const inp=document.getElementById('fillInput');inp.focus();inp.addEventListener('keydown',e=>{if(e.key==='Enter')answerFill();});
+  }
+  if(kahoot)startTimer();
+}
+
+function startTimer(){
+  timeLeft=TIME;const bar=document.getElementById('timerBar');bar.classList.remove('low');bar.style.width="100%";
+  timer=setInterval(()=>{
+    timeLeft--;bar.style.width=`${timeLeft/TIME*100}%`;
+    if(timeLeft<=8)bar.classList.add('low');
+    if(timeLeft<=0){clearInterval(timer);if(!locked)timeUp();}
+  },1000);
+}
+function timeUp(){
+  const r=rounds[idx];
+  if(r.mode==="fill"){revealFill(false,r.sol);return;}
+  const opts=[...document.querySelectorAll('#opts .opt')];
+  opts.forEach((o,j)=>{const isC=r.mode==="mcq"?r.opts[j].ok:r.opts[j]===r.correct;o.classList.add(isC?'correct':'dim');});
+  reveal(false,`⏱ Time's up! ${r.sol}`);
+}
+
+function speedBonus(){return kahoot?Math.round(timeLeft/TIME*5):0;}
+
+function reveal(ok,sol){
+  locked=true;clearInterval(timer);
+  const fb=document.getElementById('feedback');fb.classList.add('show');
+  let bonus=0;
+  if(ok){bonus=speedBonus();score+=10+bonus;keys++;fb.classList.add('ok');
+    fb.innerHTML=`<b>✅ Correct! +10${bonus?` <span class="bonus">⚡ +${bonus} speed</span>`:''} — a key is yours 🔑</b>${sol}`;}
+  else{fb.classList.add('no');fb.innerHTML=`<b>❌ Not quite. Here's how:</b>${sol}`;}
+  document.getElementById('scorePill').textContent=`★ ${score}`;
+  document.getElementById('locks').textContent=lockStr(keys,total);
+  const nb=document.getElementById('nextBtn');nb.textContent=idx===total-1?"See your escape ▶":"Next lock ▶";nb.classList.remove('hidden');
+}
+function answerMCQ(i,el){if(locked)return;const r=rounds[idx];const opts=[...document.querySelectorAll('#opts .opt')];
+  opts.forEach((o,j)=>{o.classList.add(r.opts[j].ok?'correct':'dim');});
+  if(!r.opts[i].ok){el.classList.remove('dim');el.classList.add('wrong');}reveal(r.opts[i].ok,r.sol);}
+function answerNum(val,el){if(locked)return;const r=rounds[idx];const opts=[...document.querySelectorAll('#opts .opt')];
+  opts.forEach((o,j)=>{o.classList.add(r.opts[j]===r.correct?'correct':'dim');});
+  const ok=val===r.correct;if(!ok){el.classList.remove('dim');el.classList.add('wrong');}reveal(ok,r.sol);}
+function answerFill(){if(locked)return;const r=rounds[idx];const raw=(document.getElementById('fillInput').value||"").trim().toLowerCase();
+  let val=raw.replace(/cm2|cm²|cm3|cm³|cm|\s/g,'');
+  const ok=r.answers.some(a=>a.toLowerCase()===val||a.toLowerCase()===raw);revealFill(ok,r.sol);}
+function revealFill(ok,sol){const inp=document.getElementById('fillInput');if(inp){inp.disabled=true;inp.style.borderColor=ok?'#2a9d8f':'#e76f51';}reveal(ok,sol);}
+
+function nextRound(){idx++;if(idx>=total){endGame();return;}renderRound();}
+
+function endGame(){
+  clearInterval(timer);document.getElementById('bar').style.width="100%";
+  document.getElementById('game').classList.add('hidden');
+  document.getElementById('end').classList.remove('hidden');
+  const maxScore=total*(kahoot?15:10);
+  document.getElementById('endScore').textContent=`Score: ${score} / ${maxScore}  ·  Keys: ${keys} / ${total}`;
+  document.getElementById('endLocks').textContent=lockStr(keys,total);
+  const pct=keys/total;let title,emoji,medal;
+  if(pct===1){title="Flawless escape!";emoji="🏆";medal="🥇 Geometry Master — perfect run!";}
+  else if(pct>=0.8){title="You escaped! 🚪💨";emoji="🎉";medal="🥈 Vault Breaker — great job!";}
+  else if(pct>=0.5){title="You made it out!";emoji="🙌";medal="🥉 Apprentice — solid work, keep practising!";}
+  else{title="Almost there...";emoji="💪";medal="Keep training — try again to escape!";}
+  document.getElementById('endTitle').textContent=title;document.getElementById('endEmoji').textContent=emoji;document.getElementById('endMedal').textContent=medal;
+}
+</script>
+</body>
+</html>
