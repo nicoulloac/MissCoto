@@ -1,0 +1,1194 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Soil Quest</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Layout: a soil cross-section. Sky and grass on top, missions dug into layers that get deeper (and harder) as you go down. Single bright look by choice. */
+:root{
+  color-scheme: light;
+  --sky:#CDEBF7; --sky2:#9ED6EE; --grass:#3E9B34; --sprout:#6CCB4B;
+  --o:#2C1C12; --a:#4A2E1C; --b:#8A4F2C; --c:#9A8A7A; --r:#5B5652;
+  --paper:#FFFCF4; --paper2:#F6EEDD; --ink:#2A1B12; --ink2:#6B5848; --line:#E2D5BE;
+  --sun:#FFC43D; --worm:#F07C98; --wormdark:#C9566F;
+  --ok:#23944A; --okbg:#DDF3E3; --bad:#D33A3F; --badbg:#FBE1E1; --info:#2F6FD1;
+  --k1:#E0474C; --k2:#2F72D8; --k3:#E8A400; --k4:#2B9A4E;
+  --display:"Baloo 2", "Trebuchet MS", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --body:"Lexend", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r-sm:10px; --r-md:16px; --r-lg:22px;
+  --shadow:0 3px 0 rgba(42,27,18,.18);
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--info);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+
+/* Top bar */
+.topbar{position:sticky;top:env(safe-area-inset-top, 0px);z-index:20;background:var(--o);color:#FFF6E6;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.topbar .wrap{display:flex;align-items:center;gap:10px;padding-block:8px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:6px;background:none;border:0;padding:0;font-family:var(--display);font-size:24px;font-weight:800;color:#FFF6E6}
+.brand svg{width:34px;height:34px}
+.chips{display:flex;gap:6px;margin-left:auto;align-items:center;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border-radius:999px;padding:4px 10px;font-weight:600;font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip svg{width:18px;height:18px}
+.iconbtn{background:rgba(255,255,255,.12);border:0;border-radius:999px;width:40px;height:40px;display:inline-grid;place-items:center;color:#FFF6E6}
+.iconbtn svg{width:22px;height:22px}
+.progress{background:var(--a);color:#F3E3C8}
+.progress .wrap{display:flex;align-items:center;gap:10px;padding-block:6px;font-size:14px}
+.pbar{flex:1;height:12px;background:rgba(255,255,255,.15);border-radius:999px;overflow:hidden}
+.pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sprout),var(--sun));border-radius:999px;transition:width .6s}
+
+main{padding-block:18px 48px}
+.screen{animation:rise .35s ease}
+@keyframes rise{from{transform:translateY(8px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:10px 22px;border-radius:999px;border:0;font-family:var(--display);font-weight:700;font-size:20px;background:var(--grass);color:#fff;box-shadow:0 4px 0 #2B6E25;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #2B6E25}
+.btn.alt{background:var(--paper);color:var(--ink);box-shadow:0 4px 0 var(--line)}
+.btn.sun{background:var(--sun);color:var(--ink);box-shadow:0 4px 0 #C99000}
+.btn.small{min-height:42px;font-size:17px;padding:6px 16px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.center{text-align:center}
+.muted{color:var(--ink2)}
+
+/* Panels */
+.panel{background:var(--paper);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow)}
+.panel + .panel{margin-top:14px}
+.stack{display:grid;gap:14px}
+.howto{background:var(--paper2);border-radius:var(--r-md);padding:12px 14px;font-size:16px;display:flex;gap:10px;align-items:flex-start}
+.howto svg{flex:none;width:28px;height:28px}
+.tag{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+
+/* Welcome */
+.hero{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+.hero-sky{background:linear-gradient(var(--sky2),var(--sky));padding:26px 22px 0;position:relative}
+.hero h1{font-size:clamp(46px,11vw,84px);color:var(--o);letter-spacing:-.01em}
+.hero p.lead{font-size:19px;max-width:30ch;margin:6px 0 0}
+.hero-sky .tag{display:block;padding-right:84px}
+.sunball{position:absolute;right:22px;top:18px;width:64px;height:64px;border-radius:50%;background:var(--sun);box-shadow:0 0 0 10px rgba(255,196,61,.25)}
+.grassline{height:18px;background:var(--grass);margin-top:22px;position:relative}
+.grassline:before{content:"";position:absolute;left:0;right:0;top:-8px;height:10px;background:radial-gradient(circle at 6px 10px,var(--grass) 6px,transparent 7px) 0 0/12px 10px repeat-x}
+.layers > div{padding:14px 22px;color:#FFF3E0;font-size:16px;display:flex;gap:12px;align-items:center}
+.layers b{font-family:var(--display);font-size:22px;width:28px}
+.hero .worm{position:absolute;right:20px;bottom:14px;width:110px;height:auto}
+.hero .grassline{margin-top:70px}
+.goal{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.goal div{background:var(--paper2);border-radius:var(--r-md);padding:12px 14px;font-size:16px}
+.goal strong{display:block;font-family:var(--display);font-size:20px}
+
+/* Mission map */
+.map{border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+.band{padding:16px;color:#FFF3E0}
+.band h2{font-size:26px}
+.band .sub{font-size:15px;opacity:.85;margin:2px 0 12px}
+.band.l1{background:var(--a)}
+.band.l2{background:var(--b)}
+.band.l3{background:var(--c);color:var(--ink)}
+.band.l4{background:var(--r)}
+.band.sky{background:linear-gradient(var(--sky2),var(--sky));color:var(--ink);padding-bottom:26px;position:relative}
+.band.sky:after{content:"";position:absolute;left:0;right:0;bottom:0;height:12px;background:var(--grass)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.tile{display:flex;gap:12px;align-items:center;text-align:left;background:var(--paper);color:var(--ink);border:0;border-radius:var(--r-md);padding:12px;box-shadow:0 4px 0 rgba(0,0,0,.25);min-height:84px;transition:transform .1s}
+.tile:hover{transform:translateY(-2px)}
+.tile .ic{flex:none;width:54px;height:54px;border-radius:14px;display:grid;place-items:center;background:var(--paper2)}
+.tile .ic svg{width:34px;height:34px}
+.tile .tt{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.1}
+.tile .td{font-size:14px;color:var(--ink2)}
+.tile .stars{display:flex;gap:2px;margin-top:3px}
+.tile .stars svg{width:18px;height:18px}
+.tile.locked{opacity:.55;filter:grayscale(.6)}
+.tile.done .ic{background:var(--okbg)}
+.boss-tile{background:#2E2A27;color:#FFF3E0}
+.boss-tile .td{color:#D9CBB8}
+.lockmsg{font-size:14px;margin-top:10px;opacity:.9}
+
+/* Mission screen */
+.mhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.mhead h2{font-size:30px;flex:1;min-width:0}
+.counter{font-weight:600;font-variant-numeric:tabular-nums;background:var(--paper);border-radius:999px;padding:6px 12px;font-size:15px}
+.qcard{background:var(--paper);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow)}
+.qtext{font-size:21px;font-weight:500;line-height:1.4;margin:0 0 14px}
+.fig{display:flex;justify-content:center;margin:0 0 14px;overflow-x:auto}
+.fig svg{max-width:100%;height:auto}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;width:100%;min-height:56px;padding:10px 14px;border-radius:var(--r-md);border:3px solid var(--line);background:#fff;font-size:18px;transition:transform .08s}
+.opt:hover{border-color:var(--ink2)}
+.opt .k{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;background:var(--paper2)}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt[disabled]{cursor:default}
+.opts.kahoot{grid-template-columns:1fr 1fr}
+@media (max-width:560px){.opts.kahoot{grid-template-columns:1fr}}
+.kahoot .opt{border:0;color:#fff;font-weight:600;min-height:72px;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.kahoot .opt .k{background:rgba(255,255,255,.25)}
+.kahoot .opt.c0{background:var(--k1)} .kahoot .opt.c1{background:var(--k2)} .kahoot .opt.c2{background:var(--k3);color:#2A1B12} .kahoot .opt.c3{background:var(--k4)}
+.kahoot .opt.dim{opacity:.35}
+.kahoot .opt.right{outline:5px solid var(--ink);outline-offset:-5px;opacity:1}
+.tf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tf .opt{overflow-wrap:anywhere;text-align:center}
+.counter:empty{display:none}
+@media (max-width:440px){.brand-text{display:none}.chip{font-size:14px;padding:3px 8px}.iconbtn{width:36px;height:36px}.topbar .wrap{flex-wrap:nowrap;gap:6px}.chips{gap:4px;flex-wrap:nowrap}#lo .opt{font-size:18px!important}}
+.tf .opt{justify-content:center;font-family:var(--display);font-size:26px;font-weight:800;min-height:80px}
+.feedback{margin-top:14px;border-radius:var(--r-md);padding:14px 16px;font-size:17px;display:grid;gap:10px}
+.feedback.ok{background:var(--okbg);border:2px solid var(--ok)}
+.feedback.no{background:var(--badbg);border:2px solid var(--bad)}
+.feedback b.v{font-family:var(--display);font-size:22px}
+.timer{height:10px;border-radius:999px;background:var(--paper2);overflow:hidden;margin-bottom:12px}
+.timer i{display:block;height:100%;background:var(--info);width:100%;transition:width .25s linear}
+.timer.low i{background:var(--bad)}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.pop{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.06)}}
+
+/* Matching */
+.match{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:10px}
+.match .col{display:grid;gap:10px;align-content:start}
+.mcard{width:100%;min-width:0;overflow-wrap:anywhere;hyphens:auto;min-height:60px;padding:10px 12px;border-radius:var(--r-md);border:3px solid var(--line);background:#fff;text-align:left;font-size:16px;line-height:1.3}
+.mcard.term{font-family:var(--display);font-weight:700;font-size:19px}
+@media (max-width:480px){.match{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:8px}.mcard{font-size:14.5px;padding:8px}.mcard.term{font-size:16px}}
+.mcard.sel{border-color:var(--info);background:#E4EEFC}
+.mcard.done{border-color:var(--ok);background:var(--okbg);cursor:default}
+.mcard.done .pairno{display:inline-grid}
+.pairno{display:none;width:24px;height:24px;border-radius:50%;background:var(--ok);color:#fff;place-items:center;font-size:13px;font-weight:700;margin-right:6px;vertical-align:middle}
+
+/* Gaps */
+.passage{font-size:19px;line-height:2.2}
+.gap{display:inline-block;min-width:120px;min-height:38px;padding:2px 12px;margin:0 2px;border-radius:10px;border:3px dashed var(--ink2);background:#fff;font-weight:600;line-height:1.5;vertical-align:middle}
+.gap.sel{border-style:solid;border-color:var(--info);background:#E4EEFC}
+.gap.right{border-style:solid;border-color:var(--ok);background:var(--okbg)}
+.gap.wrong{border-style:solid;border-color:var(--bad);background:var(--badbg)}
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding:12px;background:var(--paper2);border-radius:var(--r-md)}
+.word{border:0;border-radius:999px;padding:8px 16px;background:var(--a);color:#FFF3E0;font-weight:600;font-size:17px;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.word.used{opacity:.3}
+
+/* Order */
+.olist{display:grid;gap:8px;counter-reset:o}
+.oitem{display:flex;align-items:center;gap:10px;background:#fff;border:3px solid var(--line);border-radius:var(--r-md);padding:8px 8px 8px 12px}
+.oitem .n{flex:none;width:32px;height:32px;border-radius:50%;background:var(--paper2);display:grid;place-items:center;font-family:var(--display);font-weight:800}
+.oitem .tx{flex:1;min-width:0;font-size:17px}
+.oitem .mv{display:flex;flex-direction:column;gap:4px}
+.oitem .mv button{width:40px;height:34px;border-radius:8px;border:0;background:var(--paper2);display:grid;place-items:center}
+.oitem .mv button svg{width:18px;height:18px}
+.oitem.right{border-color:var(--ok);background:var(--okbg)}
+.oitem.wrong{border-color:var(--bad);background:var(--badbg)}
+.oitem .lab{font-family:var(--display);font-weight:800;color:var(--b);margin-right:4px}
+
+/* Sort */
+.tray{display:flex;flex-wrap:wrap;gap:8px;min-height:56px;padding:12px;border-radius:var(--r-md);background:var(--paper2)}
+.card{border:3px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;font-size:16px;text-align:left;user-select:none}
+.card.sel{border-color:var(--info);background:#E4EEFC;transform:scale(1.04)}
+.card.right{border-color:var(--ok);background:var(--okbg);cursor:default}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+@media (max-width:520px){.bins{grid-template-columns:1fr}}
+.bin{border:3px dashed var(--ink2);border-radius:var(--r-md);padding:10px;min-height:150px;background:rgba(255,255,255,.6);display:flex;flex-direction:column;gap:8px;text-align:left}
+.bin h3{font-size:21px}
+.bin .in{display:flex;flex-wrap:wrap;gap:6px}
+.bin.hot{border-style:solid;border-color:var(--info);background:#E4EEFC}
+.ghost{position:fixed;pointer-events:none;z-index:99;opacity:.9}
+
+/* Word search */
+.ws{display:grid;gap:3px;margin:0 auto;max-width:520px;user-select:none;touch-action:manipulation}
+.ws button{aspect-ratio:1;max-width:100%;border:0;border-radius:6px;background:#fff;font-family:var(--display);font-weight:700;font-size:clamp(14px,4vw,22px);padding:0;display:grid;place-items:center;text-transform:uppercase}
+.ws button.start{background:var(--sun)}
+.ws button.found{background:var(--sprout);color:#fff}
+.ws button.hint{background:#FFE7A3}
+.wlist{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.wlist span{padding:4px 10px;border-radius:999px;background:var(--paper2);font-weight:600;font-size:15px}
+.wlist span.f{background:var(--okbg);color:var(--ok);text-decoration:line-through}
+
+/* Race */
+.track{position:relative;height:96px;border-radius:var(--r-md);background:repeating-linear-gradient(90deg,#8A4F2C 0 8%,#7A4527 8% 16%);margin-bottom:14px;overflow:hidden}
+.track .lane{position:absolute;left:8px;right:40px;height:40px}
+.track .lane.l1{top:6px}.track .lane.l2{top:50px}
+.track .runner{position:absolute;top:0;width:44px;height:40px;transition:left .5s;transform:translateX(-50%)}
+.track .finish{position:absolute;right:0;top:0;bottom:0;width:32px;background:repeating-conic-gradient(#fff 0 25%,#222 0 50%) 0 0/16px 16px}
+.track .lbl{position:absolute;left:8px;font-size:12px;color:#FFE9C9;font-weight:600}
+
+/* Boss */
+.arena{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;background:linear-gradient(#E7C9A0,#C99A68);border-radius:var(--r-lg);padding:14px;margin-bottom:14px}
+.fighter{text-align:center}
+.fighter svg{width:min(120px,26vw);height:auto}
+.hp{height:14px;border-radius:999px;background:rgba(0,0,0,.2);overflow:hidden;margin-top:6px}
+.hp i{display:block;height:100%;background:var(--bad);transition:width .4s}
+.hearts{display:flex;justify-content:center;gap:4px;margin-top:6px}
+.hearts svg{width:26px;height:26px}
+.vs{font-family:var(--display);font-weight:800;font-size:30px;color:var(--o)}
+.hit{animation:hit .4s}
+@keyframes hit{30%{transform:translateX(10px) rotate(4deg);filter:brightness(1.6)}}
+
+/* Results */
+.big{font-family:var(--display);font-weight:800;font-size:56px;line-height:1}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{background:var(--paper2);border-radius:var(--r-md);padding:12px}
+.stat .v{font-family:var(--display);font-weight:800;font-size:34px;font-variant-numeric:tabular-nums}
+.stat .l{font-size:14px;color:var(--ink2)}
+.topicrow{display:grid;grid-template-columns:minmax(0,1fr) 120px 48px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:16px}
+@media (max-width:480px){.topicrow{grid-template-columns:minmax(0,1fr) 70px 44px}}
+.tbar{height:12px;background:var(--paper2);border-radius:999px;overflow:hidden}
+.tbar i{display:block;height:100%}
+.pct{font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.badge{display:flex;gap:8px;align-items:center;background:var(--paper2);border-radius:var(--r-md);padding:8px 10px;font-size:14px;line-height:1.25}
+.badge svg{flex:none;width:38px;height:38px}
+.badge.off{opacity:.4;filter:grayscale(1)}
+.badge b{display:block;font-size:15px}
+.review{background:#FFF4D6;border:2px solid var(--sun);border-radius:var(--r-md);padding:12px 14px}
+.review ul{margin:6px 0 0;padding-left:20px}
+.stars-big{display:flex;justify-content:center;gap:6px}
+.stars-big svg{width:56px;height:56px}
+
+/* Notebook */
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.note{background:#fff;border-radius:var(--r-md);padding:14px 16px;border-top:8px solid var(--b);font-size:16px}
+.note h3{font-size:22px;margin-bottom:6px}
+.note ul{margin:0;padding-left:18px}
+
+/* Toast + modal */
+#toast{pointer-events:none;opacity:0;position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%) translateY(140%);background:var(--o);color:#FFF6E6;border-radius:999px;padding:10px 18px;font-weight:600;z-index:50;transition:transform .3s;display:flex;align-items:center;gap:8px;max-width:calc(100% - 32px)}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#toast svg{width:24px;height:24px;flex:none}
+.modal{position:fixed;inset:0;background:rgba(42,27,18,.55);display:grid;place-items:center;z-index:60;padding:16px}
+.modal .panel{max-width:440px;width:100%}
+.setrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.switch{width:58px;height:32px;border-radius:999px;border:0;background:var(--line);position:relative;flex:none}
+.switch:after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
+.switch[aria-checked="true"]{background:var(--grass)}
+.switch[aria-checked="true"]:after{left:30px}
+.mhead .ic svg{width:32px;height:32px}
+.band.sky svg{width:100%;height:auto}
+.track .runner svg{width:100%;height:100%}
+.legend{font-size:14px;color:var(--ink2);margin:-6px 0 12px}
+.dtable{border-collapse:collapse;font-size:16px;background:#fff;font-variant-numeric:tabular-nums}
+.dtable th,.dtable td{border:2px solid var(--line);padding:6px 14px;text-align:center}
+.dtable th{background:var(--paper2);font-weight:600}
+</style>
+</head><body>
+
+<header class="topbar"><div class="wrap">
+  <button class="brand" id="homeBtn" aria-label="Back to mission map"><span id="brandWorm"></span><span class="brand-text">Soil Quest</span></button>
+  <div class="chips">
+    <span class="chip" title="Points"><span id="icoPts"></span><span id="ptsVal">0</span></span>
+    <span class="chip" title="Stars"><span id="icoStar"></span><span id="starVal">0</span></span>
+    <span class="chip" title="Correct answers in a row"><span id="icoFire"></span><span id="streakVal">0</span></span>
+    <button class="iconbtn" id="soundBtn" aria-label="Sound on or off"></button>
+    <button class="iconbtn" id="setBtn" aria-label="Settings"></button>
+  </div>
+</div></header>
+<div class="progress"><div class="wrap"><span>Missions</span><div class="pbar" role="progressbar" aria-label="Missions completed" aria-valuemin="0" aria-valuemax="10"><i id="pbar"></i></div><span id="pval">0/10</span></div></div>
+<main class="wrap" id="screen"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="modal" class="modal" hidden></div>
+<script>
+// ===================== CONTENT (based on Project 4 "Chile takes shape" – Soil) =====================
+// In every multiple-choice item the CORRECT option is written first; the game shuffles them on screen.
+const TOPICS = {
+  C1:{name:"Experiments & fair tests", tip:"Remember: question → prediction → fair test (change only one thing) → results → conclusion."},
+  C2:{name:"Soil properties & data", tip:"Water retained = water poured − water drained. Least drained = most retained."},
+  C3:{name:"Sand, clay & particles", tip:"Sand: big particles, big spaces, drains fast. Clay: tiny packed particles, holds water."},
+  C4:{name:"How soil forms", tip:"Parent rock → weathering → young soil → mature soil. It takes a very long time."},
+  C5:{name:"Soil changes: natural & human", tip:"Natural: rain, wind, floods, volcanoes. Human: deforestation, dams, pesticides."},
+  C6:{name:"Pollution & caring for soil", tip:"Pollution is highest near the source. Crop rotation and compost protect soil."},
+  C7:{name:"What soil is made of", tip:"Healthy soil = minerals + organic matter + water + air (+ living things)."},
+  C8:{name:"Decomposers & living things", tip:"Bacteria and fungi decompose dead matter → nutrients → plants → animals."},
+  C9:{name:"Soil horizons", tip:"O leaves · A humus · E washed · B minerals collect · C broken rock · R bedrock."}
+};
+
+const NOTEBOOK = [
+ {t:"C1", h:"Experiments & fair tests", li:[
+  "A scientific question can be answered with an experiment: <b>Which sediment holds the most water?</b>",
+  "A <b>prediction</b> is what you think will happen, written <b>before</b> the experiment.",
+  "In a <b>fair test</b> you change only <b>one</b> thing (the type of sediment). Keep the same amount of sediment, the same amount of water, the same time and the same cups.",
+  "A <b>conclusion</b> is based on the results. Repeating the experiment and comparing with other similar experiments makes it stronger."]},
+ {t:"C2", h:"Soil properties & data", li:[
+  "<b>Water retention</b>: how much water the soil holds.",
+  "<b>Porosity</b>: the air spaces (pores) between particles.",
+  "<b>Drainage</b>: water passing through and out of the soil.",
+  "Water retained = water poured − water drained. The sediment that drains the <b>least</b> retains the <b>most</b>.",
+  "Colour does not change how much water drains, so it is not relevant in this experiment."]},
+ {t:"C3", h:"Sand, clay & particles", li:[
+  "Particle size: <b>gravel &gt; sand &gt; clay</b>.",
+  "<b>Sand</b>: large particles, big air spaces, water drains fast, holds little water, feels gritty.",
+  "<b>Clay</b>: tiny particles packed close together, water drains slowly, holds a lot of water, sticky when wet.",
+  "<b>Garden soil</b>: a mix of particles and humus. It holds water and also lets air reach the roots."]},
+ {t:"C4", h:"How soil forms", li:[
+  "<b>Parent rock</b> is broken into pieces by water, wind, temperature changes and roots. This is <b>weathering</b>. Heavy rain increases weathering.",
+  "Plants grow, die and decompose, adding <b>humus</b>.",
+  "<b>Young soil</b> is thin with few plants. <b>Mature soil</b> is deep, has horizons, more organic matter and supports more plant life.",
+  "Soil forms over very long periods. The time depends on the type of bedrock, climate, relief and vegetation."]},
+ {t:"C5", h:"Soil changes: natural & human", li:[
+  "<b>Natural causes</b>: heavy rain washing nutrients away, strong winds, floods, volcanic eruptions, landslides.",
+  "<b>Human causes</b>: deforestation, building dams, pesticides, garbage, overgrazing.",
+  "<b>Erosion</b> removes fertile soil. With few plants, land can turn into desert (<b>desertification</b>) and animals lose their habitat."]},
+ {t:"C6", h:"Pollution & caring for soil", li:[
+  "Soil is polluted by factory waste, toxic chemicals, too many pesticides, garbage and burning.",
+  "Pollution is usually <b>highest near the source</b> and lower further away.",
+  "To protect soil: <b>crop rotation</b>, <b>compost / organic fertilizer</b>, planting trees, not burning crop residues, not dumping waste."]},
+ {t:"C7", h:"What soil is made of", li:[
+  "Healthy soil = <b>minerals</b> + <b>organic matter (humus)</b> + <b>water</b> + <b>air</b>.",
+  "It is full of living things: earthworms, insects, bacteria and fungi.",
+  "Roots and soil organisms need the air in the pores."]},
+ {t:"C8", h:"Decomposers & living things", li:[
+  "<b>Decomposers</b> (bacteria and fungi) break down dead plants, dead animals and animal feces.",
+  "This adds organic matter and <b>nutrients</b> to the soil, so it becomes more <b>fertile</b>.",
+  "Plants absorb nutrients through their <b>roots</b>; animals eat the plants. Soil and living things depend on each other.",
+  "<b>Exchange capacity</b>: the soil's ability to hold and supply nutrients. Higher capacity = more fertile soil."]},
+ {t:"C9", h:"Soil horizons", li:[
+  "<b>O</b>: fallen leaves and fresh organic matter (not yet decomposed).",
+  "<b>A</b> (topsoil): dark, rich in humus, roots and living things; soft and porous.",
+  "<b>E</b>: light layer; water washes minerals down.",
+  "<b>B</b> (subsoil): zone where minerals accumulate.",
+  "<b>C</b>: broken pieces of weathered parent rock, mostly minerals. Here rocks break apart.",
+  "<b>R</b>: bedrock (parent rock), the base of all the layers."]}
+];
+
+// ---------- Mission 1: Matching ----------
+const MATCH_ROUNDS = [
+ [ {a:"Weathering", b:"Rocks breaking into smaller pieces because of water, wind, temperature and living things.", t:"C4"},
+   {a:"Erosion", b:"Soil being removed and carried away by wind or water.", t:"C5"},
+   {a:"Humus", b:"Dark organic matter made from decomposed plants and animals.", t:"C7"},
+   {a:"Decomposers", b:"Living things, like bacteria and fungi, that break down dead organisms.", t:"C8"},
+   {a:"Parent rock", b:"The original rock that soil forms from.", t:"C4"} ],
+ [ {a:"Porosity", b:"The amount of air spaces between soil particles.", t:"C2"},
+   {a:"Water retention", b:"The ability of soil to hold water.", t:"C2"},
+   {a:"Drainage", b:"Water flowing down through the soil and out of it.", t:"C2"},
+   {a:"Fertility", b:"The ability of soil to give plants the nutrients they need.", t:"C8"},
+   {a:"Fair test", b:"An experiment where only one thing changes and everything else stays the same.", t:"C1"} ],
+ [ {a:"Desertification", b:"Land that becomes dry and loses its plants, like a desert.", t:"C5"},
+   {a:"Crop rotation", b:"Planting different crops in a field each season to keep the soil healthy.", t:"C6"},
+   {a:"Nutrients", b:"Substances that plants absorb through their roots to grow.", t:"C8"},
+   {a:"Horizon", b:"A layer of soil with its own characteristics.", t:"C9"},
+   {a:"Prediction", b:"What you think will happen, written before the experiment.", t:"C1"} ]
+];
+
+// ---------- Mission 2: True or false ----------
+const TF = [
+ {id:"tf1", t:"C4", s:"Soil forms very quickly, in just a few years.", a:false, ex:"Soil forms over very long periods: hundreds or thousands of years."},
+ {id:"tf2", t:"C4", s:"Water, wind and changes in temperature help break parent rock into smaller pieces.", a:true, ex:"This is weathering, the first step of soil formation."},
+ {id:"tf3", t:"C4", s:"Mature soil has more organic matter than young soil.", a:true, ex:"Over time, more plants and animals die and decompose, so mature soil has more humus."},
+ {id:"tf4", t:"C5", s:"Heavy rain washing nutrients out of the soil is a natural cause of soil change.", a:true, ex:"Rain is part of nature, so this change has a natural cause."},
+ {id:"tf5", t:"C5", s:"Deforestation is a natural cause of soil change.", a:false, ex:"Deforestation is caused by people cutting down forests. It is a human cause."},
+ {id:"tf6", t:"C5", s:"Strong winds can erode soil and lead to desertification.", a:true, ex:"Wind removes fertile soil. With few plants, the land can become a desert."},
+ {id:"tf7", t:"C6", s:"Using lots of chemical pesticides helps reduce soil contamination.", a:false, ex:"Pesticides contaminate soil. Crop rotation and organic fertilizer help protect it."},
+ {id:"tf8", t:"C7", s:"Healthy soil contains minerals, organic matter, water and air.", a:true, ex:"These are the four main components of healthy soil."},
+ {id:"tf9", t:"C8", s:"Bacteria and fungi break down dead plants and animals and return nutrients to the soil.", a:true, ex:"They are decomposers. They recycle nutrients for new plants."},
+ {id:"tf10", t:"C8", s:"Animal feces make the soil poorer.", a:false, ex:"Feces add organic matter and nutrients, so they enrich the soil."},
+ {id:"tf11", t:"C2", s:"Colour is an important property to measure in a water retention experiment.", a:false, ex:"Colour does not change how much water drains. We measure the water drained."},
+ {id:"tf12", t:"C3", s:"Clay particles are larger than sand particles.", a:false, ex:"Clay particles are much smaller than sand particles."}
+];
+
+// ---------- Mission 3: Word search ----------
+const WORDS = [
+ {w:"HUMUS", d:"Dark organic matter that makes soil fertile."},
+ {w:"CLAY", d:"Tiny packed particles that hold a lot of water."},
+ {w:"SAND", d:"Large particles with big air spaces; water drains fast."},
+ {w:"HORIZON", d:"A layer of soil."},
+ {w:"EROSION", d:"Soil carried away by wind or water."},
+ {w:"MINERALS", d:"Non-living particles that come from rocks."},
+ {w:"FUNGI", d:"Decomposers, like mushrooms and mould."},
+ {w:"BACTERIA", d:"Tiny decomposers that break down dead matter."},
+ {w:"POROSITY", d:"The air spaces between soil particles."},
+ {w:"WEATHERING", d:"Rocks breaking into smaller pieces."},
+ {w:"NUTRIENTS", d:"Substances plants absorb to grow."},
+ {w:"BEDROCK", d:"The solid rock at the bottom (horizon R)."}
+];
+
+// ---------- Mission 4: Quiz show ----------
+const QUIZ = [
+ {id:"qz1", t:"C9", fig:"hz:C", q:"The arrow points to a layer of broken rock pieces, where rocks are breaking apart. Which horizon is it?", o:["Horizon C","Horizon O","Horizon A","Horizon B"], ex:"Horizon C is made of weathered pieces of parent rock."},
+ {id:"qz2", t:"C9", q:"Which horizon is the solid bedrock at the bottom of the soil?", o:["Horizon R","Horizon O","Horizon A","Horizon E"], ex:"R is the bedrock (parent rock). It is the base of all the other layers."},
+ {id:"qz3", t:"C9", q:"In which horizon do minerals washed down from above accumulate?", o:["Horizon B","Horizon A","Horizon O","Horizon R"], ex:"Horizon B (subsoil) is the zone of accumulation of minerals."},
+ {id:"qz4", t:"C9", q:"The O horizon is mainly made of…", o:["fallen leaves and fresh organic matter","solid rock","clay and minerals only","water"], ex:"O is the top layer of leaves, twigs and remains that are not yet decomposed."},
+ {id:"qz5", t:"C9", q:"Why can plant roots spread easily in the A horizon?", o:["It is soft and porous","It is solid rock","It has no air","It has lots of large rocks"], ex:"The A horizon is soft, porous and full of humus, so roots grow easily."},
+ {id:"qz6", t:"C3", q:"Which sediment has the largest particles?", o:["Gravel","Sand","Clay","Humus"], ex:"Gravel particles are bigger than sand, and sand is bigger than clay."},
+ {id:"qz7", t:"C3", q:"Water drains fastest through sand because…", o:["its particles are large, with big air spaces between them","its particles stick together tightly","it has more humus","it is darker"], ex:"Big spaces between particles let water pass quickly."},
+ {id:"qz8", t:"C3", q:"Clay holds a lot of water because…", o:["its tiny particles are packed close together","it has large air spaces","its particles are very big","it has no minerals"], ex:"Tiny, tightly packed particles slow down the water and hold it."},
+ {id:"qz9", t:"C8", q:"What is the role of decomposers in the soil?", o:["They break down dead matter and return nutrients to the soil","They make new rocks","They remove water from the soil","They only eat living roots"], ex:"Bacteria and fungi recycle the nutrients in dead plants and animals."},
+ {id:"qz10", t:"C8", q:"A soil's exchange capacity tells us…", o:["how well it can hold and supply nutrients to plants","its temperature","its colour","how fast the wind blows on it"], ex:"Higher exchange capacity means the soil holds more nutrients, so it is more fertile."},
+ {id:"qz11", t:"C7", q:"Which of these is NOT a component of healthy soil?", o:["Plastic","Minerals","Water","Air"], ex:"Plastic is pollution. Healthy soil has minerals, organic matter, water and air."},
+ {id:"qz12", t:"C8", q:"Which action makes soil more fertile?", o:["Adding compost (decomposed organic matter)","Burning crop residues","Dumping waste on it","Removing all the plants"], ex:"Compost adds organic matter and nutrients."}
+];
+
+// ---------- Mission 5: Fill the gaps ----------
+const GAPS = [
+ {t:"C4", title:"How soil forms", text:"Soil formation begins with the [parent rock]. Water, wind and changes in temperature break it into smaller pieces. This process is called [weathering]. Plants grow and die, and [decomposers] turn their remains into humus. Young soil is thin, but [mature] soil is deep and has more organic matter. Soil forms very [slowly].", extra:["quickly","erosion"]},
+ {t:"C8", title:"The deer in the forest", text:"A deer dies in a forest. [Bacteria] and fungi break down its body. This process is called [decomposition]. It adds organic matter to the soil and increases the amount of [nutrients]. Plants absorb these substances through their [roots] and grow. Then animals eat the plants. Soil and living things are [interdependent].", extra:["rocks","independent"]},
+ {t:"C2", title:"Inside the soil", text:"Healthy soil is made of [minerals], organic matter, water and [air]. The more spaces between particles, the higher the [porosity]. Soil that holds a lot of water has a high water [retention] capacity. [Sand] lets water drain quickly, while [clay] holds water for a long time.", extra:["colour","plastic"]}
+];
+
+// ---------- Mission 6: Put it in order ----------
+const ORDERS = [
+ {t:"C4", title:"How soil forms", prompt:"Put the steps of soil formation in order, from first to last.", items:[
+   "Solid parent rock is on the surface.",
+   "Water, wind and temperature changes crack the rock into pieces.",
+   "Small plants grow on a thin layer of young soil.",
+   "Over many years, plants and animals die and decompose, adding more humus.",
+   "After a very long time, deep mature soil with horizons supports a forest."]},
+ {t:"C1", title:"The water retention experiment", prompt:"Put the steps of the experiment in order.", items:[
+   "Ask a question: which sediment holds the most water?",
+   "Write a prediction.",
+   "Put the same amount of sand, clay and soil into cups with holes.",
+   "Pour the same amount of water into each cup.",
+   "Wait 2 minutes and measure the water drained.",
+   "Compare the results and write a conclusion."]},
+ {t:"C9", title:"Soil horizons", prompt:"Order the layers from the TOP of the soil to the BOTTOM.", labels:["O","A","E","B","C","R"], items:[
+   "Fallen leaves and fresh organic matter.",
+   "Dark topsoil, rich in humus, roots and living things.",
+   "Light layer where water washes minerals down.",
+   "Subsoil where minerals accumulate.",
+   "Broken pieces of weathered parent rock.",
+   "Solid bedrock."]},
+ {t:"C8", title:"The nutrient cycle", prompt:"Put the events in order.", items:[
+   "A deer dies in the forest.",
+   "Bacteria and fungi decompose its body.",
+   "Nutrients and organic matter enter the soil.",
+   "Plant roots absorb the nutrients.",
+   "Animals eat the plants."]}
+];
+
+// ---------- Mission 7: Sort it out ----------
+const SORTS = [
+ {t:"C5", title:"What caused the change?", bins:["Natural cause","Human activity"], items:[
+  {x:"Heavy rains wash nutrients away",b:0},{x:"Strong winds blow soil away",b:0},{x:"A volcano covers the land with ash",b:0},{x:"A landslide after a storm",b:0},
+  {x:"Cutting down a forest",b:1},{x:"Building a dam that floods a valley",b:1},{x:"Spraying pesticides",b:1},{x:"Dumping garbage",b:1}]},
+ {t:"C6", title:"Good or bad for soil?", bins:["Protects soil","Harms soil"], items:[
+  {x:"Crop rotation",b:0},{x:"Using compost",b:0},{x:"Planting trees",b:0},{x:"Using organic fertilizer",b:0},
+  {x:"Burning crop residues",b:1},{x:"Too many chemical fertilizers",b:1},{x:"Factory waste in a river",b:1},{x:"Throwing batteries in the field",b:1}]},
+ {t:"C3", title:"Sand or clay?", bins:["Sand","Clay"], items:[
+  {x:"Large particles",b:0},{x:"Big air spaces",b:0},{x:"Water drains quickly",b:0},{x:"Feels gritty",b:0},
+  {x:"Very small particles",b:1},{x:"Particles packed tightly",b:1},{x:"Holds a lot of water",b:1},{x:"Sticky when wet",b:1}]},
+ {t:"C7", title:"What is in the soil?", bins:["Living things & organic matter","Minerals, water & air"], items:[
+  {x:"Earthworms",b:0},{x:"Bacteria",b:0},{x:"Humus",b:0},{x:"Dead leaves",b:0},
+  {x:"Sand grains",b:1},{x:"Rock pieces",b:1},{x:"Water in the pores",b:1},{x:"Air in the pores",b:1}]}
+];
+
+// ---------- Mission 8: Lab race ----------
+const LAB_SETUP = {poured:200, rows:[["Gravel",170],["Sand",130],["Garden soil",90],["Clay",60]]};
+const LAB = [
+ {id:"lb1", t:"C1", q:"What is the objective of Team B's experiment?", o:["To compare the water retention capacity of different sediments","To find out the colour of each sediment","To measure the temperature of the soil","To see how long the cups take to break"], ex:"They measure how much water each sediment lets through, so they compare water retention."},
+ {id:"lb2", t:"C1", q:"Which is a good scientific question for this experiment?", o:["Which sediment holds the most water?","Which cup looks the prettiest?","Do people like clay?","What is the best colour for soil?"], ex:"A scientific question can be answered by measuring. We can measure the water held."},
+ {id:"lb3", t:"C1", q:"Before starting, Sofía says: “I think clay will hold the most water because its particles are very small.” This is a…", o:["prediction","conclusion","result","measurement"], ex:"An idea about what will happen, said before the experiment, is a prediction."},
+ {id:"lb4", t:"C1", q:"Why did they use 200 g of each sediment and 200 ml of water in every cup?", o:["To make it a fair test","To finish faster","To use all the water","Because clay is heavier"], ex:"Only the sediment changes. Everything else stays the same, so the test is fair."},
+ {id:"lb5", t:"C1", q:"Which change would make the test UNFAIR?", o:["Pouring more water into the sand cup","Using the same type of cup for all","Waiting 5 minutes for all the cups","Using the same scale for all"], ex:"If the amount of water changes, we can't know if the result is caused by the sediment."},
+ {id:"lb6", t:"C2", q:"Which sediment let the most water drain through?", o:["Gravel","Sand","Garden soil","Clay"], ex:"Gravel drained 170 ml, the highest number in the table."},
+ {id:"lb7", t:"C2", q:"How much water did the clay retain? (200 ml poured, 60 ml drained)", o:["140 ml","60 ml","260 ml","100 ml"], ex:"Retained = poured − drained = 200 − 60 = 140 ml."},
+ {id:"lb8", t:"C2", q:"Which conclusion is supported by the data?", o:["Clay has the highest water retention capacity","Gravel holds the most water","All the sediments hold the same amount of water","Sand holds more water than garden soil"], ex:"Clay drained the least water, so it retained the most."},
+ {id:"lb9", t:"C3", q:"Which sediment probably has the largest air spaces between its particles?", o:["Gravel","Clay","Garden soil","They are all the same"], ex:"Water passed fastest through gravel because its big particles leave big spaces."},
+ {id:"lb10", t:"C1", q:"How could Team B make their conclusion more reliable?", o:["Repeat the experiment and compare with other similar experiments","Ask a friend what they think","Change the amount of water each time","Test only one sediment"], ex:"More data from similar experiments supports the conclusion."},
+ {id:"lb11", t:"C2", q:"A farmer wants to plant tomatoes. They need soil that holds water, lets air reach the roots and has nutrients. What should Team B recommend?", o:["Garden soil","Gravel","Sand","Clay"], ex:"Garden soil held a lot of water (110 ml), has humus with nutrients and has pores for air. Clay can get waterlogged and hard; sand and gravel dry out fast."},
+ {id:"lb12", t:"C2", q:"Which property was NOT being tested in this experiment?", o:["Colour","Water retention","Drainage","Porosity"], ex:"They measured water, not colour."}
+];
+
+// ---------- Mission 9: Lightning round (correct option first) ----------
+const LIGHT = [
+ {t:"C3", q:"Bigger particles?", o:["Sand","Clay"]},
+ {t:"C3", q:"Holds more water?", o:["Clay","Sand"]},
+ {t:"C3", q:"Drains faster?", o:["Gravel","Clay"]},
+ {t:"C9", q:"Layer with the most humus?", o:["Horizon A","Horizon C"]},
+ {t:"C9", q:"Solid bedrock layer?", o:["Horizon R","Horizon O"]},
+ {t:"C9", q:"Zone where minerals accumulate?", o:["Horizon B","Horizon O"]},
+ {t:"C9", q:"Layer of fallen leaves?", o:["Horizon O","Horizon B"]},
+ {t:"C9", q:"Layer of broken rock pieces?", o:["Horizon C","Horizon A"]},
+ {t:"C9", q:"Softer and more porous?", o:["Horizon A","Horizon R"]},
+ {t:"C9", q:"Horizon C (where rocks break apart) is mainly…", o:["minerals","humus"]},
+ {t:"C8", q:"A decomposer?", o:["Fungi","Rocks"]},
+ {t:"C8", q:"Enriches the soil?", o:["Animal feces","Plastic"]},
+ {t:"C8", q:"Plants take in nutrients through…", o:["roots","flowers"]},
+ {t:"C8", q:"High exchange capacity holds…", o:["more nutrients","fewer nutrients"]},
+ {t:"C5", q:"Natural cause?", o:["Heavy rain","Pesticides"]},
+ {t:"C5", q:"Human cause?", o:["Deforestation","Wind"]},
+ {t:"C5", q:"Soil carried away by wind?", o:["Erosion","Decomposition"]},
+ {t:"C5", q:"Strong winds + no plants can cause…", o:["desertification","more fertility"]},
+ {t:"C6", q:"Protects soil?", o:["Crop rotation","Burning residues"]},
+ {t:"C6", q:"Factory waste in a river…", o:["pollutes soil","cleans soil"]},
+ {t:"C6", q:"Further from the pollution source?", o:["Less pollution","More pollution"]},
+ {t:"C4", q:"Rock breaking into pieces?", o:["Weathering","Decomposition"]},
+ {t:"C4", q:"More organic matter?", o:["Mature soil","Young soil"]},
+ {t:"C4", q:"Heavy rain on rocks causes…", o:["more weathering","less weathering"]},
+ {t:"C7", q:"Part of healthy soil?", o:["Air","Metal"]},
+ {t:"C7", q:"Part of healthy soil?", o:["Minerals","Plastic"]},
+ {t:"C1", q:"In a fair test you change…", o:["one thing","everything"]},
+ {t:"C1", q:"Said before the experiment?", o:["Prediction","Conclusion"]},
+ {t:"C1", q:"Written after the results?", o:["Conclusion","Prediction"]},
+ {t:"C2", q:"Not relevant for water retention?", o:["Colour","Porosity"]},
+ {t:"C2", q:"Ability to hold water?", o:["Retention","Erosion"]}
+];
+
+// ---------- Mission 10: Boss battle ----------
+const BOSS = [
+ {id:"bs1", t:"C9", fig:"hz:B:lab", q:"What defines the horizon the arrow is pointing at?", o:["It is a zone where minerals accumulate","It is the top layer of fallen leaves","It is solid rock, the base of the other layers","It has the most humus"], ex:"The arrow points at B, the subsoil, where minerals accumulate."},
+ {id:"bs2", t:"C9", q:"What is found directly beneath Horizon C?", o:["Bedrock (parent rock)","Humus","Fallen leaves","Topsoil"], ex:"Under C is R, the bedrock."},
+ {id:"bs3", t:"C3", fig:"particles", q:"These are four sediments under a microscope. Which view shows CLAY?", o:["View 3","View 1","View 2","View 4"], ex:"Clay has the tiniest particles, packed very close together (view 3)."},
+ {id:"bs4", t:"C5", q:"People burned all the trees on a hillside. Then heavy rains started to wash the soil away. What is the most likely consequence?", o:["Fertile soil and nutrients are lost, and living things lose their habitat","The soil becomes more fertile","More types of plants will grow","The soil will hold more water"], ex:"Without plants, soil is eroded. Fertile soil is lost and animals lose their habitat."},
+ {id:"bs5", t:"C5", q:"Which change in soil has a NATURAL cause?", o:["Soil covered by ash after a volcanic eruption","Soil polluted by mining waste","Soil pressed down by heavy machines","Soil lost after cutting down a forest"], ex:"A volcanic eruption is a natural event. The others are caused by people."},
+ {id:"bs6", t:"C6", fig:"river", q:"Soil samples near a mine: Place 1 (next to the mine) = 80 units of pollution. Place 2 (5 km downstream) = 30 units. Which conclusion is correct?", o:["Pollution is lower further from the source","Pollution is the same in both places","Place 2 is more polluted","The mine has nothing to do with the pollution"], ex:"30 is less than 80. Pollution is highest near the source and lower further away."},
+ {id:"bs7", t:"C4", q:"Why does soil take different amounts of time to form in different places?", o:["It depends on the type of bedrock, climate, relief and vegetation","It only depends on the rain","It forms faster in cities","It only depends on the temperature"], ex:"Many factors work together, and soil formation takes a very long time."},
+ {id:"bs8", t:"C4", q:"What does heavy rainfall do to rocks during soil formation?", o:["Increases weathering","Decreases weathering","Creates more fossils","Stops plants from growing forever"], ex:"Water helps break rocks into pieces, so weathering increases."},
+ {id:"bs9", t:"C8", q:"How does organic matter from decomposed animals change the soil?", o:["It increases the nutrients available","It makes the soil harder","It makes the soil less fertile","It stops the soil from holding water"], ex:"Decomposed matter adds nutrients, so the soil becomes more fertile."},
+ {id:"bs10", t:"C8", q:"Why are decomposers important in a forest?", o:["They recycle nutrients from dead organisms back into the soil for plants","They produce sunlight","They make rocks","They eat living trees"], ex:"Without decomposers, nutrients would stay locked in dead matter."},
+ {id:"bs11", t:"C2", fig:"ana", q:"Ana poured 250 ml of water into each cup. Water drained: Soil 120 ml, Sand 200 ml, Gravel 230 ml, Clay 140 ml. Which one would she recommend for planting lettuce?", o:["Soil","Sand","Gravel","Clay"], ex:"Soil retained the most water (130 ml) and also has humus with nutrients."},
+ {id:"bs12", t:"C1", q:"You want to compare how fast water drains through sand and clay. What makes it a fair test?", o:["Same amount of sediment, same amount of water and same time","More water for the clay","Different types of cups","Measure sand after 2 min and clay after 10 min"], ex:"Only the sediment should change."},
+ {id:"bs13", t:"C7", q:"Why is air important in soil?", o:["Roots and soil organisms need it","It makes soil heavier","It gives soil its colour","It dissolves rocks"], ex:"Roots, worms and microorganisms need the oxygen in the pores."},
+ {id:"bs14", t:"C6", q:"Which practice would best reduce soil contamination on a farm?", o:["Rotating crops and using compost","Burning crop residues","Using more pesticides","Dumping waste in the river"], ex:"Sustainable practices keep soil healthy without chemicals."},
+ {id:"bs15", t:"C9", q:"The A horizon is usually darker than the other horizons because…", o:["it has a lot of organic matter (humus)","it has more rocks","it has no minerals","it is always wet"], ex:"Humus is dark, so soil rich in organic matter looks darker."}
+];
+
+const MISSIONS = [
+ {id:"match", lvl:1, name:"Word Match", desc:"Pair each word with its meaning.", icon:"match"},
+ {id:"tf", lvl:1, name:"True or False?", desc:"Decide if each statement is right.", icon:"tf"},
+ {id:"search", lvl:1, name:"Word Search", desc:"Find 12 soil words.", icon:"search"},
+ {id:"quiz", lvl:2, name:"Quiz Show", desc:"Beat the clock with 4 colourful answers.", icon:"quiz"},
+ {id:"gaps", lvl:2, name:"Fill the Gaps", desc:"Complete three short texts.", icon:"gaps"},
+ {id:"order", lvl:2, name:"Put It in Order", desc:"Order processes and layers.", icon:"order"},
+ {id:"sort", lvl:2, name:"Sort It Out", desc:"Put each card in the right group.", icon:"sort"},
+ {id:"lab", lvl:3, name:"Lab Race", desc:"Analyse an experiment and race to the finish.", icon:"race"},
+ {id:"light", lvl:3, name:"Lightning Round", desc:"60 seconds of quick answers.", icon:"bolt"},
+ {id:"boss", lvl:4, name:"Boss: The Erosion Giant", desc:"Final battle with everything you learned.", icon:"boss"}
+];
+const LEVELS = {1:{name:"Level 1 · Topsoil", sub:"Explorer: learn the key words.", cls:"l1"}, 2:{name:"Level 2 · Subsoil", sub:"Scientist: explain how soil works.", cls:"l2"}, 3:{name:"Level 3 · Weathered rock", sub:"Expert: use data and evidence.", cls:"l3"}, 4:{name:"Bedrock", sub:"The final challenge.", cls:"l4"}};
+
+const BADGES = [
+ {id:"first", n:"First Dig", d:"Finish your first mission."},
+ {id:"streak5", n:"Hot Streak", d:"5 correct answers in a row."},
+ {id:"streak10", n:"On Fire", d:"10 correct answers in a row."},
+ {id:"words", n:"Word Hunter", d:"Find all the words in the word search."},
+ {id:"lab", n:"Lab Champion", d:"3 stars in the Lab Race."},
+ {id:"quick", n:"Lightning Fast", d:"10+ correct in the Lightning Round."},
+ {id:"boss", n:"Giant Defeated", d:"Win the boss battle."},
+ {id:"fixer", n:"Learn from Mistakes", d:"Fix 5 questions in Review."},
+ {id:"notes", n:"Note Taker", d:"Open the Soil Notebook."},
+ {id:"master", n:"Soil Master", d:"2 or more stars in every mission."}
+];
+// ===================== ART (inline SVG) =====================
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const IC = {
+ star:(f,empty="#B8A48C")=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="${f?'#FFC43D':'none'}" stroke="${f?'#C99000':empty}" stroke-width="1.7" stroke-linejoin="round"/></svg>`,
+ heart:(f)=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 5 6.4 5c2 0 3.6 1.2 4.6 2.8C12 6.2 13.6 5 15.6 5 19 5 21.1 8.4 19.6 11.8 17.5 16.4 12 21 12 21z" fill="${f?'#E0474C':'#FFFFFF'}" fill-opacity="${f?1:.5}" stroke="#8E2226" stroke-width="1.4"/></svg>`,
+ fire:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 5.5 6 5.5 11.2a5.5 5.5 0 0 1-11 0c0-2.7 1.6-4.4 2.7-5.4.2 2.1 1 3.2 2.1 3.7C10.8 9 10.8 5.6 12 2z" fill="#FF8A2B"/><path d="M12 12.5c.6 1.8 2.6 2.6 2.6 4.6a2.6 2.6 0 0 1-5.2 0c0-1.5 1.4-2.6 2.6-4.6z" fill="#FFD23F"/></svg>`,
+ pts:`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#FFC43D" stroke="#C99000" stroke-width="1.5"/><path d="M12 17c0-4 0-6-3.5-8.5M12 13c1.5-3 3.5-4 5-4" stroke="#2B6E25" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+ soundOn:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+ soundOff:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+ gear:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="7" r="2.3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2.3" fill="none" stroke="currentColor" stroke-width="2"/></svg>`,
+ up:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" stroke="#2A1B12" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ down:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#2A1B12" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ bulb:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="#FFE7A3" stroke="#8A5A00" stroke-width="1.6" stroke-linejoin="round"/></svg>`,
+ lock:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" fill="#8A7A6A"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="#8A7A6A" stroke-width="2.4" fill="none"/></svg>`
+};
+const MIC = {
+ match:`<svg viewBox="0 0 40 40"><rect x="3" y="6" width="14" height="10" rx="3" fill="#2F72D8"/><rect x="23" y="24" width="14" height="10" rx="3" fill="#2B9A4E"/><path d="M17 11c8 0 0 18 6 18" stroke="#2A1B12" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
+ tf:`<svg viewBox="0 0 40 40"><path d="M4 21l6 6 10-13" stroke="#23944A" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M25 14l11 11M36 14L25 25" stroke="#D33A3F" stroke-width="4.5" stroke-linecap="round"/></svg>`,
+ search:`<svg viewBox="0 0 40 40"><circle cx="17" cy="17" r="10" fill="#FFF" stroke="#2A1B12" stroke-width="3.5"/><path d="M25 25l10 10" stroke="#2A1B12" stroke-width="5" stroke-linecap="round"/><text x="17" y="22" text-anchor="middle" font-family="Arial" font-weight="700" font-size="13" fill="#8A4F2C">A</text></svg>`,
+ quiz:`<svg viewBox="0 0 40 40"><path d="M10 4l7 12H3z" fill="#E0474C"/><path d="M30 3l7 7-7 7-7-7z" fill="#2F72D8"/><circle cx="10" cy="29" r="7" fill="#E8A400"/><rect x="23" y="22" width="14" height="14" rx="2" fill="#2B9A4E"/></svg>`,
+ gaps:`<svg viewBox="0 0 40 40"><path d="M4 9h32M4 31h20" stroke="#6B5848" stroke-width="3.5" stroke-linecap="round"/><path d="M4 20h8" stroke="#6B5848" stroke-width="3.5" stroke-linecap="round"/><rect x="15" y="15" width="21" height="10" rx="3" fill="#FFF" stroke="#2F72D8" stroke-width="2.5" stroke-dasharray="4 3"/></svg>`,
+ order:`<svg viewBox="0 0 40 40"><rect x="10" y="4" width="26" height="8" rx="3" fill="#4A2E1C"/><rect x="10" y="16" width="26" height="8" rx="3" fill="#8A4F2C"/><rect x="10" y="28" width="26" height="8" rx="3" fill="#B98B64"/><path d="M5 6v28M2 30l3 4 3-4" stroke="#2A1B12" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ sort:`<svg viewBox="0 0 40 40"><path d="M3 18h15l-2 18H5zM22 18h15l-2 18H24z" fill="#8A4F2C"/><rect x="6" y="4" width="10" height="9" rx="2" fill="#2B9A4E" transform="rotate(-10 11 8)"/><rect x="25" y="5" width="10" height="9" rx="2" fill="#2F72D8" transform="rotate(12 30 9)"/></svg>`,
+ race:`<svg viewBox="0 0 40 40"><path d="M8 4v34" stroke="#2A1B12" stroke-width="3" stroke-linecap="round"/><rect x="9" y="5" width="26" height="18" fill="#FFF" stroke="#2A1B12" stroke-width="1.5"/><path d="M9 5h6.5v6H9zM22 5h6.5v6H22zM15.5 11H22v6h-6.5zM28.5 11H35v6h-6.5zM9 17h6.5v6H9zM22 17h6.5v6H22z" fill="#2A1B12"/></svg>`,
+ bolt:`<svg viewBox="0 0 40 40"><path d="M23 2L7 23h11l-3 15 18-22H21z" fill="#FFC43D" stroke="#C99000" stroke-width="2" stroke-linejoin="round"/></svg>`,
+ boss:`<svg viewBox="0 0 40 40"><circle cx="20" cy="22" r="15" fill="#B98B64"/><circle cx="9" cy="14" r="7" fill="#C9A27A"/><circle cx="31" cy="13" r="7" fill="#C9A27A"/><path d="M11 19l7 3M29 19l-7 3" stroke="#2A1B12" stroke-width="2.5" stroke-linecap="round"/><circle cx="15" cy="24" r="2" fill="#2A1B12"/><circle cx="25" cy="24" r="2" fill="#2A1B12"/><path d="M13 31q7-5 14 0" stroke="#2A1B12" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`
+};
+function wormSVG(cls=""){
+ return `<svg class="${cls}" viewBox="0 0 120 70" aria-hidden="true"><g fill="#F07C98" stroke="#C9566F" stroke-width="2">
+ <circle cx="16" cy="52" r="10"/><circle cx="30" cy="46" r="11"/><circle cx="45" cy="50" r="11"/><circle cx="60" cy="54" r="11"/><circle cx="75" cy="48" r="12"/></g>
+ <circle cx="92" cy="36" r="18" fill="#F07C98" stroke="#C9566F" stroke-width="2"/>
+ <path d="M76 22c4-14 28-14 32 0z" fill="#3E9B34"/><path d="M74 22h36" stroke="#2B6E25" stroke-width="3" stroke-linecap="round"/>
+ <circle cx="86" cy="34" r="4.5" fill="#fff"/><circle cx="99" cy="34" r="4.5" fill="#fff"/><circle cx="87" cy="35" r="2.3" fill="#2A1B12"/><circle cx="100" cy="35" r="2.3" fill="#2A1B12"/>
+ <path d="M86 43q7 6 14 0" stroke="#2A1B12" stroke-width="2.2" fill="none" stroke-linecap="round"/><circle cx="81" cy="41" r="3" fill="#FF9FB4"/><circle cx="105" cy="41" r="3" fill="#FF9FB4"/></svg>`;
+}
+function beetleSVG(){
+ return `<svg viewBox="0 0 48 40" aria-hidden="true"><g stroke="#1B1310" stroke-width="2.2" stroke-linecap="round"><path d="M14 14l-7-5M14 22H5M14 30l-7 5M30 14l7-5M30 30l7 5"/></g><ellipse cx="22" cy="22" rx="12" ry="14" fill="#5E3A8C"/><path d="M22 9v27" stroke="#3B2260" stroke-width="2"/><circle cx="36" cy="22" r="7" fill="#3B2260"/><circle cx="38" cy="19" r="2" fill="#fff"/></svg>`;
+}
+function giantSVG(){
+ return `<svg viewBox="0 0 140 130" aria-hidden="true"><g fill="#C9A27A"><circle cx="40" cy="50" r="30"/><circle cx="95" cy="45" r="32"/><circle cx="70" cy="80" r="45"/><circle cx="30" cy="90" r="22"/><circle cx="112" cy="88" r="24"/></g>
+ <path d="M10 60q-10 10 0 20M128 55q12 12 0 24M20 28q10-12 24-8" stroke="#8A6A4A" stroke-width="3" fill="none" stroke-linecap="round"/>
+ <path d="M44 62l20 8M100 60l-20 9" stroke="#2A1B12" stroke-width="5" stroke-linecap="round"/>
+ <circle cx="55" cy="76" r="7" fill="#fff"/><circle cx="88" cy="76" r="7" fill="#fff"/><circle cx="56" cy="77" r="3.5" fill="#2A1B12"/><circle cx="87" cy="77" r="3.5" fill="#2A1B12"/>
+ <path d="M50 100q22-14 44 0q-22 8-44 0z" fill="#5A2E1C"/><path d="M56 99l4 5 4-6 4 6 4-6 4 6 4-5" stroke="#fff" stroke-width="2" fill="none"/></svg>`;
+}
+function badgeSVG(i){
+ const cols=["#2F72D8","#FF8A2B","#E0474C","#2B9A4E","#8A4F2C","#E8A400","#5E3A8C","#23944A","#4A2E1C","#C99000"];
+ const c=cols[i%cols.length];
+ return `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M13 22l-4 15 6-3 3 5 3-13M27 22l4 15-6-3-3 5-3-13" fill="${c}" opacity=".7"/><circle cx="20" cy="16" r="13" fill="${c}"/><circle cx="20" cy="16" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M20 10l1.8 3.7 4 .6-2.9 2.8.7 4L20 19.2l-3.6 1.9.7-4-2.9-2.8 4-.6z" fill="#fff"/></svg>`;
+}
+
+// Soil horizons diagram. arrow = layer letter to point at; labels = show letters.
+function horizonsSVG(arrow, labels){
+ const L=[["O",20,"#2C1C12"],["A",48,"#4A2E1C"],["E",30,"#D8C3A0"],["B",52,"#9C5A32"],["C",52,"#A99A86"],["R",48,"#6B6560"]];
+ const x0=30,w=220,r=rng(7);let y=72,out="",mid={};
+ L.forEach(([k,h,c])=>{
+  out+=`<rect x="${x0}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+  if(k==="O"){for(let i=0;i<14;i++)out+=`<ellipse cx="${x0+8+i*15.5}" cy="${y+8+r()*6}" rx="6" ry="2.5" fill="${i%2?'#6B8F2E':'#8A5A2A'}" transform="rotate(${r()*60-30} ${x0+8+i*15.5} ${y+10})"/>`;}
+  if(k==="A"){for(let i=0;i<40;i++)out+=`<circle cx="${x0+5+r()*(w-10)}" cy="${y+5+r()*(h-10)}" r="${1+r()*1.6}" fill="#2A170C"/>`;}
+  if(k==="E"){for(let i=0;i<18;i++)out+=`<circle cx="${x0+5+r()*(w-10)}" cy="${y+4+r()*(h-8)}" r="1.4" fill="#B79F7A"/>`;}
+  if(k==="B"){for(let i=0;i<9;i++)out+=`<ellipse cx="${x0+15+r()*(w-30)}" cy="${y+10+r()*(h-20)}" rx="${5+r()*5}" ry="${3+r()*3}" fill="#B9774A"/>`;}
+  if(k==="C"){for(let i=0;i<16;i++){const cx=x0+10+r()*(w-20),cy=y+8+r()*(h-16),s=5+r()*7;out+=`<path d="M${cx-s} ${cy} L${cx-s/3} ${cy-s*.8} L${cx+s} ${cy-s/3} L${cx+s*.6} ${cy+s*.7} L${cx-s*.4} ${cy+s*.6}Z" fill="#7F7466" stroke="#5E554A" stroke-width="1"/>`;}}
+  if(k==="R"){out+=`<path d="M${x0+20} ${y+12}l40 6 30-4M${x0+120} ${y+30}l35-8 40 6M${x0+40} ${y+38}l30-6M${x0+150} ${y+12}l20 10" stroke="#3F3B38" stroke-width="2" fill="none" stroke-linecap="round"/>`;}
+  mid[k]=y+h/2;
+  if(labels){out+=`<path d="M${x0+w+4} ${y+h/2}h10" stroke="#2A1B12" stroke-width="2"/><text x="${x0+w+20}" y="${y+h/2+6}" font-family="Arial" font-weight="700" font-size="17" fill="#2A1B12">${k}</text>`;}
+  y+=h;
+ });
+ // plant + roots
+ let p=`<path d="M140 72V22" stroke="#2B6E25" stroke-width="4"/>`;
+ [[30,1],[40,-1],[50,1],[60,-1]].forEach(([yy,s])=>p+=`<ellipse cx="${140+s*14}" cy="${yy}" rx="14" ry="6" fill="#3E9B34" transform="rotate(${s*-25} ${140+s*14} ${yy})"/>`);
+ p+=`<path d="M140 72c0 30-14 45-24 80M140 72c4 30 20 40 28 70M140 72v95M132 100c-10 6-20 6-30 14M150 110c10 4 22 4 30 14" stroke="#E9D8B6" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+ p+=`<path d="M60 72c-2-10 4-10 2-18M64 72c2-8 8-8 8-14M210 72c-2-10 5-10 3-17M214 72c2-8 8-8 8-12" stroke="#3E9B34" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+ let a="";
+ if(arrow&&mid[arrow]!==undefined){const ax=labels?296:262;a=`<path d="M352 ${mid[arrow]}H${ax+12}" stroke="#D33A3F" stroke-width="5" stroke-linecap="round"/><path d="M${ax} ${mid[arrow]}l16-10v20z" fill="#D33A3F"/>`;}
+ return `<svg viewBox="0 0 360 332" width="360" role="img" aria-label="Diagram of soil horizons${arrow?' with an arrow pointing at one layer':''}"><rect x="0" y="0" width="360" height="332" fill="#FFFFFF" fill-opacity="0"/>${out}${p}${a}</svg>`;
+}
+
+function particlesSVG(){
+ const r=rng(42);let s="";const cx=[50,150,250,350];
+ const defs=cx.map((c,i)=>`<clipPath id="pc${i}"><circle cx="${c}" cy="50" r="44"/></clipPath>`).join("");
+ // 1 gravel
+ let g="";[[28,30],[55,24],[72,40],[36,58],[60,62],[80,68],[45,82],[22,74]].forEach(([x,y])=>{const k=11+r()*4;g+=`<path d="M${x-k} ${y} L${x-k/2} ${y-k} L${x+k*.8} ${y-k*.7} L${x+k} ${y+k*.4} L${x} ${y+k} Z" fill="#7F7466" stroke="#4E4945" stroke-width="1.5"/>`;});
+ s+=`<g clip-path="url(#pc0)"><rect x="6" y="6" width="88" height="88" fill="#F3EEE6"/>${g}</g>`;
+ // 2 sand
+ let sa="";for(let i=0;i<34;i++){sa+=`<circle cx="${110+r()*80}" cy="${10+r()*80}" r="${4+r()*2.5}" fill="#D9B26A" stroke="#A8823F" stroke-width="1"/>`;}
+ s+=`<g clip-path="url(#pc1)"><rect x="106" y="6" width="88" height="88" fill="#F7F1E4"/>${sa}</g>`;
+ // 3 clay
+ let c="";for(let y=8;y<94;y+=4.2)for(let x=208;x<294;x+=4.2){c+=`<ellipse cx="${(x+r()*1.4).toFixed(1)}" cy="${(y+r()*1.4).toFixed(1)}" rx="2" ry="1.4" fill="#A0522D"/>`;}
+ s+=`<g clip-path="url(#pc2)"><rect x="206" y="6" width="88" height="88" fill="#C98A5E"/>${c}</g>`;
+ // 4 garden soil
+ let so="";for(let i=0;i<10;i++)so+=`<circle cx="${310+r()*80}" cy="${12+r()*76}" r="${3+r()*2}" fill="#C9A06A"/>`;
+ for(let i=0;i<60;i++)so+=`<circle cx="${308+r()*84}" cy="${10+r()*80}" r="1.6" fill="#7A5A3A"/>`;
+ for(let i=0;i<7;i++)so+=`<ellipse cx="${312+r()*76}" cy="${14+r()*72}" rx="${5+r()*4}" ry="3" fill="#1E120A" transform="rotate(${r()*180} 350 50)"/>`;
+ so+=`<path d="M315 30c15 10 25 5 40 20s20 10 30 20" stroke="#E9D8B6" stroke-width="2" fill="none"/>`;
+ s+=`<g clip-path="url(#pc3)"><rect x="306" y="6" width="88" height="88" fill="#5A3B24"/>${so}</g>`;
+ cx.forEach((c,i)=>{s+=`<circle cx="${c}" cy="50" r="44" fill="none" stroke="#2A1B12" stroke-width="3"/><text x="${c}" y="118" text-anchor="middle" font-family="Arial" font-weight="700" font-size="16" fill="#2A1B12">View ${i+1}</text>`;});
+ return `<svg viewBox="0 0 400 126" width="400" role="img" aria-label="Four circular microscope views of different sediments, numbered 1 to 4"><defs>${defs}</defs>${s}</svg>`;
+}
+
+function riverSVG(){
+ return `<svg viewBox="0 0 360 170" width="360" role="img" aria-label="A mine next to a river, with Place 1 next to the mine and Place 2 further downstream">
+ <rect width="360" height="170" fill="#EAF6E4"/><path d="M0 60l60-40 50 30 60-45 70 50 50-30 70 40v15H0z" fill="#C9D6C0"/>
+ <path d="M0 95c60-10 90 20 150 15s90-35 140-20 50 30 70 30v50H0z" fill="#EAF6E4"/>
+ <path d="M-5 92c60-8 95 18 155 14s95-36 145-20 45 26 70 26" stroke="#5AA9E6" stroke-width="22" fill="none" stroke-linecap="round"/>
+ <rect x="22" y="48" width="58" height="34" fill="#9A8A7A" stroke="#2A1B12" stroke-width="2"/><rect x="60" y="24" width="10" height="26" fill="#6B5848" stroke="#2A1B12" stroke-width="2"/>
+ <path d="M65 22c-6-8 6-10 2-18" stroke="#8A8A8A" stroke-width="4" fill="none" stroke-linecap="round"/>
+ <text x="51" y="70" text-anchor="middle" font-family="Arial" font-weight="700" font-size="13" fill="#FFFFFF">MINE</text>
+ <path d="M80 76c8 4 10 8 12 14" stroke="#6B4A2A" stroke-width="5" fill="none"/>
+ <circle cx="100" cy="112" r="13" fill="#2A1B12"/><text x="100" y="117" text-anchor="middle" font-family="Arial" font-weight="700" font-size="15" fill="#FFFFFF">1</text>
+ <circle cx="318" cy="132" r="13" fill="#2A1B12"/><text x="318" y="137" text-anchor="middle" font-family="Arial" font-weight="700" font-size="15" fill="#FFFFFF">2</text>
+ <text x="300" y="160" text-anchor="end" font-family="Arial" font-size="12" fill="#2A1B12">5 km downstream →</text></svg>`;
+}
+
+function cupsSVG(poured,rows){
+ const cols={"Gravel":"#8C8680","Sand":"#D9B26A","Garden soil":"#4A2E1C","Clay":"#A0522D","Soil":"#4A2E1C"};
+ let s="";rows.forEach(([n,d],i)=>{const x=10+i*88;
+  s+=`<path d="M${x} 10h64l-6 52h-52z" fill="#FFFFFF" stroke="#2A1B12" stroke-width="2"/><path d="M${x+3} 28h58l-3.8 34h-50.4z" fill="${cols[n]||'#777'}"/>`;
+  const H=56,wh=Math.round(H*d/poured);
+  s+=`<path d="M${x+10} 70h44l-5 60h-34z" fill="#FFFFFF" stroke="#2A1B12" stroke-width="2"/><rect x="${x+16}" y="${130-wh}" width="32" height="${wh}" fill="#7CC6E8"/>`;
+  s+=`<text x="${x+32}" y="150" text-anchor="middle" font-family="Arial" font-weight="700" font-size="13" fill="#2A1B12">${n}</text><text x="${x+32}" y="166" text-anchor="middle" font-family="Arial" font-size="12" fill="#2A1B12">${d} ml drained</text>`;});
+ return `<svg viewBox="0 0 360 172" width="360" role="img" aria-label="Cups with different sediments and the water drained below each one">${s}</svg>`;
+}
+function dataTable(head,rows){return `<table class="dtable"><thead><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;}
+function figure(spec){
+ if(!spec)return "";
+ if(spec.startsWith("hz:")){const p=spec.split(":");return horizonsSVG(p[1],p[2]==="lab");}
+ if(spec==="particles")return particlesSVG();
+ if(spec==="river")return riverSVG();
+ if(spec==="ana")return dataTable(["Sediment","Water drained (ml)"],[["Soil",120],["Sand",200],["Gravel",230],["Clay",140]]);
+ return "";
+}
+// ===================== ENGINE =====================
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const SAVE_KEY="soilquest-v1";
+function fresh(){return{score:0,correct:0,wrong:0,streak:0,best:0,missions:{},topics:{},missed:{},fixed:0,badges:[],settings:{timers:true,sound:true,unlock:false}}}
+function load(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(s&&s.settings&&s.missions)return s}catch(e){}return null}
+let S=load()||fresh();
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S))}catch(e){}}
+
+// ---------- sound ----------
+let AC=null;
+function beep(kind){
+ if(!S.settings.sound)return;
+ try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  const seq={ok:[[660,.08],[880,.14]],no:[[240,.12],[180,.2]],win:[[523,.1],[659,.1],[784,.1],[1046,.3]],tap:[[520,.035]],hit:[[150,.08],[110,.12]]}[kind]||[];
+  let t=AC.currentTime;seq.forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(.13,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.03);t+=d;});
+ }catch(e){}
+}
+
+// ---------- HUD ----------
+function totalStars(){return MISSIONS.reduce((n,m)=>n+((S.missions[m.id]||{}).stars||0),0)}
+function doneCount(){return MISSIONS.filter(m=>(S.missions[m.id]||{}).done).length}
+function hud(){
+ $("#ptsVal").textContent=S.score;$("#starVal").textContent=totalStars();$("#streakVal").textContent=S.streak;
+ const d=doneCount();$("#pbar").style.width=(d*10)+"%";$("#pval").textContent=d+"/10";$(".pbar").setAttribute("aria-valuenow",d);
+ $("#soundBtn").innerHTML=S.settings.sound?IC.soundOn:IC.soundOff;
+}
+let toastT;
+function toast(html,icon){const t=$("#toast");t.innerHTML=(icon||"")+`<span>${html}</span>`;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2600)}
+function award(id){if(S.badges.includes(id))return false;S.badges.push(id);save();const b=BADGES.find(x=>x.id===id);const i=BADGES.indexOf(b);setTimeout(()=>{toast(`New badge: <b>${b.n}</b>`,badgeSVG(i));beep("win")},400);return true}
+
+// ---------- scoring ----------
+function normItem(it){return{id:it.id,t:it.t,q:it.q,o:it.o.slice(),ex:it.ex||TOPICS[it.t].tip,fig:it.fig||null}}
+function record(t,ok,base=100,extra=0,item=null){
+ const tp=S.topics[t]||(S.topics[t]={c:0,w:0});let pts=0;
+ if(ok){S.correct++;tp.c++;S.streak++;S.best=Math.max(S.best,S.streak);
+  const sb=S.streak>=3?Math.min(S.streak,10)*10:0;pts=base+extra+sb;S.score+=pts;
+  if(S.streak>=5)award("streak5");if(S.streak>=10)award("streak10");
+ }else{S.wrong++;tp.w++;S.streak=0;if(item)S.missed[item.id]=normItem(item);}
+ save();hud();return pts;
+}
+
+// ---------- navigation ----------
+let cleanups=[];
+function addCleanup(f){cleanups.push(f)}
+function go(fn,...args){$("#toast").classList.remove("show");cleanups.forEach(f=>{try{f()}catch(e){}});cleanups=[];const sc=$("#screen");sc.innerHTML="";const d=document.createElement("div");d.className="screen";sc.appendChild(d);fn(d,...args);window.scrollTo(0,0);hud()}
+function levelOpen(l){
+ if(S.settings.unlock)return true;
+ const done=lv=>MISSIONS.filter(m=>m.lvl===lv&&(S.missions[m.id]||{}).done).length;
+ if(l===1)return true;if(l===2)return done(1)>=2;if(l===3)return done(2)>=2;
+ if(l===4)return MISSIONS.filter(m=>m.lvl<4&&(S.missions[m.id]||{}).done).length>=6;
+}
+function lockText(l){return{2:"Finish 2 missions in Level 1 to open this level.",3:"Finish 2 missions in Level 2 to open this level.",4:"Finish 6 missions to face the boss."}[l]}
+
+// ---------- WELCOME ----------
+function welcome(el){
+ const started=S.correct+S.wrong>0||doneCount()>0;
+ el.innerHTML=`<div class="hero">
+  <div class="hero-sky"><div class="sunball"></div>
+   <span class="tag">Science · 6º grade · Project 4: Chile takes shape</span>
+   <h1>Soil Quest</h1>
+   <p class="lead">Dig through the layers of the soil, complete missions and defeat the Erosion Giant.</p>
+   <div class="grassline"></div>${wormSVG("worm")}</div>
+  <div class="layers">
+   <div style="background:var(--a)"><b>1</b>Topsoil · learn the key words</div>
+   <div style="background:var(--b)"><b>2</b>Subsoil · explain how soil works</div>
+   <div style="background:var(--c);color:var(--ink)"><b>3</b>Weathered rock · use data and evidence</div>
+   <div style="background:var(--r)"><b>4</b>Bedrock · the boss battle</div>
+  </div></div>
+  <div class="panel" style="margin-top:16px"><h2 style="font-size:26px;margin-bottom:10px">How to play</h2>
+  <div class="goal">
+   <div><strong>Complete missions</strong>Each mission is a different game. Finish missions to open deeper levels.</div>
+   <div><strong>Earn points and stars</strong>Correct answers give points. Answer several in a row for a streak bonus.</div>
+   <div><strong>Learn from mistakes</strong>Every answer has an explanation. Practise the questions you missed in Review.</div>
+  </div>
+  <div class="row" style="margin-top:16px"><button class="btn" id="startBtn">${started?"Continue digging":"Start digging"}</button><button class="btn alt" id="nbBtn">Soil Notebook</button></div>
+  <p class="muted" style="font-size:14px;margin:12px 0 0">No account needed. Your progress is saved only on this device.</p></div>`;
+ $("#startBtn",el).onclick=()=>{beep("tap");go(mapScreen)};
+ $("#nbBtn",el).onclick=()=>go(notebook);
+}
+
+// ---------- MAP ----------
+function mapScreen(el){
+ const nMiss=Object.keys(S.missed).length;
+ let html=`<div class="map"><div class="band sky"><div class="row" style="justify-content:space-between;align-items:flex-start">
+  <div style="min-width:0;flex:1"><h2 style="font-size:30px">Choose a mission</h2><p class="sub" style="opacity:1;margin:4px 0 12px">Dig down level by level. The deeper you go, the harder it gets.</p>
+  <div class="row"><button class="btn small sun" id="repBtn">Field Report</button><button class="btn small alt" id="nbBtn">Soil Notebook</button><button class="btn small alt" id="revBtn">Review mistakes (${nMiss})</button></div></div>
+  <div style="width:110px;flex:none">${wormSVG()}</div></div></div>`;
+ [1,2,3,4].forEach(l=>{
+  const L=LEVELS[l],open=levelOpen(l);
+  html+=`<div class="band ${L.cls}"><h2>${L.name}</h2><p class="sub">${L.sub}</p><div class="tiles">`;
+  MISSIONS.filter(m=>m.lvl===l).forEach(m=>{
+   const st=S.missions[m.id]||{};
+   html+=`<button class="tile ${m.id==="boss"?"boss-tile":""} ${open?"":"locked"} ${st.done?"done":""}" data-m="${m.id}" ${open?"":'aria-disabled="true"'}>
+    <span class="ic">${open?MIC[m.icon]:IC.lock}</span><span style="min-width:0"><span class="tt">${m.name}</span><br><span class="td">${m.desc}</span>
+    <span class="stars">${[1,2,3].map(i=>IC.star(i<=(st.stars||0),m.id==="boss"?"#D9CBB8":"#B8A48C")).join("")}</span></span></button>`;});
+  html+=`</div>${open?"":`<p class="lockmsg">${lockText(l)}</p>`}</div>`;
+ });
+ el.innerHTML=html+"</div>";
+ $$(".tile",el).forEach(b=>b.onclick=()=>{const m=MISSIONS.find(x=>x.id===b.dataset.m);if(!levelOpen(m.lvl)){toast(lockText(m.lvl),IC.lock);el.querySelector(`[data-m="${m.id}"]`).classList.add("shake");setTimeout(()=>b.classList.remove("shake"),400);return}beep("tap");startMission(m.id)});
+ $("#repBtn",el).onclick=()=>go(report);$("#nbBtn",el).onclick=()=>go(notebook);$("#revBtn",el).onclick=()=>go(reviewMode,null);
+}
+
+function mhead(m,counter){return `<div class="mhead"><span class="ic" style="width:48px;height:48px;display:grid;place-items:center;background:var(--paper);border-radius:14px;flex:none"><span style="width:32px;height:32px;display:block">${MIC[m.icon]}</span></span><h2>${m.name}</h2><span class="counter" id="ctr">${counter||""}</span></div>`}
+function howto(t){return `<div class="howto">${IC.bulb}<div>${t}</div></div>`}
+const SHAPES=[`<svg viewBox="0 0 20 20" width="18"><path d="M10 2l8 15H2z" fill="#fff"/></svg>`,`<svg viewBox="0 0 20 20" width="18"><path d="M10 1l9 9-9 9-9-9z" fill="#fff"/></svg>`,`<svg viewBox="0 0 20 20" width="18"><circle cx="10" cy="10" r="8" fill="#2A1B12"/></svg>`,`<svg viewBox="0 0 20 20" width="18"><rect x="2" y="2" width="16" height="16" fill="#fff"/></svg>`];
+
+function startMission(id){const f={match:mMatch,tf:mTF,search:mSearch,quiz:mQuiz,gaps:mGaps,order:mOrder,sort:mSort,lab:mLab,light:mLight,boss:mBoss}[id];go(f,MISSIONS.find(m=>m.id===id))}
+
+// ---------- generic multiple choice ----------
+// opts: kahoot, timer(sec), onAnswer(ok,info)->points, onNext(), nextLabel, compact
+function mcq(host,item,opts){
+ const order=shuffle(item.o.map((x,i)=>({x,ok:i===0})));
+ host.innerHTML=`<div class="qcard">${opts.timer?'<div class="timer"><i></i></div>':''}${item.fig?`<div class="fig">${figure(item.fig)}</div>`:""}<p class="qtext">${item.q}</p>
+ <div class="opts ${opts.kahoot?"kahoot":""}">${order.map((o,i)=>`<button class="opt c${i}" data-i="${i}"><span class="k">${opts.kahoot?SHAPES[i]:"ABCD"[i]}</span><span>${o.x}</span></button>`).join("")}</div><div class="fb"></div></div>`;
+ let done=false;const t0=performance.now();let iv=null;
+ if(opts.timer){const bar=$(".timer i",host),wrap=$(".timer",host);
+  iv=setInterval(()=>{const left=opts.timer-(performance.now()-t0)/1000;bar.style.width=Math.max(0,left/opts.timer*100)+"%";wrap.classList.toggle("low",left<5);if(left<=0)finish(-1)},200);addCleanup(()=>clearInterval(iv));}
+ $$(".opt",host).forEach(b=>b.onclick=()=>finish(+b.dataset.i));
+ function finish(i){
+  if(done)return;done=true;clearInterval(iv);
+  const ok=i>=0&&order[i].ok;const secs=(performance.now()-t0)/1000;
+  $$(".opt",host).forEach((b,j)=>{b.disabled=true;if(order[j].ok)b.classList.add("right");else if(j===i)b.classList.add("wrong");else if(opts.kahoot)b.classList.add("dim")});
+  const pts=opts.onAnswer(ok,{secs,timedOut:i<0});
+  beep(ok?"ok":"no");if(!ok)$(".qcard",host).classList.add("shake");
+  const right=order.find(o=>o.ok).x;
+  $(".fb",host).innerHTML=`<div class="feedback ${ok?"ok":"no"}"><div><b class="v">${ok?"Correct!":(i<0?"Time's up!":"Not quite.")}</b> ${ok&&pts?`<span>+${pts} points</span>`:""}</div>
+   ${ok?"":`<div>Correct answer: <b>${right}</b></div>`}<div>${item.ex||""}</div><div><button class="btn small" id="nextBtn">${opts.nextLabel||"Next"}</button></div></div>`;
+  const nb=$("#nextBtn",host);nb.focus({preventScroll:true});nb.onclick=()=>{beep("tap");opts.onNext()};
+  $(".fb",host).scrollIntoView({behavior:"smooth",block:"nearest"});
+ }
+}
+
+// run bookkeeping
+function newRun(m){return{m,correct:0,total:0,points:0,missed:[]}}
+function runAns(run,ok,pts,item){run.total++;if(ok)run.correct++;else if(item)run.missed.push(item);run.points+=pts||0}
+function starsFor(c,t){const p=t?c/t:0;return p>=.9?3:p>=.7?2:p>=.4?1:0}
+
+function endMission(el,run,opts={}){
+ const id=run.m.id;const stars=opts.stars!==undefined?opts.stars:starsFor(run.correct,run.total);
+ const st=S.missions[id]||(S.missions[id]={});const first=!st.done;
+ if(opts.complete!==false){st.done=true;st.stars=Math.max(st.stars||0,stars);}
+ save();
+ if(opts.complete!==false){award("first");if(MISSIONS.every(m=>((S.missions[m.id]||{}).stars||0)>=2))award("master");}
+ beep(stars>=2?"win":"tap");
+ const pct=run.total?Math.round(run.correct/run.total*100):0;
+ const msg=stars===3?"Excellent work!":stars===2?"Great job!":stars===1?"Good effort. Practise a bit more!":"Keep practising. You can do it!";
+ const canRetry=run.missed.length>0;
+ el.innerHTML=`<div class="panel center stack">
+  <span class="tag">Mission ${opts.complete===false?"not completed":"complete"}</span><h2 style="font-size:38px">${opts.title||msg}</h2>
+  <div class="stars-big">${[1,2,3].map(i=>IC.star(i<=stars)).join("")}</div>
+  ${opts.text?`<p>${opts.text}</p>`:""}
+  <div class="statgrid"><div class="stat"><div class="v">${run.correct}/${run.total}</div><div class="l">${opts.unit||"correct on the first try"}</div></div><div class="stat"><div class="v">${pct}%</div><div class="l">accuracy</div></div><div class="stat"><div class="v">+${run.points}</div><div class="l">points</div></div></div>
+  ${canRetry?`<div class="review" style="text-align:left"><b>You missed ${run.missed.length} question${run.missed.length>1?"s":""}.</b> Try them again now. They are also saved in Review mistakes.</div>`:""}
+  <div class="row" style="justify-content:center">${canRetry?`<button class="btn sun" id="retryBtn">Try missed questions</button>`:""}<button class="btn alt" id="againBtn">Play again</button><button class="btn" id="mapBtn">Mission map</button></div></div>`;
+ if(canRetry)$("#retryBtn",el).onclick=()=>go(reviewMode,run.missed.map(normItem));
+ $("#againBtn",el).onclick=()=>startMission(id);$("#mapBtn",el).onclick=()=>go(id==="boss"&&opts.complete!==false?report:mapScreen);
+ if(id==="boss"&&opts.complete!==false){$("#mapBtn",el).textContent="See my Field Report"}
+}
+
+// ---------- M1 MATCH ----------
+function mMatch(el,m){
+ const run=newRun(m);let round=0;
+ el.innerHTML=mhead(m)+howto("Tap a word, then tap its meaning. Matched pairs turn green.")+`<div id="mbody" style="margin-top:14px"></div>`;
+ const body=$("#mbody",el);
+ function play(){
+  const pairs=MATCH_ROUNDS[round];$("#ctr",el).textContent=`Round ${round+1}/3`;
+  const L=shuffle(pairs.map((p,i)=>({i,x:p.a}))),R=shuffle(pairs.map((p,i)=>({i,x:p.b})));
+  body.innerHTML=`<div class="qcard"><div class="match"><div class="col">${L.map(o=>`<button class="mcard term" data-s="L" data-i="${o.i}"><span class="pairno"></span>${o.x}</button>`).join("")}</div><div class="col">${R.map(o=>`<button class="mcard" data-s="R" data-i="${o.i}"><span class="pairno"></span>${o.x}</button>`).join("")}</div></div></div>`;
+  let sel={L:null,R:null},wrongOnce=new Set(),matched=0;
+  $$(".mcard",body).forEach(b=>b.onclick=()=>{
+   if(b.classList.contains("done"))return;beep("tap");
+   const s=b.dataset.s;if(sel[s])sel[s].classList.remove("sel");sel[s]=b;b.classList.add("sel");
+   if(sel.L&&sel.R){const a=+sel.L.dataset.i,c=+sel.R.dataset.i,p=pairs[a];
+    if(a===c){matched++;[sel.L,sel.R].forEach(x=>{x.classList.remove("sel");x.classList.add("done","pop");x.querySelector(".pairno").textContent=matched});
+     const firstTry=!wrongOnce.has(a);const pts=firstTry?record(p.t,true):0;runAns(run,firstTry,pts);beep("ok");
+     if(firstTry)toast(`Correct! +${pts}`);
+     sel={L:null,R:null};
+     if(matched===pairs.length){setTimeout(()=>{round++;if(round<MATCH_ROUNDS.length)play();else endMission(el,run)},700)}
+    }else{const bad=[sel.L,sel.R];bad.forEach(x=>x.classList.add("shake"));beep("no");
+     if(!wrongOnce.has(a)){wrongOnce.add(a);record(p.t,false);}
+     toast("Not a match. Read the meaning again.");
+     setTimeout(()=>bad.forEach(x=>x.classList.remove("shake","sel")),400);sel={L:null,R:null};}
+   }});
+ }
+ play();
+}
+
+// ---------- M2 TRUE / FALSE ----------
+function mTF(el,m){
+ const run=newRun(m);const items=shuffle(TF);let k=0;
+ el.innerHTML=mhead(m)+howto("Read each statement. Is it true or false? Read the explanation after each answer.")+`<div id="mbody" style="margin-top:14px"></div>`;
+ const body=$("#mbody",el);
+ function next(){
+  if(k>=items.length)return endMission(el,run);
+  const it=items[k];$("#ctr",el).textContent=`${k+1}/${items.length}`;
+  body.innerHTML=`<div class="qcard"><p class="qtext">${it.s}</p><div class="tf"><button class="opt" data-v="1">TRUE</button><button class="opt" data-v="0">FALSE</button></div><div class="fb"></div></div>`;
+  let done=false;
+  $$(".opt",body).forEach(b=>b.onclick=()=>{if(done)return;done=true;const v=b.dataset.v==="1";const ok=v===it.a;
+   const asMcq={id:it.id,t:it.t,q:"True or false? "+it.s,o:[it.a?"True":"False",it.a?"False":"True"],ex:it.ex};
+   const pts=record(it.t,ok,100,0,asMcq);runAns(run,ok,pts,asMcq);beep(ok?"ok":"no");
+   $$(".opt",body).forEach(x=>{x.disabled=true;if((x.dataset.v==="1")===it.a)x.classList.add("right");else x.classList.add("wrong")});
+   $(".fb",body).innerHTML=`<div class="feedback ${ok?"ok":"no"}"><div><b class="v">${ok?"Correct!":"Not quite."}</b> ${ok?`+${pts} points`:`It is <b>${it.a?"TRUE":"FALSE"}</b>.`}</div><div>${it.ex}</div><div><button class="btn small" id="nextBtn">Next</button></div></div>`;
+   $("#nextBtn",body).onclick=()=>{k++;next()};$("#nextBtn",body).focus({preventScroll:true});});
+ }
+ next();
+}
+
+// ---------- M3 WORD SEARCH ----------
+function buildGrid(words,N,seed){
+ for(let s=seed;s<seed+500;s++){
+  const r=rng(s);const g=Array.from({length:N},()=>Array(N).fill(""));const pos={};let ok=true;
+  const dirs=[[0,1],[1,0],[1,1],[-1,1]];
+  for(const w of words.slice().sort((a,b)=>b.length-a.length)){
+   let placed=false;
+   for(let tries=0;tries<300&&!placed;tries++){
+    const[dr,dc]=dirs[Math.floor(r()*dirs.length)];const r0=Math.floor(r()*N),c0=Math.floor(r()*N);
+    const re=r0+dr*(w.length-1),ce=c0+dc*(w.length-1);if(re<0||re>=N||ce<0||ce>=N)continue;
+    let fit=true;for(let i=0;i<w.length;i++){const ch=g[r0+dr*i][c0+dc*i];if(ch&&ch!==w[i]){fit=false;break}}
+    if(!fit)continue;for(let i=0;i<w.length;i++)g[r0+dr*i][c0+dc*i]=w[i];pos[w]={r0,c0,dr,dc};placed=true;}
+   if(!placed){ok=false;break}}
+  if(!ok)continue;
+  const AB="ABCDEFGHIJKLMNOPRSTUVWY";for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(!g[i][j])g[i][j]=AB[Math.floor(r()*AB.length)];
+  return{g,pos};}
+}
+function mSearch(el,m){
+ const run=newRun(m);const N=12;const words=WORDS.map(w=>w.w);
+ const{g,pos}=buildGrid(words,N,Math.floor(Math.random()*1000));
+ const found=new Set();let start=null,hints=0;
+ el.innerHTML=mhead(m,`0/${words.length}`)+howto("Tap the FIRST letter of a word, then tap its LAST letter. Words go across, down or diagonally.")+
+ `<div class="qcard" style="margin-top:14px"><div class="ws" id="ws" style="grid-template-columns:repeat(${N},1fr)"></div>
+ <div class="wlist" id="wl"></div><div class="row" style="margin-top:14px"><button class="btn small alt" id="hintBtn">Hint</button><button class="btn small" id="doneBtn">Finish</button></div></div>`;
+ const ws=$("#ws",el);
+ for(let i=0;i<N;i++)for(let j=0;j<N;j++){const b=document.createElement("button");b.textContent=g[i][j];b.dataset.r=i;b.dataset.c=j;b.setAttribute("aria-label",`Row ${i+1}, column ${j+1}, letter ${g[i][j]}`);ws.appendChild(b)}
+ const cell=(r,c)=>ws.children[r*N+c];
+ function list(){$("#wl",el).innerHTML=words.map(w=>`<span class="${found.has(w)?"f":""}">${w}</span>`).join("");$("#ctr",el).textContent=`${found.size}/${words.length}`}
+ list();
+ ws.onclick=e=>{const b=e.target.closest("button");if(!b)return;const r=+b.dataset.r,c=+b.dataset.c;
+  if(!start){start={r,c};b.classList.add("start");beep("tap");return}
+  cell(start.r,start.c).classList.remove("start");
+  const dr=Math.sign(r-start.r),dc=Math.sign(c-start.c),len=Math.max(Math.abs(r-start.r),Math.abs(c-start.c))+1;
+  const straight=(start.r===r||start.c===c||Math.abs(r-start.r)===Math.abs(c-start.c));
+  let txt="",cells=[];if(straight)for(let i=0;i<len;i++){const rr=start.r+dr*i,cc=start.c+dc*i;txt+=g[rr][cc];cells.push(cell(rr,cc))}
+  const rev=txt.split("").reverse().join("");const w=words.find(x=>!found.has(x)&&(x===txt||x===rev));
+  start=null;
+  if(w&&len>1){found.add(w);cells.forEach(x=>{x.classList.add("found");x.classList.remove("hint")});const pts=50+(S.streak>=3?10:0);S.score+=pts;save();hud();run.points+=pts;beep("ok");
+   toast(`<b>${w}</b>: ${WORDS.find(x=>x.w===w).d}`);list();if(found.size===words.length){award("words");setTimeout(finish,900)}}
+  else{b.classList.add("shake");setTimeout(()=>b.classList.remove("shake"),400);beep("no");toast("That is not one of the words. Try again!")}
+ };
+ $("#hintBtn",el).onclick=()=>{const left=words.filter(w=>!found.has(w));if(!left.length)return;const w=left[Math.floor(Math.random()*left.length)];const p=pos[w];hints++;cell(p.r0,p.c0).classList.add("hint");toast(`Hint: <b>${w}</b> starts at the yellow letter.`)};
+ $("#doneBtn",el).onclick=finish;
+ function finish(){run.correct=found.size;run.total=words.length;
+  const stars=found.size===words.length?(hints<=1?3:hints<=3?2:1):(found.size>=8?1:0);
+  endMission(el,run,{stars,unit:"words found",text:hints?`You used ${hints} hint${hints>1?"s":""}.`:""});}
+}
+
+// ---------- M4 QUIZ SHOW ----------
+function mQuiz(el,m){
+ const run=newRun(m);const items=shuffle(QUIZ);let k=0;const T=S.settings.timers?20:0;
+ el.innerHTML=mhead(m)+howto(T?"You have 20 seconds for each question. Faster correct answers earn bonus points.":"Choose the correct answer. Timers are off.")+`<div id="mbody" style="margin-top:14px"></div>`;
+ const body=$("#mbody",el);
+ function next(){if(k>=items.length)return endMission(el,run);const it=items[k];$("#ctr",el).textContent=`${k+1}/${items.length}`;
+  mcq(body,it,{kahoot:true,timer:T,onAnswer:(ok,info)=>{const bonus=ok&&T?Math.round(Math.max(0,T-info.secs)/T*50):0;const p=record(it.t,ok,100,bonus,it);runAns(run,ok,p,it);return p},onNext:()=>{k++;next()}});}
+ next();
+}
+
+// ---------- M5 GAPS ----------
+function mGaps(el,m){
+ const run=newRun(m);let k=0;
+ el.innerHTML=mhead(m)+howto("Tap a gap, then tap a word from the word bank. Tap a filled gap to empty it. Two words in the bank are extra.")+`<div id="mbody" style="margin-top:14px"></div>`;
+ const body=$("#mbody",el);
+ function play(){
+  const P=GAPS[k];$("#ctr",el).textContent=`Text ${k+1}/${GAPS.length}`;
+  const parts=P.text.split(/\[([^\]]+)\]/);const ans=[];let html="";
+  parts.forEach((p,i)=>{if(i%2){ans.push(p);html+=`<button class="gap" data-g="${ans.length-1}" aria-label="Gap ${ans.length}">&nbsp;</button>`}else html+=p});
+  const bank=shuffle(ans.concat(P.extra));
+  body.innerHTML=`<div class="qcard"><h3 style="font-size:24px;margin-bottom:8px">${P.title}</h3><div class="passage">${html}</div>
+   <div class="bank">${bank.map((w,i)=>`<button class="word" data-w="${i}">${w}</button>`).join("")}</div><div class="fb"></div>
+   <div class="row" style="margin-top:14px"><button class="btn" id="chk" disabled>Check</button></div></div>`;
+  const fill=Array(ans.length).fill(null);let selG=0,tries=0,locked=new Set();
+  const gaps=$$(".gap",body),words=$$(".word",body);
+  function paint(){gaps.forEach((g,i)=>{g.innerHTML=fill[i]!==null?bank[fill[i]]:"&nbsp;";g.classList.toggle("sel",i===selG&&!locked.has(i))});words.forEach((w,i)=>w.classList.toggle("used",fill.includes(i)));$("#chk",body).disabled=fill.includes(null)}
+  paint();
+  gaps.forEach((g,i)=>g.onclick=()=>{if(locked.has(i))return;beep("tap");if(selG===i&&fill[i]!==null){fill[i]=null}selG=i;g.classList.remove("wrong");paint()});
+  words.forEach((w,wi)=>w.onclick=()=>{if(fill.includes(wi))return;if(selG===null||locked.has(selG)){selG=fill.findIndex((f,i)=>f===null&&!locked.has(i));if(selG<0)return}
+   beep("tap");fill[selG]=wi;const nxt=fill.findIndex((f,i)=>f===null&&!locked.has(i));selG=nxt<0?null:nxt;paint()});
+  $("#chk",body).onclick=()=>{tries++;let allOk=true;
+   gaps.forEach((g,i)=>{if(locked.has(i))return;const ok=bank[fill[i]].toLowerCase()===ans[i].toLowerCase();
+    if(tries===1){const p=record(P.t,ok,60);runAns(run,ok,p)}
+    if(ok){locked.add(i);g.classList.add("right");g.classList.remove("wrong","sel")}else{allOk=false;g.classList.add("wrong")}});
+   beep(allOk?"ok":"no");
+   if(allOk||tries>=2){gaps.forEach((g,i)=>{if(!locked.has(i)){g.innerHTML=`<s>${bank[fill[i]]}</s> → ${ans[i]}`;g.classList.add("wrong")}g.disabled=true});words.forEach(w=>w.disabled=true);
+    $(".fb",body).innerHTML=`<div class="feedback ${allOk?"ok":"no"}"><b class="v">${allOk?"All correct!":"Here are the correct words."}</b><div>${TOPICS[P.t].tip}</div></div>`;
+    const c=$("#chk",body);c.disabled=false;c.textContent=k<GAPS.length-1?"Next text":"Finish";c.onclick=()=>{k++;if(k<GAPS.length)play();else endMission(el,run)};
+   }else{gaps.forEach((g,i)=>{if(!locked.has(i))fill[i]=null});selG=fill.findIndex(f=>f===null);paint();gaps.forEach((g,i)=>{if(!locked.has(i))g.classList.add("wrong")});
+    $(".fb",body).innerHTML=`<div class="feedback no"><b class="v">Almost!</b><div>The red gaps are wrong. Choose new words and check again.</div></div>`;}
+  };
+ }
+ play();
+}
+
+// ---------- M6 ORDER ----------
+function mOrder(el,m){
+ const run=newRun(m);let k=0;
+ el.innerHTML=mhead(m)+howto("Use the arrows to move the cards up or down. Then press Check.")+`<div id="mbody" style="margin-top:14px"></div>`;
+ const body=$("#mbody",el);
+ function play(){
+  const O=ORDERS[k];$("#ctr",el).textContent=`${k+1}/${ORDERS.length}`;
+  let cur;do{cur=shuffle(O.items.map((x,i)=>i))}while(cur.every((v,i)=>v===i));
+  let tries=0,over=false;
+  body.innerHTML=`<div class="qcard"><h3 style="font-size:24px">${O.title}</h3><p class="qtext" style="margin-top:6px">${O.prompt}</p><div class="olist" id="ol"></div><div class="fb"></div><div class="row" style="margin-top:14px"><button class="btn" id="chk">Check</button></div></div>`;
+  const ol=$("#ol",body);
+  function paint(marks){ol.innerHTML=cur.map((v,i)=>`<div class="oitem ${marks?marks[i]:""}"><span class="n">${i+1}</span><span class="tx">${over&&O.labels?`<span class="lab">${O.labels[v]}</span>`:""}${O.items[v]}</span>${over?"":`<span class="mv"><button data-u="${i}" aria-label="Move up" ${i===0?"disabled":""}>${IC.up}</button><button data-d="${i}" aria-label="Move down" ${i===cur.length-1?"disabled":""}>${IC.down}</button></span>`}</div>`).join("");
+   $$("[data-u]",ol).forEach(b=>b.onclick=()=>{const i=+b.dataset.u;[cur[i-1],cur[i]]=[cur[i],cur[i-1]];beep("tap");paint()});
+   $$("[data-d]",ol).forEach(b=>b.onclick=()=>{const i=+b.dataset.d;[cur[i+1],cur[i]]=[cur[i],cur[i+1]];beep("tap");paint()});}
+  paint();
+  $("#chk",body).onclick=()=>{
+   if(over){k++;if(k<ORDERS.length)play();else endMission(el,run,{unit:"cards in the right place (first try)"});return}
+   tries++;const marks=cur.map((v,i)=>v===i?"right":"wrong");const nOk=marks.filter(x=>x==="right").length;const all=nOk===cur.length;
+   if(tries===1){const p=record(O.t,all,all?150:0);if(!all){S.score+=nOk*20;run.points+=nOk*20;save();hud()}run.points+=p;run.total+=cur.length;run.correct+=nOk;}
+   beep(all?"ok":"no");
+   if(all||tries>=2){if(!all){cur=O.items.map((x,i)=>i)}over=true;paint(all?marks:cur.map(()=>"right"));
+    $(".fb",body).innerHTML=`<div class="feedback ${all?"ok":"no"}"><b class="v">${all?"Perfect order!":"This is the correct order."}</b><div>${TOPICS[O.t].tip}</div></div>`;
+    $("#chk",body).textContent=k<ORDERS.length-1?"Next":"Finish";}
+   else{paint(marks);$(".fb",body).innerHTML=`<div class="feedback no"><b class="v">${nOk} of ${cur.length} are in the right place.</b><div>Green cards are correct. Move the red ones and check again.</div></div>`;}
+  };
+ }
+ play();
+}
+
+// ---------- M7 SORT ----------
+function mSort(el,m){
+ const run=newRun(m);let k=0;
+ el.innerHTML=mhead(m)+howto("Tap a card, then tap the group where it belongs. On a computer you can also drag the cards.")+`<div id="mbody" style="margin-top:14px"></div>`;
+ const body=$("#mbody",el);
+ function play(){
+  const R=SORTS[k];$("#ctr",el).textContent=`${k+1}/${SORTS.length}`;
+  const cards=shuffle(R.items.map((it,i)=>({...it,i})));let sel=null,left=cards.length;const tried=new Set();
+  body.innerHTML=`<div class="qcard"><h3 style="font-size:24px;margin-bottom:10px">${R.title}</h3><div class="tray" id="tray">${cards.map(c=>`<button class="card" draggable="true" data-i="${c.i}">${c.x}</button>`).join("")}</div>
+   <div class="bins">${R.bins.map((b,i)=>`<div class="bin" data-b="${i}" role="button" tabindex="0"><h3>${b}</h3><div class="in"></div></div>`).join("")}</div></div>`;
+  const bins=$$(".bin",body);
+  function place(cardEl,bi){
+   const it=R.items[+cardEl.dataset.i];const ok=it.b===bi;const first=!tried.has(it.i);tried.add(it.i);
+   if(first){const p=record(R.t,ok,50);runAns(run,ok,p)}
+   if(ok){cardEl.classList.remove("sel");cardEl.classList.add("right");cardEl.draggable=false;cardEl.disabled=true;bins[bi].querySelector(".in").appendChild(cardEl);beep("ok");left--;sel=null;
+    if(left===0){setTimeout(()=>{toast("Group complete!");k++;if(k<SORTS.length)play();else endMission(el,run)},700)}}
+   else{beep("no");cardEl.classList.add("shake");toast("Not this group. Think again!");setTimeout(()=>cardEl.classList.remove("shake"),400)}
+  }
+  $$(".card",body).forEach(c=>{c.onclick=()=>{if(c.classList.contains("right"))return;beep("tap");if(sel)sel.classList.remove("sel");sel=c===sel?null:c;if(sel)sel.classList.add("sel")};
+   c.ondragstart=e=>{e.dataTransfer.setData("text/plain",c.dataset.i);sel=c}});
+  bins.forEach((b,bi)=>{const act=()=>{if(sel)place(sel,bi)};b.onclick=act;b.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();act()}};
+   b.ondragover=e=>{e.preventDefault();b.classList.add("hot")};b.ondragleave=()=>b.classList.remove("hot");
+   b.ondrop=e=>{e.preventDefault();b.classList.remove("hot");const c=body.querySelector(`.card[data-i="${e.dataTransfer.getData("text/plain")}"]`);if(c&&!c.classList.contains("right"))place(c,bi)}});
+ }
+ play();
+}
+
+// ---------- M8 LAB RACE ----------
+function mLab(el,m){
+ const run=newRun(m);const items=LAB.slice();let k=0,me=0,rival=0;const GOAL=10;const timed=S.settings.timers;let won=null;
+ el.innerHTML=mhead(m)+`<div class="panel"><span class="tag">Team B's experiment</span>
+  <p style="margin:6px 0 10px">Team B put <b>200 g</b> of gravel, sand, garden soil and clay into four cups with small holes. They poured <b>200 ml</b> of water into each cup and waited <b>5 minutes</b>. Then they measured the water that drained into the cups below.</p>
+  <div class="fig">${cupsSVG(LAB_SETUP.poured,LAB_SETUP.rows)}</div><div class="fig">${dataTable(["Sediment","Water poured (ml)","Water drained (ml)"],LAB_SETUP.rows.map(r=>[r[0],200,r[1]]))}</div></div>
+  <div class="panel">${howto(`Each correct answer moves your worm forward. Reach the flag (${GOAL} correct answers)${timed?" before Rusty the beetle, who moves every 15 seconds":""}.`)}
+  <div class="track" style="margin-top:12px"><div class="lane l1"><div class="runner" id="me">${wormSVG()}</div></div><div class="lane l2"><div class="runner" id="rv">${beetleSVG()}</div></div><div class="finish"></div></div><p class="legend" style="margin-bottom:0">Top lane: you (the worm). Bottom lane: Rusty the beetle${timed?"":" (resting, because timers are off)"}.</p></div>
+  <div id="mbody" style="margin-top:14px"></div>`;
+ const body=$("#mbody",el);
+ const posX=n=>`calc(${(n/GOAL)*100}% + 18px)`;
+ function move(){$("#me",el).style.left=posX(Math.min(me,GOAL));$("#rv",el).style.left=posX(Math.min(rival,GOAL))}
+ move();
+ if(timed){const iv=setInterval(()=>{if(won!==null)return;rival++;move();if(rival>=GOAL&&won===null){won=false;toast("Rusty reached the flag first! Keep going to finish the lab.")}},15000);addCleanup(()=>clearInterval(iv))}
+ function next(){
+  if(k>=items.length){const bonus=won?200:0;if(bonus){S.score+=bonus;run.points+=bonus;save();hud()}
+   const st=starsFor(run.correct,run.total);if(st===3)award("lab");
+   return endMission(el,run,{text:won?"You won the race! +200 bonus points.":(me>=GOAL?"You reached the flag!":"You finished the lab.")});}
+  const it=items[k];$("#ctr",el).textContent=`${k+1}/${items.length}`;
+  mcq(body,it,{onAnswer:(ok)=>{const p=record(it.t,ok,100,0,it);runAns(run,ok,p,it);if(ok){me++;move();if(me>=GOAL&&won===null){won=true;beep("win");toast("You reached the flag first!")}}return p},onNext:()=>{k++;next()}});
+ }
+ next();
+}
+
+// ---------- M9 LIGHTNING ----------
+function mLight(el,m){
+ const run=newRun(m);const timed=S.settings.timers;const pool=shuffle(LIGHT.map((x,i)=>({...x,id:"lt"+i})));const LIMIT=timed?60:20;let k=0,over=false;const t0=performance.now();
+ el.innerHTML=mhead(m)+howto(timed?"Answer as many as you can in 60 seconds. Tap fast, but think!":"Answer 20 quick questions. Timers are off.")+
+  `<div class="qcard" style="margin-top:14px">${timed?'<div class="timer" id="lt"><i></i></div>':""}<div class="row" style="justify-content:space-between"><span class="tag" id="lscore">Correct: 0</span>${timed?'<span class="tag" id="lsec">60 s</span>':""}</div><p class="qtext" id="lq" style="font-size:26px;margin-top:10px"></p><div class="tf" id="lo"></div><p id="lfb" style="min-height:28px;margin:10px 0 0;font-weight:600"></p></div>`;
+ let iv;
+ if(timed){iv=setInterval(()=>{const left=LIMIT-(performance.now()-t0)/1000;$("#lt i",el).style.width=Math.max(0,left/LIMIT*100)+"%";$("#lt",el).classList.toggle("low",left<10);$("#lsec",el).textContent=Math.max(0,Math.ceil(left))+" s";if(left<=0)stop()},200);addCleanup(()=>clearInterval(iv))}
+ function stop(){if(over)return;over=true;clearInterval(iv);if(run.correct>=10)award("quick");
+  const stars=timed?(run.correct>=12?3:run.correct>=8?2:run.correct>=4?1:0):starsFor(run.correct,run.total);
+  endMission(el,run,{stars,unit:"correct answers",text:timed?`You answered ${run.total} questions in 60 seconds.`:""})}
+ function next(){
+  if(over)return;if(k>=pool.length||(!timed&&k>=LIMIT))return stop();
+  const it=pool[k];const opts=shuffle([{x:it.o[0],ok:true},{x:it.o[1],ok:false}]);
+  $("#lq",el).textContent=it.q;$("#lo",el).innerHTML=opts.map((o,i)=>`<button class="opt" style="font-size:22px" data-i="${i}">${o.x}</button>`).join("");$("#lfb",el).textContent="";
+  let done=false;
+  $$("#lo .opt",el).forEach(b=>b.onclick=()=>{if(done||over)return;done=true;const o=opts[+b.dataset.i];
+   const p=record(it.t,o.ok,50,0,it);runAns(run,o.ok,p,it);$("#lscore",el).textContent="Correct: "+run.correct;
+   b.classList.add(o.ok?"right":"wrong");beep(o.ok?"ok":"no");
+   $("#lfb",el).innerHTML=o.ok?`<span style="color:var(--ok)">+${p}</span>`:`<span style="color:var(--bad)">Answer: ${it.o[0]}</span>`;
+   setTimeout(()=>{k++;next()},o.ok?450:1300)});
+ }
+ next();
+}
+
+// ---------- M10 BOSS ----------
+function mBoss(el,m){
+ const run=newRun(m);const HP=10;let hp=HP,hearts=3,k=0;const items=shuffle(BOSS);
+ el.innerHTML=mhead(m)+howto("Each correct answer hits the Erosion Giant. Each wrong answer costs one heart. Hit the giant 10 times to win!")+
+ `<div class="arena" style="margin-top:14px"><div class="fighter">${wormSVG()}<div class="hearts" id="hearts"></div></div><div class="vs">VS</div><div class="fighter"><div id="giant">${giantSVG()}</div><div class="hp"><i id="hp" style="width:100%"></i></div></div></div><div id="mbody"></div>`;
+ const body=$("#mbody",el);
+ function paint(){$("#hearts",el).innerHTML=[1,2,3].map(i=>IC.heart(i<=hearts)).join("");$("#hp",el).style.width=(hp/HP*100)+"%";$("#ctr",el).textContent=`Giant ${hp}/${HP}`}
+ paint();
+ function next(){
+  if(hp<=0){award("boss");return endMission(el,run,{stars:hearts,title:"You defeated the Erosion Giant!",text:"The soil is safe. You have completed Soil Quest!",unit:"correct answers"})}
+  if(hearts<=0){return endMission(el,run,{stars:0,complete:false,title:"The giant won this time",text:"Read the explanations, review the Soil Notebook and try again!",unit:"correct answers"})}
+  if(k>=items.length){k=0}
+  const it=items[k];
+  mcq(body,it,{nextLabel:"Continue",onAnswer:(ok)=>{const p=record(it.t,ok,120,0,it);runAns(run,ok,p,it);
+   if(ok){hp--;const g=$("#giant",el);g.classList.remove("hit");void g.offsetWidth;g.classList.add("hit");beep("hit")}else{hearts--}paint();return p},onNext:()=>{k++;next()}});
+ }
+ next();
+}
+
+// ---------- REVIEW ----------
+function reviewMode(el,list){
+ const fromMissed=!list;const items=shuffle(list||Object.values(S.missed));let k=0,fixed=0;
+ el.innerHTML=`<div class="mhead"><h2>Review mistakes</h2><span class="counter" id="ctr"></span></div>`+howto("Here are questions you answered wrong. Answer them correctly to remove them from your list.")+`<div id="mbody" style="margin-top:14px"></div>`;
+ const body=$("#mbody",el);
+ if(!items.length){body.innerHTML=`<div class="panel center"><h2 style="font-size:28px">Nothing to review!</h2><p>You have no missed questions right now. Great work.</p><button class="btn" id="mapBtn">Mission map</button></div>`;$("#mapBtn",body).onclick=()=>go(mapScreen);return}
+ function next(){
+  if(k>=items.length){body.innerHTML=`<div class="panel center stack"><h2 style="font-size:30px">Review complete</h2><p>You fixed <b>${fixed}</b> of ${items.length} questions.</p><div class="row" style="justify-content:center">${Object.keys(S.missed).length?`<button class="btn sun" id="againBtn">Review again</button>`:""}<button class="btn" id="mapBtn">Mission map</button></div></div>`;
+   $("#mapBtn",body).onclick=()=>go(mapScreen);const a=$("#againBtn",body);if(a)a.onclick=()=>go(reviewMode,null);return}
+  const it=items[k];$("#ctr",el).textContent=`${k+1}/${items.length}`;
+  mcq(body,it,{onAnswer:(ok)=>{const p=record(it.t,ok,50,0,it);if(ok){fixed++;if(S.missed[it.id]){delete S.missed[it.id];S.fixed++;if(S.fixed>=5)award("fixer");save()}}return p},onNext:()=>{k++;next()}});
+ }
+ next();
+}
+
+// ---------- NOTEBOOK ----------
+function notebook(el){
+ award("notes");
+ el.innerHTML=`<div class="mhead"><h2>Soil Notebook</h2></div>${howto("Read these notes before a mission or after a mistake. They cover everything in the test.")}
+ <div class="notes" style="margin-top:14px">${NOTEBOOK.map(n=>`<div class="note"><h3>${n.h}</h3><ul>${n.li.map(l=>`<li>${l}</li>`).join("")}</ul></div>`).join("")}</div>
+ <div class="note" style="margin-top:12px"><h3>Soil horizons diagram</h3><div class="fig">${horizonsSVG(null,true)}</div></div>
+ <div class="note" style="margin-top:12px"><h3>Particles under a microscope</h3><div class="fig">${particlesSVG()}</div><p style="margin:0">View 1: gravel · View 2: sand · View 3: clay · View 4: garden soil (with humus and roots).</p></div>
+ <div class="row" style="margin-top:16px"><button class="btn" id="mapBtn">Mission map</button></div>`;
+ $("#mapBtn",el).onclick=()=>go(mapScreen);
+}
+
+// ---------- REPORT ----------
+function report(el){
+ const tot=S.correct+S.wrong;const acc=tot?Math.round(S.correct/tot*100):0;
+ const rows=Object.keys(TOPICS).map(t=>{const x=S.topics[t]||{c:0,w:0};const n=x.c+x.w;const p=n?Math.round(x.c/n*100):null;return{t,n,p}});
+ const weak=rows.filter(r=>r.p!==null&&r.p<70),todo=rows.filter(r=>r.p===null);
+ const bossWon=(S.missions.boss||{}).done;
+ el.innerHTML=`<div class="panel stack"><span class="tag">Field Report</span><h2 style="font-size:36px">${bossWon?"Soil Quest complete!":"Your progress so far"}</h2>
+  <div class="statgrid"><div class="stat"><div class="v">${S.score}</div><div class="l">points</div></div><div class="stat"><div class="v">${S.correct}</div><div class="l">correct answers</div></div><div class="stat"><div class="v">${S.wrong}</div><div class="l">mistakes</div></div><div class="stat"><div class="v">${acc}%</div><div class="l">accuracy</div></div><div class="stat"><div class="v">${totalStars()}/30</div><div class="l">stars</div></div><div class="stat"><div class="v">${S.best}</div><div class="l">best streak</div></div></div></div>
+  <div class="panel"><h2 style="font-size:26px;margin-bottom:6px">How you did in each topic</h2>
+  ${rows.map(r=>{const col=r.p===null?"var(--line)":r.p>=80?"var(--ok)":r.p>=60?"var(--sun)":"var(--bad)";return `<div class="topicrow"><span>${TOPICS[r.t].name}</span><span class="tbar"><i style="width:${r.p||0}%;background:${col}"></i></span><span class="pct">${r.p===null?"–":r.p+"%"}</span></div>`}).join("")}
+  ${weak.length||todo.length?`<div class="review" style="margin-top:14px"><b>Topics to review before the test</b><ul>${weak.map(r=>`<li><b>${TOPICS[r.t].name}</b> (${r.p}%): ${TOPICS[r.t].tip}</li>`).join("")}${todo.map(r=>`<li><b>${TOPICS[r.t].name}</b>: not practised yet.</li>`).join("")}</ul></div>`:`<div class="feedback ok" style="margin-top:14px"><b class="v">You are ready!</b><div>All your topics are at 70% or more. Keep reviewing your mistakes.</div></div>`}
+  </div>
+  <div class="panel"><h2 style="font-size:26px;margin-bottom:10px">Badges</h2><div class="badges">${BADGES.map((b,i)=>`<div class="badge ${S.badges.includes(b.id)?"":"off"}">${badgeSVG(i)}<span><b>${b.n}</b>${b.d}</span></div>`).join("")}</div></div>
+  <div class="row" style="margin-top:16px"><button class="btn sun" id="revBtn">Review mistakes (${Object.keys(S.missed).length})</button><button class="btn alt" id="nbBtn">Soil Notebook</button><button class="btn" id="mapBtn">Mission map</button></div>`;
+ $("#revBtn",el).onclick=()=>go(reviewMode,null);$("#nbBtn",el).onclick=()=>go(notebook);$("#mapBtn",el).onclick=()=>go(mapScreen);
+}
+
+// ---------- SETTINGS ----------
+function settings(){
+ const md=$("#modal");md.hidden=false;
+ const sw=(id,on,label,sub)=>`<div class="setrow"><div><b>${label}</b><div class="muted" style="font-size:14px">${sub}</div></div><button class="switch" id="${id}" role="switch" aria-checked="${on}" aria-label="${label}"></button></div>`;
+ md.innerHTML=`<div class="panel" role="dialog" aria-modal="true" aria-label="Settings"><h2 style="font-size:28px;margin-bottom:6px">Settings</h2>
+  ${sw("swT",S.settings.timers,"Timers","Turn off to play without time limits.")}
+  ${sw("swS",S.settings.sound,"Sound","Sound effects for answers.")}
+  ${sw("swU",S.settings.unlock,"Open all missions","For teachers: play any mission without unlocking.")}
+  <div class="setrow"><div><b>Start over</b><div class="muted" style="font-size:14px">Erase points, stars and badges on this device.</div></div><button class="btn small alt" id="rst">Erase</button></div>
+  <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn small" id="cls">Close</button></div></div>`;
+ const tog=(id,key)=>{$("#"+id).onclick=e=>{S.settings[key]=!S.settings[key];e.currentTarget.setAttribute("aria-checked",S.settings[key]);save();hud()}};
+ tog("swT","timers");tog("swS","sound");tog("swU","unlock");
+ $("#rst").onclick=e=>{const b=e.currentTarget;if(b.dataset.c){const keep=S.settings;S=fresh();S.settings=keep;save();md.hidden=true;go(welcome)}else{b.dataset.c="1";b.textContent="Yes, erase";b.style.background="var(--bad)";b.style.color="#fff"}};
+ $("#cls").onclick=()=>{md.hidden=true;if($(".map"))go(mapScreen)};
+ md.onclick=e=>{if(e.target===md){md.hidden=true;if($(".map"))go(mapScreen)}};
+}
+
+// ---------- boot ----------
+$("#brandWorm").innerHTML=wormSVG().replace("<svg","<svg width=\"34\" height=\"22\"");
+$("#icoPts").innerHTML=IC.pts;$("#icoStar").innerHTML=IC.star(true);$("#icoFire").innerHTML=IC.fire;$("#setBtn").innerHTML=IC.gear;
+$("#homeBtn").onclick=()=>go(mapScreen);
+$("#soundBtn").onclick=()=>{S.settings.sound=!S.settings.sound;save();hud();beep("tap")};
+$("#setBtn").onclick=settings;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#modal").hidden){$("#modal").hidden=true}});
+go(welcome);
+</script></body></html>
